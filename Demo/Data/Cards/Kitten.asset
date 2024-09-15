@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d7ad74be29e3414894e2ccf6a7e39e6, type: 3}
+  m_Name: Kitten
+  m_EditorClassIdentifier: 
+  cardName: Kitten
+  art: {fileID: 21300000, guid: 2d121f97d73c38d478604b34a12bf01e, type: 3}
+  color: {r: 0.9716981, g: 0.9716981, b: 0.9716981, a: 1}
+  description: Better treat him right
+  aspects:
+  - {fileID: 11400000, guid: 0b492a19e517d754ebc4c3ae8ef37742, type: 2}
+  - {fileID: 11400000, guid: a582d48a9b361d34c86ce390e1c1f9f6, type: 2}

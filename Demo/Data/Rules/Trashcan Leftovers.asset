@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 557f5e0557567a048a53124377707548, type: 3}
+  m_Name: Trashcan Leftovers
+  m_EditorClassIdentifier: 
+  time: 3
+  requirements:
+  - name: 
+    card: {fileID: 11400000, guid: 81fd3c01bb1bc104aa7ee20bf354b578, type: 2}
+    aspects: []
+  results:
+  - chance: 0
+    cards:
+    - {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
+    - {fileID: 11400000, guid: d10a489eb2498384e921ee099e5baef9, type: 2}
+    - {fileID: 11400000, guid: d10a489eb2498384e921ee099e5baef9, type: 2}
+    - {fileID: 11400000, guid: d10a489eb2498384e921ee099e5baef9, type: 2}
+    - {fileID: 11400000, guid: d10a489eb2498384e921ee099e5baef9, type: 2}
+    extra: {fileID: 11400000, guid: 1dbc6bcd065ed6144957343ba26b2988, type: 2}
+    endText: 'Infernal noises!
+
+      Hungry cats fighting for scraps.'
+  startText: 
+  endText: 

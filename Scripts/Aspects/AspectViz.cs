@@ -5,17 +5,21 @@ using UnityEngine.UI;
 
 namespace CultistLike
 {
-    public class AspectViz : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
+    public class AspectViz : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         public Aspect aspect;
 
         [SerializeField] private Image art;
 
-        //TODO
-        public void OnPointerClick(PointerEventData eventData) {}
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            UIManager.Instance?.aspectInfo?.LoadAspect(aspect);
+        }
 
-        //TODO
-        public void OnPointerEnter(PointerEventData eventData) {}
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            UIManager.Instance?.aspectInfo?.Unload();
+        }
 
         public void LoadAspect(Aspect aspect)
         {

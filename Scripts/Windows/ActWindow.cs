@@ -37,7 +37,7 @@ namespace CultistLike
         //Rule ready to be run with the slotted cards
         [SerializeField, HideInInspector]
         private Rule readyRule;
-        //Rules initiated (set) by a card slotted in the first slot 
+        //Rules initiated (set) by a card slotted in the first slot
         //that need additional cards to become ready
         [SerializeField, HideInInspector]
         private List<Rule> setRules;
@@ -56,7 +56,7 @@ namespace CultistLike
         private CardViz firstCardViz { get => cardSlots[0].slottedCard; }
 
         public void OnDrop(PointerEventData eventData) {}
-    
+
         public void TrySlotAndBringUp(CardViz cardViz)
         {
             if (actStatus == ActStatus.Running || actStatus == ActStatus.Finished)
@@ -361,7 +361,7 @@ namespace CultistLike
                 {
                     if (card == null)
                     {
-                        Debug.LogWarning("Missing Results card in " + actViz.act.actName);    
+                        Debug.LogWarning("Missing Results card in " + actViz.act.actName);
                     }
 
                     var cardViz = Instantiate(GameManager.Instance.cardPrefab);
@@ -383,13 +383,13 @@ namespace CultistLike
                 if (i >= resultSlots.Count)
                 {
                     extraCardsGO.SetActive(true);
-                    SetExtraResultsCount(i - resultSlots.Count); 
+                    SetExtraResultsCount(i - resultSlots.Count);
                 }
                 else
                 {
                     extraCardsGO.SetActive(false);
                 }
-            
+
                 actViz.SetResultCount(result.cards.Count);
             }
 
@@ -495,9 +495,9 @@ namespace CultistLike
                     {
                         for (int j=0; j<rule.requirements.Count; j++)
                         {
-                            if (j>maxSlots) 
+                            if (j>maxSlots)
                             {
-                                maxSlots = j; 
+                                maxSlots = j;
                                 cardSlots[j].OpenSlot();
                             }
                             if (rule.requirements[j].name != "")

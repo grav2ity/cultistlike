@@ -46,7 +46,7 @@ namespace CultistLike
                 {
                     return;
                 }
-                
+
                 array.ForV(v, viz.GetCellSize(), a => null);
             }
         }
@@ -139,7 +139,7 @@ namespace CultistLike
         }
 
         private Vector2Int NextCell(Vector2Int v, Vector2Int size)
-        { 
+        {
             v.x = v.x + size.x * 2 + 1;
             if (v.x + size.x >= cellCount.x)
             {
@@ -281,14 +281,14 @@ namespace CultistLike
             {
                 this.w = w;
                 this.h = h;
-                array = new T[w * h]; 
+                array = new T[w * h];
             }
 
             public SArray(int w, int h, T t)
             {
                 this.w = w;
                 this.h = h;
-                array = new T[w * h]; 
+                array = new T[w * h];
                 for (int i=0; i<array.Length; i++)
                 {
                     array[i] = t;

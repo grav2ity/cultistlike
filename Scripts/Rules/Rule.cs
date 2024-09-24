@@ -13,17 +13,17 @@ namespace CultistLike
     {
         public string name;
         public Card card;
-        [Tooltip("If specific Card is not set any card with the following Aspects will do")] 
+        [Tooltip("If specific Card is not set any card with the following Aspects will do")]
         public List<Aspect> aspects;
     }
 
     [Serializable]
     public struct Result
     {
-        [Tooltip("Has no effect if Resulsts have only one element")] 
+        [Tooltip("Has no effect if Resulsts have only one element")]
         [Range(0, 1)] public float chance;
         public List<Card> cards;
-        [Tooltip("Extra Act to be spawned")] 
+        [Tooltip("Extra Act to be spawned")]
         public ScriptableObject extra;
         [TextArea(3, 10)] public string endText;
     }
@@ -36,7 +36,7 @@ namespace CultistLike
         public List<Result> results;
 
         [TextArea(3, 10)] public string startText;
-        [Tooltip("Used if Result's End Text is not set")] 
+        [Tooltip("Used if Result's End Text is not set")]
         [TextArea(3, 10)] public string endText;
 
 
@@ -55,7 +55,7 @@ namespace CultistLike
 
             for (int i=0; i<requirements.Count; i++)
             {
-                if (AttemptOne(requirements[i], cards[i]) == false) 
+                if (AttemptOne(requirements[i], cards[i]) == false)
                 {
                     return false;
                 }

@@ -15,7 +15,7 @@ namespace CultistLike
 
         [SerializeField, HideInInspector] private float startTime;
         [SerializeField, HideInInspector] private float endTime;
-    
+
         [SerializeField, HideInInspector] private UnityEvent timeUpEvent;
 
         [SerializeField, HideInInspector] private Timer following;
@@ -26,7 +26,7 @@ namespace CultistLike
             get => following != null ? following.timeLeft : endTime - Time.time;
         }
 
-        public float duration 
+        public float duration
         {
             get => following != null ? following.duration : endTime - startTime;
         }
@@ -55,7 +55,7 @@ namespace CultistLike
             }
         }
 
-        private void UpdateDisplay(float time) 
+        private void UpdateDisplay(float time)
         {
             text.text = time.ToString("0.0");
             if (duration > 0f)

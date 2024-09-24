@@ -39,7 +39,7 @@ namespace CultistLike
         /// <param name="l">Objects to be placed.</param>
         /// <returns></returns>
         public abstract List<T> FindFreeLocations(Viz viz, List<Viz> l);
-        
+
         public virtual void OnDrop(PointerEventData eventData)
         {
             if (eventData.button == PointerEventData.InputButton.Left)
@@ -47,7 +47,7 @@ namespace CultistLike
                 Drag drag = eventData.pointerDrag.GetComponent<Drag>();
                 if (drag == null || drag.isDragging == false)
                 {
-                    return; 
+                    return;
                 }
 
                 OnCardDock(eventData.pointerDrag);
@@ -62,7 +62,7 @@ namespace CultistLike
                 UIManager.Instance?.cardInfo?.Unload();
             }
         }
-        
+
         public virtual void OnCardDock(GameObject go)
         {
             var viz = go.GetComponent<Viz>();
@@ -87,7 +87,7 @@ namespace CultistLike
             var cardViz = go.GetComponent<CardViz>();
             if (cardViz != null)
             {
-                cards.Remove(cardViz); 
+                cards.Remove(cardViz);
             }
         }
 
@@ -154,7 +154,7 @@ namespace CultistLike
                 OnCardDock(viz.gameObject);
             }
         }
-        
+
         public virtual List<CardViz> GetCards()
         {
             return cards;

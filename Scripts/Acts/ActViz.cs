@@ -6,10 +6,10 @@ using UnityEngine.EventSystems;
 using DG.Tweening;
 using TMPro;
 
-namespace CultistLike 
-{    
+namespace CultistLike
+{
     public class ActViz : Viz, IDropHandler, IPointerClickHandler
-    {   
+    {
         [Header("Act")]
         public Act act;
 
@@ -22,7 +22,7 @@ namespace CultistLike
         [SerializeField] private SpriteRenderer art;
 
         [Header("Table")]
-        [Tooltip("Size on the table for an Array based table; final size is (1,1) + 2*(x,y)")] 
+        [Tooltip("Size on the table for an Array based table; final size is (1,1) + 2*(x,y)")]
         [SerializeField] private Vector2Int CellCount;
 
         [SerializeField, HideInInspector] private ActWindow _actWindow;
@@ -41,7 +41,7 @@ namespace CultistLike
                 Drag drag = eventData.pointerDrag?.GetComponent<Drag>();
                 if (drag == null || drag.isDragging == false)
                 {
-                    return; 
+                    return;
                 }
 
                 var droppedCard = eventData.pointerDrag.GetComponent<CardViz>();

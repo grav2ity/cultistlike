@@ -17,12 +17,12 @@ namespace CultistLike
         public List<Rule> rules;
 
         [Header("Consuming")]
-        [Tooltip("Grabs cards (e.g. resources) from the table and destroys them")] 
+        [Tooltip("Grabs cards (e.g. resources) from the table and destroys them")]
         public Rule consumeRule;
-        [Tooltip("Called when no matching card could be found. Game Over could be set up here")] 
+        [Tooltip("Called when no matching card could be found. Game Over could be set up here")]
         public UnityEvent onConsumeFail;
-    
-        
+
+
         /// <summary>
         /// Attempt a <c>Card</c> against first requirement of each rule.
         /// </summary>

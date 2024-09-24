@@ -6,7 +6,7 @@ using TMPro;
 
 namespace CultistLike
 {
-    public class CardViz : Viz, IDropHandler, IPointerClickHandler, IPointerEnterHandler 
+    public class CardViz : Viz, IDropHandler, IPointerClickHandler, IPointerEnterHandler
     {
         [Header("Card")]
         public Card card;
@@ -18,7 +18,7 @@ namespace CultistLike
         [SerializeField] private Renderer highlight;
 
         [Header("Table")]
-        [Tooltip("Size on the table for an Array based table; final size is (1,1) + 2*(x,y)")] 
+        [Tooltip("Size on the table for an Array based table; final size is (1,1) + 2*(x,y)")]
         [SerializeField] private Vector2Int CellCount;
 
 
@@ -32,7 +32,7 @@ namespace CultistLike
             Drag drag = eventData.pointerDrag.GetComponent<Drag>();
             if (drag == null || drag.draggable == false)
             {
-                return; 
+                return;
             }
 
             if (eventData.button == PointerEventData.InputButton.Left)
@@ -44,7 +44,7 @@ namespace CultistLike
                         actViz.SetHighlight(true);
                     }
                 }
-                GameManager.Instance.openWindow?.HighlightSlots(card);   
+                GameManager.Instance.openWindow?.HighlightSlots(card);
             }
         }
 
@@ -62,7 +62,7 @@ namespace CultistLike
                 Drag drag = eventData.pointerDrag?.GetComponent<Drag>();
                 if (drag == null || drag.isDragging == false)
                 {
-                    return; 
+                    return;
                 }
 
                 //handles dropping card on a slotted card
@@ -100,7 +100,7 @@ namespace CultistLike
                 act.SetHighlight(false);
             }
 
-            GameManager.Instance.openWindow?.HighlightSlots(null);   
+            GameManager.Instance.openWindow?.HighlightSlots(null);
         }
 
         public void LoadCard(Card card)

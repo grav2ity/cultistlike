@@ -9,9 +9,9 @@ namespace CultistLike
     public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         [Header("Drag Options")]
-        [Tooltip("Object centered on cursor while dragging")] 
+        [Tooltip("Object centered on cursor while dragging")]
         public bool centerOnCursor;
-        [Tooltip("Return object to previous location if it was not docked after dropping")] 
+        [Tooltip("Return object to previous location if it was not docked after dropping")]
         public bool undrag;
 
         [HideInInspector] public bool draggable;
@@ -103,12 +103,12 @@ namespace CultistLike
 
         public void Enable()
         {
-            draggable = true; 
+            draggable = true;
         }
 
         public void Disable()
         {
-            draggable = false; 
+            draggable = false;
         }
 
         private void Awake()

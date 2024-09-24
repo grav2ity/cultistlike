@@ -36,7 +36,7 @@ namespace CultistLike
                 Drag drag = eventData.pointerDrag?.GetComponent<Drag>();
                 if (drag == null || drag.isDragging == false)
                 {
-                    return; 
+                    return;
                 }
 
                 OnCardDock(eventData.pointerDrag);
@@ -50,7 +50,7 @@ namespace CultistLike
             {
                 if (gameObject.activeInHierarchy)
                 {
-                    SlotCard(cardViz); 
+                    SlotCard(cardViz);
                 }
                 else
                 {

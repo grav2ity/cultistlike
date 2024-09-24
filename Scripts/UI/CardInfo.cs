@@ -49,7 +49,7 @@ namespace CultistLike
             }
             else
             {
-                art.color = card.color; 
+                art.color = card.color;
             }
 
 
@@ -57,10 +57,10 @@ namespace CultistLike
             {
                 while (card.aspects.Count > aspects.Count)
                 {
-                    var aspect = Instantiate(GameManager.Instance.aspectPrefab, aspectsGO.transform); 
+                    var aspect = Instantiate(GameManager.Instance.aspectPrefab, aspectsGO.transform);
                     aspects.Add(aspect);
                 }
-                
+
             }
             else if (card.aspects.Count < aspects.Count)
             {

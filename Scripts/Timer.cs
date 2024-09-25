@@ -23,7 +23,7 @@ namespace CultistLike
 
         public float timeLeft
         {
-            get => following != null ? following.timeLeft : endTime - Time.time;
+            get => following != null ? following.timeLeft : endTime - GameManager.Instance.time;
         }
 
         public float duration
@@ -38,7 +38,7 @@ namespace CultistLike
 
         public void StartTimer(float time, UnityAction action = null)
         {
-            startTime = Time.time;
+            startTime = GameManager.Instance.time;
             endTime = startTime + time;
             enabled = true;
             timeUpEvent.RemoveAllListeners();

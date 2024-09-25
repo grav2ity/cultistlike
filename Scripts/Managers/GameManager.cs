@@ -31,8 +31,12 @@ namespace CultistLike
         [SerializeField, HideInInspector] private List<CardViz> cards;
         [SerializeField, HideInInspector] private ActWindow _openWindow;
 
+        [SerializeField, HideInInspector] private float elapsedTime;
+        private float timeScale;
+
 
         public ActWindow openWindow { get => _openWindow; private set => _openWindow = value; }
+        public float time { get => elapsedTime; }
 
 
         public void CloseWindow()
@@ -62,12 +66,24 @@ namespace CultistLike
             Destroy(cardViz.gameObject, 1f);
         }
 
+        public void SetTimeScale(float ts)
+        {
+            timeScale = ts;
+        }
+
         private void Awake()
         {
             Instance = this;
 
+            timeScale = 1f;
+
             acts = new List<ActViz>();
             cards = new List<CardViz>();
+        }
+
+        private void Update()
+        {
+            elapsedTime += Time.deltaTime * timeScale;
         }
     }
 }

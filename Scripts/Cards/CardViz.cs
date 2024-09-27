@@ -6,7 +6,7 @@ using TMPro;
 
 namespace CultistLike
 {
-    public class CardViz : Viz, IDropHandler, IPointerClickHandler, IPointerEnterHandler
+    public class CardViz : Viz, ICardDock, IDropHandler, IPointerClickHandler, IPointerEnterHandler
     {
         [Header("Card")]
         public Card card;
@@ -16,6 +16,7 @@ namespace CultistLike
         [SerializeField] private Renderer artBack;
         [SerializeField] private SpriteRenderer art;
         [SerializeField] private Renderer highlight;
+        [SerializeField] private CardStack cardStack;
 
         [Header("Table")]
         [Tooltip("Size on the table for an Array based table; final size is (1,1) + 2*(x,y)")]
@@ -27,16 +28,27 @@ namespace CultistLike
 
         public override void OnBeginDrag(PointerEventData eventData)
         {
-            base.OnBeginDrag(eventData);
-
-            Drag drag = eventData.pointerDrag.GetComponent<Drag>();
-            if (drag == null || drag.draggable == false)
-            {
-                return;
-            }
-
             if (eventData.button == PointerEventData.InputButton.Left)
             {
+                Drag drag = eventData.pointerDrag.GetComponent<Drag>();
+                if (drag == null || drag.draggable == false)
+                {
+                    return;
+                }
+
+                if (cardStack.Count > 1)
+                {
+                    var cardViz = cardStack.Pop();
+                    if (cardViz != null)
+                    {
+                        eventData.pointerDrag = cardViz.gameObject;
+                        cardViz.OnBeginDrag(eventData);
+                        return;
+                    }
+                }
+
+                base.OnBeginDrag(eventData);
+
                 foreach(var actViz in GameManager.Instance.acts)
                 {
                     if (actViz.actWindow.HighlightSlots(card, false) == true)
@@ -65,10 +77,23 @@ namespace CultistLike
                     return;
                 }
 
-                //handles dropping card on a slotted card
                 var droppedCard = eventData.pointerDrag.GetComponent<CardViz>();
                 if (droppedCard != null)
                 {
+                    //handles stacking cards
+                    if (GetComponentInParent<ArrayTable>() != null)
+                    {
+                        if (card == droppedCard.card)
+                        {
+                            if (cardStack.Push(droppedCard) == true)
+                            {
+                                droppedCard.OnEndDrag(eventData);
+                            }
+                        }
+                        return;
+                    }
+
+                    //handles dropping card on a slotted card
                     var slot = GetComponentInParent<Slot>();
                     if (slot != null)
                     {
@@ -77,6 +102,7 @@ namespace CultistLike
                         slot.SlotCard(droppedCard);
                         return;
                     }
+
                 }
             }
         }
@@ -87,6 +113,20 @@ namespace CultistLike
         }
 
         public void OnPointerEnter(PointerEventData eventData) {}
+
+        public virtual void OnCardDock(GameObject go)
+        {
+            var cardViz = go.GetComponent<CardViz>();
+            if (cardViz != null)
+            {
+                if (cardStack.Push(cardViz) != true)
+                {
+                    GameManager.Instance.table.ReturnToTable(cardViz);
+                }
+            }
+        }
+
+        public virtual void OnCardUndock(GameObject go) {}
 
         public void SetHighlight(bool p)
         {
@@ -102,6 +142,8 @@ namespace CultistLike
 
             GameManager.Instance.openWindow?.HighlightSlots(null);
         }
+
+        public CardViz Yield() => cardStack.Count > 1 ? cardStack.Pop() : this;
 
         public void LoadCard(Card card)
         {

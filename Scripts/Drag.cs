@@ -36,7 +36,7 @@ namespace CultistLike
             isDragging = true;
 
             dragOrigin = transform.position;
-            dragOriginDock = GetComponentInParent<ICardDock>();
+            dragOriginDock = transform.parent?.GetComponentInParent<ICardDock>();
             dragOriginDock?.OnCardUndock(gameObject);
 
             foreach(var collider in gameObject.GetComponentsInChildren<Collider>())
@@ -85,7 +85,7 @@ namespace CultistLike
                 collider.enabled = true;
             }
 
-            if (undrag == true && GetComponentInParent<ICardDock>() == null)
+            if (undrag == true && transform.parent?.GetComponentInParent<ICardDock>() == null)
             {
                 Undrag();
             }

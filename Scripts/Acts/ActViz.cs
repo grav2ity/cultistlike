@@ -106,9 +106,10 @@ namespace CultistLike
             {
                 if (act.consumeRule.AttemptFirst(cardViz.card) == true)
                 {
-                    cardViz.transform.DOMove(transform.position, GameManager.Instance.normalSpeed)
-                        .OnComplete(() => { GameManager.Instance.DestroyCard(cardViz); });
-                    cardViz.transform.DOScale(new Vector3(0.3f, 0.3f, 0.3f), 1);
+                    var cardVizY = cardViz.Yield();
+                    cardVizY.transform.DOMove(transform.position, GameManager.Instance.normalSpeed)
+                        .OnComplete(() => { GameManager.Instance.DestroyCard(cardVizY); });
+                    cardVizY.transform.DOScale(new Vector3(0.3f, 0.3f, 0.3f), 1);
                     return;
                 }
             }

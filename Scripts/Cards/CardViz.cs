@@ -95,7 +95,7 @@ namespace CultistLike
 
                     //handles dropping card on a slotted card
                     var slot = GetComponentInParent<Slot>();
-                    if (slot != null)
+                    if (slot != null && slot.autoClose == false)
                     {
                         slot.UnslotCard();
                         GameManager.Instance.table.ReturnToTable(this);

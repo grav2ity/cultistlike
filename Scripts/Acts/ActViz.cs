@@ -38,14 +38,8 @@ namespace CultistLike
         {
             if (eventData.button == PointerEventData.InputButton.Left)
             {
-                Drag drag = eventData.pointerDrag?.GetComponent<Drag>();
-                if (drag == null || drag.isDragging == false)
-                {
-                    return;
-                }
-
                 var droppedCard = eventData.pointerDrag.GetComponent<CardViz>();
-                if (droppedCard != null)
+                if (droppedCard != null && droppedCard.isDragging == true)
                 {
                     actWindow.TrySlotAndBringUp(droppedCard);
                     return;
@@ -107,6 +101,7 @@ namespace CultistLike
                 if (act.consumeRule.AttemptFirst(cardViz.card) == true)
                 {
                     var cardVizY = cardViz.Yield();
+                    cardVizY.interactive = false;
                     cardVizY.transform.DOMove(transform.position, GameManager.Instance.normalSpeed)
                         .OnComplete(() => { GameManager.Instance.DestroyCard(cardVizY); });
                     cardVizY.transform.DOScale(new Vector3(0.3f, 0.3f, 0.3f), 1);
@@ -122,7 +117,7 @@ namespace CultistLike
 
         private void Start()
         {
-            GetComponent<Drag>().draggingPlane = GameManager.Instance.cardDragPlane;
+            draggingPlane = GameManager.Instance.cardDragPlane;
 
             LoadAct(act);
 

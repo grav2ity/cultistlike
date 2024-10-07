@@ -14,8 +14,9 @@ namespace CultistLike
         [Tooltip("Return object to previous location if it was not docked after dropping")]
         public bool undrag;
 
-        [HideInInspector] public bool draggable;
         [HideInInspector] public RectTransform draggingPlane;
+
+        [SerializeField, HideInInspector] private bool _interactive;
 
         private bool _isDragging; //is actually dragging (moving object along)
         private Vector3 mouseOffset;
@@ -24,13 +25,14 @@ namespace CultistLike
 
 
         public bool isDragging { get => _isDragging; private set => _isDragging = value; }
+        public bool interactive { get => _interactive; set => _interactive = value; }
 
 
         public virtual void OnBeginDrag(PointerEventData eventData)
         {
             Debug.Assert(isDragging == false);
 
-            if (CanDrag(eventData) == false || draggable == false)
+            if (CanDrag(eventData) == false || interactive == false)
                 return;
 
             isDragging = true;
@@ -67,7 +69,7 @@ namespace CultistLike
 
         public virtual void OnDrag(PointerEventData eventData)
         {
-            if (isDragging == false || CanDrag(eventData) == false || draggable == false)
+            if (isDragging == false || CanDrag(eventData) == false || interactive == false)
                 return;
 
             SetDraggedPosition(eventData);
@@ -93,27 +95,17 @@ namespace CultistLike
 
         public void Undrag()
         {
-            Disable();
+            interactive = false;
             transform.DOMove(dragOrigin, GameManager.Instance.normalSpeed).
                 OnComplete(() => {
                     dragOriginDock?.OnCardDock(gameObject);
-                    Enable();
+                    interactive = true;
                 });
-        }
-
-        public void Enable()
-        {
-            draggable = true;
-        }
-
-        public void Disable()
-        {
-            draggable = false;
         }
 
         private void Awake()
         {
-            draggable = true;
+            interactive = true;
         }
 
         private bool CanDrag(PointerEventData eventData) =>
@@ -132,7 +124,7 @@ namespace CultistLike
                 {
                     worldMousePos = worldMousePos - mouseOffset;
                 }
-                transform.SetPositionAndRotation(worldMousePos, draggingPlane.rotation);
+                transform.position = worldMousePos;
             }
         }
     }

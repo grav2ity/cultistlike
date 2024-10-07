@@ -202,11 +202,10 @@ namespace CultistLike
 
         protected void DOMove(Viz viz, T t, float speed)
         {
-            var drag = viz.GetComponent<Drag>();
-            drag?.Disable();
+            viz.interactive = false;
             Vector3 targetPosition = ToLocalPosition(t) + transform.position;
             viz.transform.DOMove(targetPosition, speed).
-                OnComplete(() => { drag?.Enable(); PutOn(viz.gameObject); });
+                OnComplete(() => { viz.interactive = true; PutOn(viz.gameObject); });
         }
 
         protected IEnumerator HighlightCardsE(List<CardViz> cards)

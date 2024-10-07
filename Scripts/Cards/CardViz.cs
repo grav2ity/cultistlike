@@ -28,14 +28,8 @@ namespace CultistLike
 
         public override void OnBeginDrag(PointerEventData eventData)
         {
-            if (eventData.button == PointerEventData.InputButton.Left)
+            if (interactive == true && eventData.button == PointerEventData.InputButton.Left)
             {
-                Drag drag = eventData.pointerDrag.GetComponent<Drag>();
-                if (drag == null || drag.draggable == false)
-                {
-                    return;
-                }
-
                 if (cardStack.Count > 1)
                 {
                     var cardViz = cardStack.Pop();
@@ -69,16 +63,10 @@ namespace CultistLike
 
         public void OnDrop(PointerEventData eventData)
         {
-            if (eventData.button == PointerEventData.InputButton.Left)
+            if (interactive == true && eventData.button == PointerEventData.InputButton.Left)
             {
-                Drag drag = eventData.pointerDrag?.GetComponent<Drag>();
-                if (drag == null || drag.isDragging == false)
-                {
-                    return;
-                }
-
                 var droppedCard = eventData.pointerDrag.GetComponent<CardViz>();
-                if (droppedCard != null)
+                if (droppedCard != null && droppedCard.isDragging == true)
                 {
                     //handles stacking cards
                     if (GetComponentInParent<ArrayTable>() != null)
@@ -168,7 +156,7 @@ namespace CultistLike
 
         private void Start()
         {
-            GetComponent<Drag>().draggingPlane = GameManager.Instance.cardDragPlane;
+            draggingPlane = GameManager.Instance.cardDragPlane;
             LoadCard(card);
 
             GameManager.Instance.AddCard(this);

@@ -16,9 +16,7 @@ namespace CultistLike
         [Header("Layout")]
         [SerializeField] private TextMeshPro text;
         [SerializeField] private GameObject cardSlotsGO;
-        [SerializeField] private GameObject resultSlotsGO;
-        [SerializeField] private GameObject extraCardsGO;
-        [SerializeField] private TextMeshPro extraCardsCounter;
+        [SerializeField] private CardLane resultLane;
         [SerializeField] private GameObject timerGO;
         [SerializeField] private Button okButton;
         [SerializeField] private Button collectButton;
@@ -26,7 +24,6 @@ namespace CultistLike
 
         [Header("Slots")]
         [SerializeField] private List<Slot> cardSlots;
-        [SerializeField] private List<Slot> resultSlots;
 
         [SerializeField, HideInInspector]
         private ActStatus actStatus  = ActStatus.Idle;
@@ -289,23 +286,14 @@ namespace CultistLike
         public void CollectAll()
         {
             List<Viz> l = new List<Viz>();
-            foreach (var cardSlot in resultSlots)
-            {
-                if (cardSlot.slottedCard != null)
-                {
-                    l.Add(cardSlot.slottedCard);
-                    cardSlot.UnslotCard();
-                }
-            }
-            CardViz[] extraCards = extraCardsGO.GetComponentsInChildren<CardViz>(true);
-            foreach (var cardViz in extraCards)
+            foreach (var cardViz in resultLane.cards)
             {
                 l.Add(cardViz);
-                cardViz.gameObject.SetActive(true);
-                cardViz.transform.SetParent(null);
+                cardViz.ShowFace();
             }
 
             GameManager.Instance.table.Place(actViz, l);
+            resultLane.cards.Clear();
 
             Check();
         }
@@ -356,7 +344,7 @@ namespace CultistLike
 
             if (result.cards != null)
             {
-                int i = 0;
+                List<CardViz> cards  = new List<CardViz>();
                 foreach (Card card in result.cards)
                 {
                     if (card == null)
@@ -366,29 +354,10 @@ namespace CultistLike
 
                     var cardViz = Instantiate(GameManager.Instance.cardPrefab);
                     cardViz.SetCard(card);
-
-                    if (i < resultSlots.Count)
-                    {
-                        resultSlots[i].OpenSlot();
-                        resultSlots[i].SlotCard(cardViz);
-                    }
-                    else
-                    {
-                        cardViz.transform.SetParent(extraCardsGO.transform, false);
-                        cardViz.gameObject.SetActive(false);
-                    }
-                    i++;
+                    cards.Add(cardViz);
                 }
 
-                if (i >= resultSlots.Count)
-                {
-                    extraCardsGO.SetActive(true);
-                    SetExtraResultsCount(i - resultSlots.Count);
-                }
-                else
-                {
-                    extraCardsGO.SetActive(false);
-                }
+                resultLane.PlaceCards(cards);
 
                 actViz.SetResultCount(result.cards.Count);
             }
@@ -429,22 +398,9 @@ namespace CultistLike
             return cards;
         }
 
-        public List<Card> GetResultCards()
+        public List<CardViz> GetResultCards()
         {
-            List<Card> cards = new List<Card>();
-            foreach (var cardSlot in resultSlots)
-            {
-                if (cardSlot.slottedCard != null)
-                {
-                    cards.Add(cardSlot.slottedCard.card);
-                }
-            }
-            var extraCards = extraCardsGO.GetComponentsInChildren<CardViz>(true);
-            foreach (var cardViz in extraCards)
-            {
-                cards.Add(cardViz.card);
-            }
-            return cards;
+            return resultLane.cards;
         }
 
         private void DestroySlotted()
@@ -474,7 +430,7 @@ namespace CultistLike
             {
                 case ActStatus.Idle:
                     cardSlotsGO.SetActive(true);
-                    resultSlotsGO.SetActive(false);
+                    resultLane.gameObject.SetActive(false);
                     okButton.interactable = false;
                     collectButton.interactable = false;
                     actViz.SetResultCount(0);
@@ -519,7 +475,7 @@ namespace CultistLike
                     break;
                 case ActStatus.Finished:
                     timerGO.SetActive(false);
-                    resultSlotsGO.SetActive(true);
+                    resultLane.gameObject.SetActive(true);
                     collectButton.interactable = true;
                     text.text = tex;
                     break;
@@ -540,18 +496,12 @@ namespace CultistLike
             }
         }
 
-        private void SetExtraResultsCount(int count)
-        {
-            extraCardsCounter.text = "+" + count.ToString();
-        }
-
         private void Start()
         {
             GetComponent<Drag>().draggingPlane = GameManager.Instance.windowPlane;
 
             firstSlot.Title = actViz.act.actName;
             timerGO.SetActive(false);
-            extraCardsGO.SetActive(false);
             collectButton.interactable = false;
             actViz.SetResultCount(0);
 
@@ -564,11 +514,6 @@ namespace CultistLike
             else
             {
                 GoConsuming();
-            }
-
-            for (int i=0; i<resultSlots.Count; i++)
-            {
-                resultSlots[i].CloseSlot();
             }
 
             for (int i=0; i<cardSlots.Count; i++)

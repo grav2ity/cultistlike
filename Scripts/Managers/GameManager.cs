@@ -25,6 +25,7 @@ namespace CultistLike
         [Header("Card move speed")]
         public float normalSpeed;
         public float fastSpeed;
+        public float rotateSpeed;
 
         [HideInInspector] public List<ActViz> acts;
 

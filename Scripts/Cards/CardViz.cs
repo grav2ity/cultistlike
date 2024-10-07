@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
+using DG.Tweening;
 using TMPro;
 
 
@@ -21,6 +22,8 @@ namespace CultistLike
         [Header("Table")]
         [Tooltip("Size on the table for an Array based table; final size is (1,1) + 2*(x,y)")]
         [SerializeField] private Vector2Int CellCount;
+
+        [SerializeField, HideInInspector] private bool faceDown;
 
 
         public override Vector2Int GetCellSize() => CellCount;
@@ -90,14 +93,20 @@ namespace CultistLike
                         slot.SlotCard(droppedCard);
                         return;
                     }
-
                 }
             }
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            UIManager.Instance?.cardInfo?.LoadCard(card);
+            if (interactive == true && faceDown == true)
+            {
+                Reverse();
+            }
+            else
+            {
+                UIManager.Instance?.cardInfo?.LoadCard(card);
+            }
         }
 
         public void OnPointerEnter(PointerEventData eventData) {}
@@ -115,6 +124,38 @@ namespace CultistLike
         }
 
         public virtual void OnCardUndock(GameObject go) {}
+
+        public void Reverse(bool instant = false)
+        {
+            if (instant == true)
+            {
+                transform.localEulerAngles += new Vector3(0f, 180f, 0f);
+            }
+            else
+            {
+                interactive = false;
+                transform.DOLocalRotate(transform.localEulerAngles +
+                                        new Vector3(0f, 180f, 0f),
+                                        GameManager.Instance.rotateSpeed);
+                transform.DOPunchPosition(new Vector3(0f, 0f, -1f),
+                                          GameManager.Instance.rotateSpeed, 2, 0f).
+                    OnComplete(() => { interactive = true; });
+
+            }
+            faceDown = !faceDown;
+        }
+
+        public void ShowFace()
+        {
+            transform.localEulerAngles = new Vector3(0f, 0f, 0f);
+            faceDown = false;
+        }
+
+        public void ShowBack()
+        {
+            transform.localEulerAngles = new Vector3(0f, 180f, 0f);
+            faceDown = true;
+        }
 
         public void SetHighlight(bool p)
         {

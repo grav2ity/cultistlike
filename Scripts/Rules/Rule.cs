@@ -8,7 +8,7 @@ using Random = UnityEngine.Random;
 
 namespace CultistLike
 {
-[Serializable]
+    [Serializable]
     public struct Requirement
     {
         public string name;
@@ -22,6 +22,9 @@ namespace CultistLike
     {
         [Tooltip("Has no effect if Resulsts have only one element")]
         [Range(0, 1)] public float chance;
+        [Space(10)]
+        public Act nextAct;
+        [Space(10)]
         public List<Card> cards;
         [Tooltip("Extra Act to be spawned")]
         public ScriptableObject extra;
@@ -36,6 +39,8 @@ namespace CultistLike
         public List<Result> results;
 
         [TextArea(3, 10)] public string startText;
+        [Tooltip("If not set defaults to Start Text")]
+        [TextArea(3, 10)] public string runText;
         [Tooltip("Used if Result's End Text is not set")]
         [TextArea(3, 10)] public string endText;
 
@@ -47,6 +52,11 @@ namespace CultistLike
         /// <returns></returns>
         public bool Attempt(List<Card> cards)
         {
+            if (requirements.Count == 0)
+            {
+                return true;
+            }
+
             //TODO
             if (cards == null || requirements == null || cards.Count != requirements.Count)
             {

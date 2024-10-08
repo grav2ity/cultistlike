@@ -1575,6 +1575,7 @@ MonoBehaviour:
   cardDragPlane: {fileID: 1509000456}
   normalSpeed: 0.7
   fastSpeed: 0.05
+  rotateSpeed: 0.5
   acts: []
   cards: []
   _openWindow: {fileID: 0}

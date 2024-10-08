@@ -13,7 +13,12 @@ namespace CultistLike
         public Color color;
         [Space(10)]
         [TextArea(3, 10)] public string text;
-        [Space(10)]
+
+        [Header("Linked Act only")]
+        public float time;
+        public string slotTitle;
+
+        [Header("Rules")]
         public List<Rule> rules;
 
         [Header("Consuming")]

@@ -18,6 +18,8 @@ namespace CultistLike
         [Header("Options")]
         [Tooltip("Close when card is removed")]
         public bool autoClose;
+        [Tooltip("Accept only matching cards")]
+        public bool onlyMatching;
 
         [SerializeField, HideInInspector] private ActWindow actWindow;
         [SerializeField, HideInInspector] private CardViz _slottedCard;
@@ -48,9 +50,19 @@ namespace CultistLike
             CardViz cardViz = go.GetComponent<CardViz>();
             if (cardViz != null)
             {
-                if (gameObject.activeInHierarchy)
+                if (gameObject.activeInHierarchy &&
+                    (!onlyMatching || actWindow.MatchesAnyOpenSlot(cardViz.card) == true))
                 {
-                    SlotCard(cardViz);
+                    if (slottedCard == null)
+                    {
+                        SlotCard(cardViz);
+                    }
+                    else
+                    {
+                        var sc = UnslotCard();
+                        GameManager.Instance.table.ReturnToTable(sc);
+                        SlotCard(cardViz);
+                    }
                 }
                 else
                 {
@@ -84,8 +96,9 @@ namespace CultistLike
             }
         }
 
-        public void UnslotCard()
+        public CardViz UnslotCard()
         {
+            var sc = slottedCard;
             if (slottedCard != null)
             {
                 slottedCard.transform.SetParent(null);
@@ -95,6 +108,7 @@ namespace CultistLike
             {
                 CloseSlot();
             }
+            return sc;
         }
 
         public void CloseSlot()

@@ -10,26 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 557f5e0557567a048a53124377707548, type: 3}
-  m_Name: Wheelbarrow Kitten
+  m_Name: 01 Wheelbarrow Kitten
   m_EditorClassIdentifier: 
-  time: 4
+  time: 10
   requirements:
   - name: 
     card: {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
     aspects: []
   results:
-  - chance: 0.95
+  - chance: 0
+    nextAct: {fileID: 11400000, guid: f0abdd383ce6f6043a5e272a8c66a14e, type: 2}
     cards:
     - {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
     - {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
     extra: {fileID: 0}
     endText: 
-  - chance: 0.05
-    cards:
-    - {fileID: 11400000, guid: f0844792f3a8dbe4885ee16837eb9830, type: 2}
-    - {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
-    extra: {fileID: 0}
-    endText: 
-  startText: Are you seriously going to send you cat to do this menial work for a
-    meager pay?
+  startText: Are you seriously going to send your cat to do this menial work for
+    a meager pay?
+  runText: Kitten works hard...
   endText: 

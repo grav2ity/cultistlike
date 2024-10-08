@@ -84,7 +84,10 @@ namespace CultistLike
                 startTime = endTime = 0f;
                 // image.fillAmount = 1f;
                 image.fillAmount = 0.9f;
-                enabled = false;
+                if (following == null)
+                {
+                    enabled = false;
+                }
                 timeUpEvent.Invoke();
             }
         }

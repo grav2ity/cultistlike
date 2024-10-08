@@ -48,7 +48,7 @@ namespace CultistLike
 
                 foreach(var actViz in GameManager.Instance.acts)
                 {
-                    if (actViz.actWindow.HighlightSlots(card, false) == true)
+                    if (actViz.actWindow.MatchesAnyOpenSlot(card) == true)
                     {
                         actViz.SetHighlight(true);
                     }
@@ -72,6 +72,7 @@ namespace CultistLike
                 if (droppedCard != null && droppedCard.isDragging == true)
                 {
                     //handles stacking cards
+                    //TODO
                     if (GetComponentInParent<ArrayTable>() != null)
                     {
                         if (card == droppedCard.card)
@@ -88,9 +89,7 @@ namespace CultistLike
                     var slot = GetComponentInParent<Slot>();
                     if (slot != null && slot.autoClose == false)
                     {
-                        slot.UnslotCard();
-                        GameManager.Instance.table.ReturnToTable(this);
-                        slot.SlotCard(droppedCard);
+                        slot.OnCardDock(droppedCard.gameObject);
                         return;
                     }
                 }

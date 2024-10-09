@@ -16,7 +16,7 @@ namespace CultistLike
 
         [HideInInspector] public RectTransform draggingPlane;
 
-        [SerializeField, HideInInspector] private bool _interactive;
+        [SerializeField] private bool _interactive;
 
         private bool _isDragging; //is actually dragging (moving object along)
         private Vector3 mouseOffset;
@@ -95,17 +95,13 @@ namespace CultistLike
 
         public void Undrag()
         {
+            bool prevInteractive = interactive;
             interactive = false;
             transform.DOMove(dragOrigin, GameManager.Instance.normalSpeed).
                 OnComplete(() => {
+                    interactive = prevInteractive;
                     dragOriginDock?.OnCardDock(gameObject);
-                    interactive = true;
                 });
-        }
-
-        private void Awake()
-        {
-            interactive = true;
         }
 
         private bool CanDrag(PointerEventData eventData) =>

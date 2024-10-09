@@ -941,7 +941,7 @@ MonoBehaviour:
   centerOnCursor: 0
   undrag: 0
   draggingPlane: {fileID: 0}
-  _interactive: 0
+  _interactive: 1
   text: {fileID: 5907030306649882847}
   cardSlotsGO: {fileID: 8647200573428268445}
   extraSlot: {fileID: 2091338451889210277}
@@ -1643,7 +1643,7 @@ PrefabInstance:
     - target: {fileID: 6062753440016442787, guid: be593928b20018543b676680c68a138a,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7243038272922166313, guid: be593928b20018543b676680c68a138a,
         type: 3}

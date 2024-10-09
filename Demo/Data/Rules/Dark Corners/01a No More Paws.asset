@@ -10,17 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 557f5e0557567a048a53124377707548, type: 3}
-  m_Name: DarkCorners Paw
+  m_Name: 01a No More Paws
   m_EditorClassIdentifier: 
-  time: 45
-  requirements:
-  - name: 
-    card: {fileID: 11400000, guid: d10a489eb2498384e921ee099e5baef9, type: 2}
-    aspects: []
+  time: 0
+  requirements: []
   results:
   - chance: 0
+    nextAct: {fileID: 0}
     cards: []
     extra: {fileID: 0}
+    unityEvent:
+      m_PersistentCalls:
+        m_Calls: []
     endText: 
   startText: 
-  endText: 
+  runText: 
+  endText: Your kitten has no more Paws! How could You!

@@ -94,27 +94,6 @@ namespace CultistLike
             timer.gameObject.SetActive(p);
         }
 
-        public void Consume()
-        {
-            foreach (var cardViz in GameManager.Instance.table.GetCards())
-            {
-                if (act.consumeRule.AttemptFirst(cardViz.card) == true)
-                {
-                    var cardVizY = cardViz.Yield();
-                    cardVizY.interactive = false;
-                    cardVizY.transform.DOMove(transform.position, GameManager.Instance.normalSpeed)
-                        .OnComplete(() => { GameManager.Instance.DestroyCard(cardVizY); });
-                    cardVizY.transform.DOScale(new Vector3(0.3f, 0.3f, 0.3f), 1);
-                    return;
-                }
-            }
-
-            if (act.onConsumeFail != null)
-            {
-                act.onConsumeFail.Invoke();
-            }
-        }
-
         private void Start()
         {
             draggingPlane = GameManager.Instance.cardDragPlane;

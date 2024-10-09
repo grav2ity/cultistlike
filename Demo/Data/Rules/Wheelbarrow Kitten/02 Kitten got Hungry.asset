@@ -18,10 +18,9 @@ MonoBehaviour:
   text: Kitten got peckish while chopping mice...
   time: 20
   slotTitle: Food
+  grab: 0
+  cardLock: 0
   rules:
   - {fileID: 11400000, guid: b645ad212f16818448c9af2117e5f687, type: 2}
   - {fileID: 11400000, guid: 17f133a39cb0efd4e90b27095ec68727, type: 2}
-  consumeRule: {fileID: 0}
-  onConsumeFail:
-    m_PersistentCalls:
-      m_Calls: []
+  autoPlay: 0

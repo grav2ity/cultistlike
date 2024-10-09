@@ -19,15 +19,20 @@ MonoBehaviour:
     aspects: []
   results:
   - chance: 0
+    nextAct: {fileID: 0}
     cards:
     - {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
     - {fileID: 11400000, guid: d10a489eb2498384e921ee099e5baef9, type: 2}
     - {fileID: 11400000, guid: d10a489eb2498384e921ee099e5baef9, type: 2}
     - {fileID: 11400000, guid: d10a489eb2498384e921ee099e5baef9, type: 2}
     - {fileID: 11400000, guid: d10a489eb2498384e921ee099e5baef9, type: 2}
-    extra: {fileID: 11400000, guid: 1dbc6bcd065ed6144957343ba26b2988, type: 2}
+    extra: {fileID: 11400000, guid: 07283528fd7177143b5c655c2a6e1c8a, type: 2}
+    unityEvent:
+      m_PersistentCalls:
+        m_Calls: []
     endText: 'Infernal noises!
 
       Hungry cats fighting for scraps.'
   startText: 
+  runText: 
   endText: 

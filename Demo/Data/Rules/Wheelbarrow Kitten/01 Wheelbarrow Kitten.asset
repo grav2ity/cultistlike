@@ -20,10 +20,11 @@ MonoBehaviour:
   results:
   - chance: 0
     nextAct: {fileID: 11400000, guid: f0abdd383ce6f6043a5e272a8c66a14e, type: 2}
-    cards:
-    - {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
-    - {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
+    cards: []
     extra: {fileID: 0}
+    unityEvent:
+      m_PersistentCalls:
+        m_Calls: []
     endText: 
   startText: Are you seriously going to send your cat to do this menial work for
     a meager pay?

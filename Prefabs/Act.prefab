@@ -603,8 +603,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   centerOnCursor: 1
   undrag: 1
-  draggable: 0
   draggingPlane: {fileID: 0}
+  _interactive: 1
   act: {fileID: 0}
   title: {fileID: 1629566531204144440}
   _timer: {fileID: 8560613225353176417}

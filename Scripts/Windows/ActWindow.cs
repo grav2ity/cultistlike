@@ -67,6 +67,10 @@ namespace CultistLike
             }
             else if (actStatus == ActStatus.Running)
             {
+                if (activeAct.cardLock == true)
+                {
+                    return;
+                }
                 if (extraSlot.gameObject.activeSelf == true)
                 {
                     if (CheckExtra(cardViz.card) == true)
@@ -138,18 +142,6 @@ namespace CultistLike
             GameManager.Instance.CloseWindow();
         }
 
-        public void GoConsuming()
-        {
-            actViz.timer.StartTimer(activeAct.consumeRule.time, () =>
-            {
-                actViz.Consume();
-                GoConsuming();
-            });
-            actViz.ShowTimer(true);
-
-            ApplyStatus(ActStatus.Running);
-        }
-
         /// <summary>
         /// Run the ready rule.
         /// </summary>
@@ -168,6 +160,10 @@ namespace CultistLike
             actViz.ShowTimer(true);
 
             DestroySlotted();
+            if (activeAct.grab == true)
+            {
+                Grab();
+            }
             ApplyStatus(ActStatus.Running);
         }
 
@@ -222,7 +218,8 @@ namespace CultistLike
         public bool HighlightSlots(Card card, bool p = true)
         {
             bool highlighted = false;
-            if (card != null)
+            if (card != null &&
+                !(actChanged == true && activeAct.grab == true && activeAct.cardLock == true))
             {
                 switch (actStatus)
                 {
@@ -313,6 +310,7 @@ namespace CultistLike
                     }
                     break;
                 case ActStatus.Running:
+                    CheckForReady(true);
                     break;
                 case ActStatus.Finished:
                     var count = GetResultCards().Count;
@@ -366,7 +364,7 @@ namespace CultistLike
             return setRules.Count;
         }
 
-        private bool CheckForReady()
+        private bool CheckForReady(bool running = false)
         {
             int cardsUsed = -1;
             Rule bestRule = null;
@@ -388,8 +386,16 @@ namespace CultistLike
             }
             if (bestRule != null)
             {
-                ApplyStatus(ActStatus.Ready, bestRule.startText);
                 readyRule = bestRule;
+                if (running)
+                {
+                    ApplyStatus(ActStatus.Running);
+                }
+                else
+                {
+                    ApplyStatus(ActStatus.Ready, bestRule.startText);
+                }
+
                 return true;
             }
             else
@@ -411,6 +417,53 @@ namespace CultistLike
             return false;
         }
 
+        private void Grab()
+        {
+            foreach (var cardViz in GameManager.Instance.table.GetCards())
+            {
+                foreach (var rule in setRules)
+                {
+                    if (rule.AttemptFirst(cardViz.card) == true)
+                    {
+                        var cardVizY = cardViz.Yield();
+
+                        //TODO
+                        cardVizY.transform.DOComplete(true);
+                        bool prevInteractive = cardVizY.interactive;
+                        cardVizY.interactive = false;
+
+                        cardVizY.transform.parent?.GetComponentInParent<ICardDock>().
+                            OnCardUndock(cardVizY.gameObject);
+                        extraSlot.slottedCard = cardVizY;
+                        cardVizY.transform.DOMove(actViz.transform.position, GameManager.Instance.normalSpeed).
+                            OnComplete(() => { cardVizY.interactive = prevInteractive; extraSlot.SlotCard(cardVizY, true); });
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void RunNextAct(Act nextAct)
+        {
+            activeAct = nextAct;
+            actChanged = true;
+            readyRule = (Rule)ScriptableObject.CreateInstance("Rule");
+            readyRule.time = activeAct.time;
+            readyRule.runText = activeAct.text;
+
+            setRules.Clear();
+            setRules = activeAct.rules.GetRange(0, activeAct.rules.Count);
+            //TODO do not always show slot
+            if (setRules.Count > 0)
+            {
+                extraSlot.OpenSlot();
+                extraSlot.Title = activeAct.slotTitle;
+                extraSlot.cardLock = activeAct.cardLock;
+            }
+            GoForIt();
+            return;
+        }
+
         private void SetupResults()
         {
             if (readyRule == null)
@@ -420,7 +473,7 @@ namespace CultistLike
 
             if (actChanged == true)
             {
-                if (CheckForReady() == false)
+                if (CheckForReady(true) == false)
                 {
                     Debug.LogError("Linked Act " + activeAct.actName +
                                    " must have a trivial Rule (with no requirements).");
@@ -430,24 +483,15 @@ namespace CultistLike
 
             Result result = readyRule.GenerateResults();
 
+            result.unityEvent?.Invoke();
+
             if (result.nextAct != null)
             {
-                activeAct = result.nextAct;
-                actChanged = true;
-                readyRule = (Rule)ScriptableObject.CreateInstance("Rule");
-                readyRule.time = activeAct.time;
-                readyRule.runText = activeAct.text;
-
-                GoForIt();
-                setRules.Clear();
-                setRules = activeAct.rules.GetRange(0, activeAct.rules.Count);
-                if (setRules.Count > 0)
-                {
-                    extraSlot.OpenSlot();
-                    extraSlot.Title = activeAct.slotTitle;
-                }
+                RunNextAct(result.nextAct);
                 return;
             }
+
+            DestroySlotted();
 
             if (result.cards != null)
             {
@@ -559,6 +603,7 @@ namespace CultistLike
                     {
                         cardSlots[i].CloseSlot();
                     }
+                    extraSlot.CloseSlot();
                     firstSlot.OpenSlot();
                     if (actViz != null)
                     {
@@ -593,9 +638,19 @@ namespace CultistLike
                     timerGO.SetActive(true);
                     cardSlotsGO.SetActive(false);
                     okButton.interactable = false;
-                    if (readyRule && readyRule.runText != "")
+                    if (readyRule != null)
                     {
-                        text.text = readyRule.runText;
+                        if (readyRule.runText == "")
+                        {
+                            if (actChanged == true)
+                            {
+                                text.text = activeAct.text;
+                            }
+                        }
+                        else
+                        {
+                            text.text = readyRule.runText;
+                        }
                     }
                     break;
                 case ActStatus.Finished:
@@ -633,14 +688,7 @@ namespace CultistLike
 
             gameObject.SetActive(false);
 
-            if (actViz.act.consumeRule == null)
-            {
-                ApplyStatus(ActStatus.Idle);
-            }
-            else
-            {
-                GoConsuming();
-            }
+            ApplyStatus(ActStatus.Idle);
 
             for (int i=0; i<cardSlots.Count; i++)
             {
@@ -651,6 +699,11 @@ namespace CultistLike
             foreach(var c in gameObject.GetComponentsInChildren<Canvas>())
             {
                 c.worldCamera = Camera.main;
+            }
+
+            if (activeAct.autoPlay == true)
+            {
+                RunNextAct(activeAct);
             }
         }
     }

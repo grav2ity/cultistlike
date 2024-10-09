@@ -20,7 +20,10 @@ MonoBehaviour:
     cards:
     - {fileID: 11400000, guid: f0844792f3a8dbe4885ee16837eb9830, type: 2}
     extra: {fileID: 0}
-    endText: Meow?
+    unityEvent:
+      m_PersistentCalls:
+        m_Calls: []
+    endText: 
   startText: 
   runText: 
   endText: 

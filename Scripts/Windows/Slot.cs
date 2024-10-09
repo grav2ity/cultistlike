@@ -20,13 +20,27 @@ namespace CultistLike
         public bool autoClose;
         [Tooltip("Accept only matching cards")]
         public bool onlyMatching;
+        [Tooltip("Cannot remove card from the slot")]
+        public bool cardLock;
 
         [SerializeField, HideInInspector] private ActWindow actWindow;
         [SerializeField, HideInInspector] private CardViz _slottedCard;
         [SerializeField, HideInInspector] private bool open;
 
         public string Title { get => title.text; set => title.text = value; }
-        public CardViz slottedCard { get => _slottedCard; private set => _slottedCard = value; }
+        public CardViz slottedCard
+        {
+            get => _slottedCard;
+            set
+            {
+                _slottedCard = value;
+                if (_slottedCard != null)
+                {
+                    actWindow.Check();
+                }
+            }
+        }
+
         public bool empty { get => open == true && slottedCard == null; }
         public int index { get; set; }
 
@@ -57,7 +71,7 @@ namespace CultistLike
                     {
                         SlotCard(cardViz);
                     }
-                    else
+                    else if (cardLock == false)
                     {
                         var sc = UnslotCard();
                         GameManager.Instance.table.ReturnToTable(sc);
@@ -82,17 +96,24 @@ namespace CultistLike
             actWindow.HighlightCards(index);
         }
 
-        public void SlotCard(CardViz cardViz)
+        public void SlotCard(CardViz cardViz, bool onlyFinalize = false)
         {
             if (cardViz != null)
             {
+                if (onlyFinalize == false)
+                {
+                    slottedCard = cardViz;
+                }
+
                 cardViz.transform.SetParent(transform);
                 cardViz.transform.localPosition = Vector3.zero;
 
-                slottedCard = cardViz;
-                actWindow.Check();
-
                 cardViz.UnhighlightTargets();
+
+                if (cardLock == true)
+                {
+                    cardViz.interactive = false;
+                }
             }
         }
 
@@ -133,6 +154,7 @@ namespace CultistLike
         {
             if (slottedCard != null)
             {
+                slottedCard.gameObject.SetActive(false);
                 Destroy(slottedCard.gameObject, 1f);
             }
             slottedCard = null;

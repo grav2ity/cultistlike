@@ -14,18 +14,19 @@ namespace CultistLike
         [Space(10)]
         [TextArea(3, 10)] public string text;
 
-        [Header("Linked Act only")]
+        [Header("Linked or Auto Acts only")]
         public float time;
         public string slotTitle;
+        [Tooltip("Grabs cards for itself")]
+        public bool grab;
+        [Tooltip("Cannot remove card from the slot")]
+        public bool cardLock;
 
         [Header("Rules")]
         public List<Rule> rules;
 
-        [Header("Consuming")]
-        [Tooltip("Grabs cards (e.g. resources) from the table and destroys them")]
-        public Rule consumeRule;
-        [Tooltip("Called when no matching card could be found. Game Over could be set up here")]
-        public UnityEvent onConsumeFail;
+        [Header("Options")]
+        public bool autoPlay;
 
 
         /// <summary>

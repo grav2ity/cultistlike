@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
+using UnityEngine.Events;
 using Random = UnityEngine.Random;
 
 
@@ -26,8 +27,10 @@ namespace CultistLike
         public Act nextAct;
         [Space(10)]
         public List<Card> cards;
+        [Space(10)]
         [Tooltip("Extra Act to be spawned")]
         public ScriptableObject extra;
+        public UnityEvent unityEvent;
         [TextArea(3, 10)] public string endText;
     }
 

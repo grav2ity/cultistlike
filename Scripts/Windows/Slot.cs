@@ -154,8 +154,7 @@ namespace CultistLike
         {
             if (slottedCard != null)
             {
-                slottedCard.gameObject.SetActive(false);
-                Destroy(slottedCard.gameObject, 1f);
+                GameManager.Instance.DestroyCard(slottedCard);
             }
             slottedCard = null;
         }

@@ -419,7 +419,7 @@ namespace CultistLike
 
         private void Grab()
         {
-            foreach (var cardViz in GameManager.Instance.table.GetCards())
+            foreach (var cardViz in GameManager.Instance.GetCards())
             {
                 foreach (var rule in setRules)
                 {
@@ -432,8 +432,10 @@ namespace CultistLike
                         bool prevInteractive = cardVizY.interactive;
                         cardVizY.interactive = false;
 
-                        cardVizY.transform.parent?.GetComponentInParent<ICardDock>().
+                        cardVizY.transform.parent?.GetComponentInParent<ICardDock>()?.
                             OnCardUndock(cardVizY.gameObject);
+                        cardVizY.transform.SetParent(null);
+                        cardVizY.gameObject.SetActive(true);
                         extraSlot.slottedCard = cardVizY;
                         cardVizY.transform.DOMove(actViz.transform.position, GameManager.Instance.normalSpeed).
                             OnComplete(() => { cardVizY.interactive = prevInteractive; extraSlot.SlotCard(cardVizY, true); });

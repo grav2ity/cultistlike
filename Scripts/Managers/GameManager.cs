@@ -67,6 +67,11 @@ namespace CultistLike
             Destroy(cardViz.gameObject, 1f);
         }
 
+        public List<CardViz> GetCards()
+        {
+            return cards;
+        }
+
         public void SetTimeScale(float ts)
         {
             timeScale = ts;

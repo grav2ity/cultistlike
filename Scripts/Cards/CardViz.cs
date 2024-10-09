@@ -192,14 +192,13 @@ namespace CultistLike
         public void SetCard(Card card)
         {
             this.card = card;
+            GameManager.Instance.AddCard(this);
         }
 
         private void Start()
         {
             draggingPlane = GameManager.Instance.cardDragPlane;
             LoadCard(card);
-
-            GameManager.Instance.AddCard(this);
         }
     }
 }

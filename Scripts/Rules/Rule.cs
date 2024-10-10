@@ -16,6 +16,28 @@ namespace CultistLike
         public Card card;
         [Tooltip("If specific Card is not set any card with the following Aspects will do")]
         public List<Aspect> aspects;
+
+        public bool AttemptOne(Card c)
+        {
+            if (c == null)
+            {
+                return false;
+            }
+            if (card != null && card == c)
+            {
+                return true;
+            }
+            else
+            {
+                if (aspects.Count == 0)
+                {
+                    return false;
+                }
+
+                var asp = aspects.Except(c.aspects);
+                return (asp.Count() == 0);
+            }
+        }
     }
 
     [Serializable]
@@ -26,19 +48,20 @@ namespace CultistLike
         [Space(10)]
         public Act nextAct;
         [Space(10)]
-        public List<Card> cards;
+        public List<ActModifier> actModifiers;
+        public List<AspectModifier> aspectModifiers;
+        public List<CardModifier> cardModifiers;
+        public List<TableModifier> tableModifiers;
         [Space(10)]
-        [Tooltip("Extra Act to be spawned")]
-        public ScriptableObject extra;
-        public UnityEvent unityEvent;
         [TextArea(3, 10)] public string endText;
-    }
+        }
 
     [CreateAssetMenu(menuName = "Rule")]
     public class Rule : ScriptableObject
     {
         public float time;
         public List<Requirement> requirements;
+
         public List<Result> results;
 
         [TextArea(3, 10)] public string startText;
@@ -68,7 +91,7 @@ namespace CultistLike
 
             for (int i=0; i<requirements.Count; i++)
             {
-                if (AttemptOne(requirements[i], cards[i]) == false)
+                if (requirements[i].AttemptOne(cards[i]) == false)
                 {
                     return false;
                 }
@@ -78,7 +101,7 @@ namespace CultistLike
         }
 
         public bool AttemptOne(int i, Card card) => i >= 0 &&
-            i < requirements.Count && AttemptOne(requirements[i], card);
+            i < requirements.Count && requirements[i].AttemptOne(card);
 
         public bool AttemptFirst(Card card) => AttemptOne(0, card);
 
@@ -116,26 +139,5 @@ namespace CultistLike
             }
         }
 
-        private bool AttemptOne(Requirement requirement, Card card)
-        {
-            if (card == null)
-            {
-                return false;
-            }
-            if (requirement.card != null && requirement.card == card)
-            {
-                return true;
-            }
-            else
-            {
-                if (requirement.aspects.Count == 0)
-                {
-                    return false;
-                }
-
-                var asp = requirement.aspects.Except(card.aspects);
-                return (asp.Count() == 0);
-            }
-        }
     }
 }

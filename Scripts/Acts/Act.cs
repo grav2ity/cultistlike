@@ -13,6 +13,7 @@ namespace CultistLike
         public Color color;
         [Space(10)]
         [TextArea(3, 10)] public string text;
+        public List<Aspect> aspects;
 
         [Header("Linked or Auto Acts only")]
         public float time;

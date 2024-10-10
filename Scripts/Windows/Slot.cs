@@ -114,11 +114,16 @@ namespace CultistLike
                 {
                     cardViz.interactive = false;
                 }
+
+                actWindow.HoldCard(cardViz);
+
             }
         }
 
         public CardViz UnslotCard()
         {
+            actWindow.UnholdCard(slottedCard);
+
             var sc = slottedCard;
             if (slottedCard != null)
             {
@@ -129,7 +134,22 @@ namespace CultistLike
             {
                 CloseSlot();
             }
+
             return sc;
+        }
+
+        public void MoveCardToAct()
+        {
+            if (slottedCard != null)
+            {
+                slottedCard.gameObject.SetActive(false);
+                slottedCard.transform.SetParent(actWindow.transform);
+                slottedCard = null;
+            }
+            if (autoClose == true)
+            {
+                CloseSlot();
+            }
         }
 
         public void CloseSlot()

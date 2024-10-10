@@ -902,6 +902,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3707799410444567590}
   - component: {fileID: 2623546043578392633}
+  - component: {fileID: 4302009630605073476}
   m_Layer: 0
   m_Name: Act Window
   m_TagString: Untagged
@@ -963,6 +964,25 @@ MonoBehaviour:
   actChanged: 0
   readyRule: {fileID: 0}
   setRules: []
+  heldCards: []
+  heldAspects: []
+--- !u!114 &4302009630605073476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6062753440016442787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3c219c7bb44723498b51efc9e46d764, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actChanged: 0
+  readyRule: {fileID: 0}
+  setRules: []
+  heldCards: []
+  heldAspects: []
 --- !u!1 &6255190282301801516
 GameObject:
   m_ObjectHideFlags: 0

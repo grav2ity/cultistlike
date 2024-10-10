@@ -61,10 +61,13 @@ namespace CultistLike
 
         public void DestroyCard(CardViz cardViz)
         {
-            cards.Remove(cardViz);
-            table.RemoveCard(cardViz);
-            cardViz.gameObject.SetActive(false);
-            Destroy(cardViz.gameObject, 1f);
+            if (cardViz != null)
+            {
+                cards.Remove(cardViz);
+                table.RemoveCard(cardViz);
+                cardViz.gameObject.SetActive(false);
+                Destroy(cardViz.gameObject, 1f);
+            }
         }
 
         public List<CardViz> GetCards()

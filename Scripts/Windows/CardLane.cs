@@ -45,12 +45,18 @@ namespace CultistLike
                 cards.Remove(cardViz);
                 cardViz.ShowFace();
                 actWindow.Check();
+
+                if (actWindow.gameObject.activeInHierarchy == false)
+                {
+                    cardViz.transform.SetParent(actWindow.actViz.transform);
+                    cardViz.transform.localPosition = Vector3.zero;
+                }
             }
         }
 
         public void PlaceCards(List<CardViz> cards)
         {
-            this.cards = cards;
+            this.cards = cards.GetRange(0, cards.Count);
 
             Vector3 spacing = new Vector3(
                 Math.Min(rect.width / cards.Count, maxSpacingX),
@@ -66,6 +72,7 @@ namespace CultistLike
 
             foreach (var cardViz in cards)
             {
+                cardViz.gameObject.SetActive(true);
                 cardViz.transform.SetParent(transform);
                 cardViz.ShowBack();
                 cardViz.transform.localPosition = o;

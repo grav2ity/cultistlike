@@ -17,12 +17,20 @@ MonoBehaviour:
   results:
   - chance: 0
     nextAct: {fileID: 0}
-    cards:
-    - {fileID: 11400000, guid: f0844792f3a8dbe4885ee16837eb9830, type: 2}
-    extra: {fileID: 0}
-    unityEvent:
-      m_PersistentCalls:
-        m_Calls: []
+    actModifiers:
+    - op: 1
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: f0844792f3a8dbe4885ee16837eb9830, type: 2}
+        aspects: []
+    aspectModifiers: []
+    cardModifiers: []
+    tableModifiers: []
     endText: 
   startText: 
   runText: 

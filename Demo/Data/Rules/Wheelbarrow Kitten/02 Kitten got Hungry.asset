@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: 02 Kitten got Hungry
   m_EditorClassIdentifier: 
   actName: Wheelbarrow
-  art: {fileID: 21300000, guid: 5ca4e9799a102284193fd6adb9a4b1d7, type: 3}
+  art: {fileID: 0}
   color: {r: 0.052198302, g: 0.09867636, b: 0.4811321, a: 1}
   text: Kitten got peckish while chopping mice...
   time: 20

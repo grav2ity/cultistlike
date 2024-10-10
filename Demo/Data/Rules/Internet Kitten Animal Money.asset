@@ -22,30 +22,117 @@ MonoBehaviour:
     aspects: []
   results:
   - chance: 0.5
-    cards:
-    - {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
-    - {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
-    - {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
-    - {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
-    - {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
-    - {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
-    - {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
-    - {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
-    - {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
-    - {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
-    - {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
-    - {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
-    - {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
-    - {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
-    - {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
-    - {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
-    - {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
-    - {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
-    - {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
-    - {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
-    - {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
-    - {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
-    extra: {fileID: 0}
+    nextAct: {fileID: 0}
+    actModifiers:
+    - op: 1
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
+        aspects: []
+    aspectModifiers: []
+    cardModifiers: []
+    tableModifiers: []
     endText: What are you going to do about all those cakes your cat ordered?
   startText: Well, there's no telling what can happen from this.
+  runText: 
   endText: 

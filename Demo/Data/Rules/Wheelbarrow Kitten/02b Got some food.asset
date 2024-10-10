@@ -21,14 +21,26 @@ MonoBehaviour:
   results:
   - chance: 0
     nextAct: {fileID: 0}
-    cards:
-    - {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
-    - {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
-    - {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
-    extra: {fileID: 0}
-    unityEvent:
-      m_PersistentCalls:
-        m_Calls: []
+    actModifiers:
+    - op: 1
+      cardReqs:
+        name: 
+        card: {fileID: 0}
+        aspects:
+        - {fileID: 11400000, guid: a46ceb5ebda24c642835ccf7d042edef, type: 2}
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
+        aspects: []
+    aspectModifiers: []
+    cardModifiers: []
+    tableModifiers: []
     endText: After a hearty meal Kitten worked extra hard.
   startText: 
   runText: Nom nom nom

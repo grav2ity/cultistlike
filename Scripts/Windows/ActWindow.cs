@@ -29,20 +29,20 @@ namespace CultistLike
         [SerializeField, HideInInspector]
         private ActStatus actStatus  = ActStatus.Idle;
 
-        [SerializeField, HideInInspector]
-        private ActViz actViz;
-        [SerializeField, HideInInspector]
-        private Act activeAct;
-        [SerializeField, HideInInspector]
-        private bool actChanged;
+        public ActViz actViz;
+        [SerializeField, HideInInspector] private Act activeAct;
+        [SerializeField, HideInInspector] private bool actChanged;
 
         //Rule ready to be run with the slotted cards
-        [SerializeField, HideInInspector]
-        private Rule readyRule;
+        [SerializeField, HideInInspector] private Rule readyRule;
         //Rules initiated (set) by a card slotted in the first slot
         //that need additional cards to become ready
-        [SerializeField, HideInInspector]
-        private List<Rule> setRules;
+        [SerializeField, HideInInspector] private List<Rule> setRules;
+
+
+        [SerializeField] private List<CardViz> heldCards;
+        [SerializeField] private List<AspectViz> heldAspects;
+
 
 
         private enum ActStatus
@@ -159,11 +159,16 @@ namespace CultistLike
             });
             actViz.ShowTimer(true);
 
-            DestroySlotted();
+            for (int i=0; i<cardSlots.Count; i++)
+            {
+                cardSlots[i].MoveCardToAct();
+            }
+
             if (activeAct.grab == true)
             {
                 Grab();
             }
+
             ApplyStatus(ActStatus.Running);
         }
 
@@ -274,6 +279,107 @@ namespace CultistLike
             }
 
             return highlighted;
+        }
+
+        public void HoldCard(CardViz cardViz)
+        {
+            if (cardViz != null)
+            {
+                heldCards.Add(cardViz);
+            }
+        }
+
+        public void HoldCard(Card card)
+        {
+            if (card != null)
+            {
+                var cardViz = Instantiate(GameManager.Instance.cardPrefab);
+                cardViz.SetCard(card);
+                HoldCard(cardViz);
+            }
+        }
+
+        public CardViz UnholdCard(CardViz cardViz)
+        {
+            if (cardViz != null)
+            {
+                heldCards.Remove(cardViz);
+            }
+            return cardViz;
+        }
+
+        public CardViz UnholdCard(Card card)
+        {
+            if (card != null)
+            {
+                var cardViz = heldCards.Find(x => x.card == card);
+                if (cardViz != null)
+                {
+                    UnholdCard(cardViz);
+                }
+                return cardViz;
+            }
+            return null;
+        }
+
+        public CardViz UnholdCard(Requirement requirement)
+        {
+            var cardViz = heldCards.Find(cardViz => requirement.AttemptOne(cardViz.card) == true );
+            if (cardViz != null)
+            {
+                UnholdCard(cardViz);
+                return cardViz;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public void HoldAspect(AspectViz aspectViz)
+        {
+            if (aspectViz != null)
+            {
+                int i = heldAspects.IndexOf(aspectViz);
+                if (i != -1)
+                {
+                    heldAspects[i].count = heldAspects[i].count + aspectViz.count;
+                }
+                else
+                {
+                    heldAspects.Add(aspectViz);
+                }
+            }
+        }
+
+        public void HoldAspect(Aspect aspect)
+        {
+            if (aspect != null)
+            {
+                var aspectViz = heldAspects.Find(x => x.aspect == aspect);
+                if (aspectViz != null)
+                {
+                    aspectViz.count = aspectViz.count + 1;
+                }
+                else
+                {
+                    aspectViz = Instantiate(GameManager.Instance.aspectPrefab, transform);
+                    aspectViz.LoadAspect(aspect);
+                    aspectViz.gameObject.SetActive(false);
+                    heldAspects.Add(aspectViz);
+                }
+            }
+        }
+
+        public void HoldAspect(Act act)
+        {
+            if (act != null)
+            {
+                foreach (var aspect in act.aspects)
+                {
+                    HoldAspect(aspect);
+                }
+            }
         }
 
         /// <summary>
@@ -432,10 +538,10 @@ namespace CultistLike
                         bool prevInteractive = cardVizY.interactive;
                         cardVizY.interactive = false;
 
-                        cardVizY.transform.parent?.GetComponentInParent<ICardDock>()?.
+                        cardVizY.transform.parent?.GetComponentInParent<ICardDock>(true)?.
                             OnCardUndock(cardVizY.gameObject);
-                        cardVizY.transform.SetParent(null);
                         cardVizY.gameObject.SetActive(true);
+                        cardVizY.transform.SetParent(null);
                         extraSlot.slottedCard = cardVizY;
                         cardVizY.transform.DOMove(actViz.transform.position, GameManager.Instance.normalSpeed).
                             OnComplete(() => { cardVizY.interactive = prevInteractive; extraSlot.SlotCard(cardVizY, true); });
@@ -485,7 +591,21 @@ namespace CultistLike
 
             Result result = readyRule.GenerateResults();
 
-            result.unityEvent?.Invoke();
+            foreach (var cardViz in heldCards)
+            {
+                cardViz.gameObject.SetActive(false);
+                cardViz.transform.SetParent(transform);
+
+            }
+
+            foreach (var actModifier in result.actModifiers)
+            {
+                actModifier.Apply(this);
+            }
+            foreach (var tableModifier in result.tableModifiers)
+            {
+                tableModifier.Apply(actViz);
+            }
 
             if (result.nextAct != null)
             {
@@ -493,49 +613,17 @@ namespace CultistLike
                 return;
             }
 
-            DestroySlotted();
-
-            if (result.cards != null)
+            if (heldCards != null)
             {
-                List<CardViz> cards  = new List<CardViz>();
-                foreach (Card card in result.cards)
-                {
-                    if (card == null)
-                    {
-                        Debug.LogWarning("Missing Results card in " + activeAct.actName);
-                    }
+                resultLane.PlaceCards(heldCards);
 
-                    var cardViz = Instantiate(GameManager.Instance.cardPrefab);
-                    cardViz.SetCard(card);
-                    cards.Add(cardViz);
-                }
+                actViz.SetResultCount(heldCards.Count);
 
-                resultLane.PlaceCards(cards);
-
-                actViz.SetResultCount(result.cards.Count);
+                heldCards.Clear();
             }
 
             ApplyStatus(ActStatus.Finished,
                         result.endText != "" ? result.endText : readyRule.endText);
-
-            if (result.extra != null)
-            {
-                Act act = result.extra as Act;
-                if (act != null)
-                {
-                    var newActViz = Instantiate(GameManager.Instance.actPrefab,
-                                                actViz.transform.position, Quaternion.identity);
-                    newActViz.SetAct(act);
-
-                    var root = newActViz.transform;
-                    var localScale = root.localScale;
-
-                    GameManager.Instance.table.Place(actViz, new List<Viz> { newActViz });
-
-                    root.localScale = new Vector3(0f, 0f, 0f);
-                    root.DOScale(localScale, 1);
-                }
-            }
 
             activeAct = actViz.act;
         }
@@ -580,8 +668,13 @@ namespace CultistLike
         private void StatusIdle()
         {
             readyRule = null;
-            setRules.Clear();
+            setRules?.Clear();
             actChanged = false;
+
+            heldCards.Clear();
+            heldAspects.Clear();
+            HoldAspect(activeAct);
+
             ApplyStatus(ActStatus.Idle);
         }
 
@@ -679,6 +772,12 @@ namespace CultistLike
             }
         }
 
+        private void Awake()
+        {
+            heldCards = new List<CardViz>();
+            heldAspects = new List<AspectViz>();
+        }
+
         private void Start()
         {
             GetComponent<Drag>().draggingPlane = GameManager.Instance.windowPlane;
@@ -690,7 +789,7 @@ namespace CultistLike
 
             gameObject.SetActive(false);
 
-            ApplyStatus(ActStatus.Idle);
+            StatusIdle();
 
             for (int i=0; i<cardSlots.Count; i++)
             {

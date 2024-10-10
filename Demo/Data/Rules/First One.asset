@@ -20,11 +20,32 @@ MonoBehaviour:
   results:
   - chance: 0
     nextAct: {fileID: 0}
-    cards:
-    - {fileID: 11400000, guid: f5f0fa7b9f3f88e4eaf16fca23caa0e8, type: 2}
-    - {fileID: 11400000, guid: 81fd3c01bb1bc104aa7ee20bf354b578, type: 2}
-    - {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
-    extra: {fileID: 11400000, guid: efb4a7de848156c41a3e133972062701, type: 2}
+    actModifiers:
+    - op: 1
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: 219db864b5c9cf84a9e11127db781ccb, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: f5f0fa7b9f3f88e4eaf16fca23caa0e8, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: 81fd3c01bb1bc104aa7ee20bf354b578, type: 2}
+        aspects: []
+    - op: 0
+      cardReqs:
+        name: 
+        card: {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
+        aspects: []
+    aspectModifiers: []
+    cardModifiers: []
+    tableModifiers:
+    - op: 0
+      act: {fileID: 11400000, guid: efb4a7de848156c41a3e133972062701, type: 2}
     endText: Just a dream. Move on.
   startText: MIght be a pleasant evening after all.
   runText: 

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 using DG.Tweening;
@@ -11,6 +13,9 @@ namespace CultistLike
     {
         [Header("Card")]
         public Card card;
+
+        [Header("Aspects")]
+        public List<AspectViz> aspects;
 
         [Header("Layout")]
         [SerializeField] private TextMeshPro title;
@@ -104,7 +109,7 @@ namespace CultistLike
             }
             else
             {
-                UIManager.Instance?.cardInfo?.LoadCard(card);
+                UIManager.Instance?.cardInfo?.LoadCard(this);
             }
         }
 
@@ -186,6 +191,15 @@ namespace CultistLike
             else
             {
                 artBack.material.SetColor("_Color", card.color);
+            }
+
+            aspects = new List<AspectViz>();
+            foreach (var aspect in card.aspects)
+            {
+                var aspectViz = Instantiate(GameManager.Instance.aspectPrefab, transform);
+                aspectViz.LoadAspect(aspect);
+                aspectViz.gameObject.SetActive(false);
+                aspects.Add(aspectViz);
             }
         }
 

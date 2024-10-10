@@ -36,43 +36,43 @@ namespace CultistLike
         }
 
 
-        public void LoadCard(Card card)
+        public void LoadCard(CardViz cardViz)
         {
             gameObject.SetActive(true);
 
-            CardName = card.cardName;
-            Description = card.description;
+            CardName = cardViz.card.cardName;
+            Description = cardViz.card.description;
 
-            if (card.art != null)
+            if (cardViz.card.art != null)
             {
-                Art = card.art;
+                Art = cardViz.card.art;
             }
             else
             {
-                art.color = card.color;
+                art.color = cardViz.card.color;
             }
 
 
-            if (card.aspects.Count > aspects.Count)
+            if (cardViz.aspects.Count > aspects.Count)
             {
-                while (card.aspects.Count > aspects.Count)
+                while (cardViz.aspects.Count > aspects.Count)
                 {
                     var aspect = Instantiate(GameManager.Instance.aspectPrefab, aspectsGO.transform);
                     aspects.Add(aspect);
                 }
 
             }
-            else if (card.aspects.Count < aspects.Count)
+            else if (cardViz.aspects.Count < aspects.Count)
             {
-                for (int i = aspects.Count; i > card.aspects.Count; i--)
+                for (int i = aspects.Count; i > cardViz.aspects.Count; i--)
                 {
                     aspects[i - 1].gameObject.SetActive(false);
                 }
             }
 
-            for (int i = 0; i < card.aspects.Count; i++)
+            for (int i = 0; i < cardViz.aspects.Count; i++)
             {
-                aspects[i].LoadAspect(card.aspects[i]);
+                aspects[i].LoadAspect(cardViz.aspects[i]);
                 aspects[i].gameObject.SetActive(true);
             }
         }

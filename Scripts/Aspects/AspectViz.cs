@@ -57,6 +57,7 @@ namespace CultistLike
             if (aspectViz == null)
                 return;
 
+            aspect = aspectViz.aspect;
             if (aspectViz.art != null)
             {
                 art.sprite = aspectViz.art.sprite;

@@ -15,7 +15,8 @@ MonoBehaviour:
   actName: Wheelbarrow
   art: {fileID: 0}
   color: {r: 0.052198302, g: 0.09867636, b: 0.4811321, a: 1}
-  text: Kitten got peckish while chopping mice...
+  text: 
+  aspects: []
   time: 20
   slotTitle: Food
   grab: 0

@@ -42,6 +42,6 @@ MonoBehaviour:
     cardModifiers: []
     tableModifiers: []
     endText: After a hearty meal Kitten worked extra hard.
-  startText: 
-  runText: Nom nom nom
+  startText: Nom nom nom
+  runText: 
   endText: 

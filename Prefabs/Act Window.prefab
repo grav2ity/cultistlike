@@ -960,12 +960,14 @@ MonoBehaviour:
   - {fileID: 3666221176189614223}
   actStatus: 0
   actViz: {fileID: 0}
+  actLogic: {fileID: 0}
   activeAct: {fileID: 0}
   actChanged: 0
   readyRule: {fileID: 0}
   setRules: []
   heldCards: []
   heldAspects: []
+  isAct: 0
 --- !u!114 &4302009630605073476
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -978,9 +980,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3c219c7bb44723498b51efc9e46d764, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actChanged: 0
   readyRule: {fileID: 0}
   setRules: []
+  activeAct: {fileID: 0}
+  isAct: 0
   heldCards: []
   heldAspects: []
 --- !u!1 &6255190282301801516

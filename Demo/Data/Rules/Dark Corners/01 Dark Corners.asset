@@ -15,7 +15,8 @@ MonoBehaviour:
   actName: Dark Corners
   art: {fileID: 21300000, guid: 0bbb923a2c6c43e499d7cd3b64fec953, type: 3}
   color: {r: 0, g: 0, b: 0, a: 1}
-  text: "Your cat likes to explore dark corners. \nHe might not return."
+  text: 
+  aspects: []
   time: 45
   slotTitle: Explore
   grab: 1

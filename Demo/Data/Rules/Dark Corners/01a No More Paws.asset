@@ -17,11 +17,10 @@ MonoBehaviour:
   results:
   - chance: 0
     nextAct: {fileID: 0}
-    cards: []
-    extra: {fileID: 0}
-    unityEvent:
-      m_PersistentCalls:
-        m_Calls: []
+    actModifiers: []
+    aspectModifiers: []
+    cardModifiers: []
+    tableModifiers: []
     endText: 
   startText: 
   runText: 

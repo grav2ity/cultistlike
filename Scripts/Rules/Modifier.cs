@@ -77,18 +77,18 @@ namespace CultistLike
         public ActOp op;
         public Requirement cardReqs;
 
-        public void Apply(ActWindow actWindow)
+        public void Apply(ActLogic actLogic)
         {
-            if (actWindow != null)
+            if (actLogic != null)
             {
                 CardViz cardViz = null;
                 switch (op)
                 {
                     case ActOp.AddCard:
-                        actWindow.HoldCard(cardReqs.card);
+                        actLogic.HoldCard(cardReqs.card);
                         break;
                     case ActOp.RemoveCard:
-                        cardViz = actWindow.UnholdCard(cardReqs);
+                        cardViz = actLogic.UnholdCard(cardReqs);
                         GameManager.Instance.DestroyCard(cardViz);
                         break;
                     default:

@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 using UnityEngine;
+
+using DG.Tweening;
 
 
 namespace CultistLike
@@ -11,7 +14,7 @@ namespace CultistLike
 
         [Header("Prefabs")]
         public CardViz cardPrefab;
-        public ActViz actPrefab;
+        public TokenViz tokenPrefab;
         public ActWindow actWindowPrefab;
         public AspectViz aspectPrefab;
 
@@ -27,13 +30,17 @@ namespace CultistLike
         public float fastSpeed;
         public float rotateSpeed;
 
-        [HideInInspector] public List<ActViz> acts;
+        public List<Slot> slotTypes;
+
+        [HideInInspector] public List<TokenViz> tokens;
 
         [SerializeField, HideInInspector] private List<CardViz> cards;
         [SerializeField, HideInInspector] private ActWindow _openWindow;
 
         [SerializeField, HideInInspector] private float elapsedTime;
         private float timeScale;
+
+        private List<Act> initialActs;
 
 
         public ActWindow openWindow { get => _openWindow; private set => _openWindow = value; }
@@ -70,6 +77,41 @@ namespace CultistLike
             }
         }
 
+        public void SpawnAct(Act act, Viz viz)
+        {
+            if (act != null && act.token != null && viz != null)
+            {
+
+                var newTokenViz = SpawnToken(act.token, viz);
+                if (newTokenViz != null)
+                {
+                    newTokenViz.SetToken(act.token);
+                    newTokenViz.autoPlay = act;
+                }
+            }
+        }
+
+        public TokenViz SpawnToken(Token token, Viz viz)
+        {
+            if (token != null && viz != null)
+            {
+                var newTokenViz = UnityEngine.Object.Instantiate(GameManager.Instance.tokenPrefab,
+                                                                 viz.transform.position, Quaternion.identity);
+                newTokenViz.SetToken(token);
+
+                var root = newTokenViz.transform;
+                var localScale = root.localScale;
+
+                GameManager.Instance.table.Place(viz, new List<Viz> { newTokenViz });
+
+                root.localScale = new Vector3(0f, 0f, 0f);
+                root.DOScale(localScale, 1);
+
+                return newTokenViz;
+            }
+            return null;
+        }
+
         public List<CardViz> GetCards()
         {
             return cards;
@@ -80,14 +122,36 @@ namespace CultistLike
             timeScale = ts;
         }
 
+        public List<Act> GetInitialActs() => initialActs;
+
+        private void FindIninitalActs()
+        {
+            var acts = Resources.LoadAll("", typeof(Act)).Cast<Act>().ToArray();
+            foreach (var act in acts)
+            {
+                if (act.initial == true)
+                {
+                    initialActs.Add(act);
+                }
+            }
+        }
+
         private void Awake()
         {
             Instance = this;
 
             timeScale = 1f;
 
-            acts = new List<ActViz>();
+            tokens = new List<TokenViz>();
             cards = new List<CardViz>();
+            initialActs = new List<Act>();
+
+            FindIninitalActs();
+
+        #if UNITY_EDITOR
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = 60;
+        #endif
         }
 
         private void Update()

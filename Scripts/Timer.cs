@@ -60,7 +60,6 @@ namespace CultistLike
             text.text = time.ToString("0.0");
             if (duration > 0f)
             {
-                // image.fillAmount = 1f - (time / duration);
                 image.fillAmount = 0.9f * (1f - (time / duration));
             }
         }
@@ -82,7 +81,6 @@ namespace CultistLike
             if (timeLeft <= 0f)
             {
                 startTime = endTime = 0f;
-                // image.fillAmount = 1f;
                 image.fillAmount = 0.9f;
                 if (following == null)
                 {

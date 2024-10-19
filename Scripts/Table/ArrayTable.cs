@@ -238,7 +238,7 @@ namespace CultistLike
             {
                 var child = transform.GetChild(i);
 
-                if (child.GetComponent<CardViz>() != null || child.GetComponent<ActViz>() != null)
+                if (child.GetComponent<CardViz>() != null || child.GetComponent<TokenViz>() != null)
                 {
                     OnCardDock(child.gameObject);
                 }

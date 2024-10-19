@@ -792,6 +792,11 @@ MonoBehaviour:
   draggingPlane: {fileID: 0}
   _interactive: 1
   card: {fileID: 0}
+  fragments:
+    cards: []
+    aspects: []
+    matches: []
+  free: 1
   title: {fileID: 1629566531204144440}
   artBack: {fileID: 8567668268619634666}
   art: {fileID: 6939245965619256764}

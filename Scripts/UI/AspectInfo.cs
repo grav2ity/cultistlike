@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 using TMPro;
@@ -11,7 +8,7 @@ namespace CultistLike
 {
     public class AspectInfo : MonoBehaviour
     {
-        [Header("Card Info")]
+        [Header("Layout")]
         [SerializeField] private Image art;
         [SerializeField] private TextMeshProUGUI description;
         [SerializeField] private TextMeshProUGUI aspectName;
@@ -27,25 +24,22 @@ namespace CultistLike
             set { aspectName.text = value; }
         }
 
-        public Sprite Art {
-            get { return art.sprite; }
-            set { art.sprite = value; }
-        }
-
 
         public void LoadAspect(Aspect aspect)
         {
             gameObject.SetActive(true);
 
-            AspectName = aspect.aspectName;
-            Description = aspect.text;
+            AspectName = aspect.label;
+            Description = aspect.description;
 
             if (aspect.art != null)
             {
-                Art = aspect.art;
+                art.sprite = aspect.art;
+                art.color = Color.white;
             }
             else
             {
+                art.sprite = null;
                 art.color = aspect.color;
             }
         }
@@ -54,7 +48,7 @@ namespace CultistLike
         {
             AspectName = "";
             Description = "";
-            Art = null;
+            art.sprite = null;
             art.color = Color.white;
 
             gameObject.SetActive(false);

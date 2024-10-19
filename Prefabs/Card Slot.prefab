@@ -197,7 +197,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3707799410444567590}
-  - component: {fileID: 1734987805397933366}
+  - component: {fileID: 4948182315103652455}
   m_Layer: 0
   m_Name: Card Slot
   m_TagString: Untagged
@@ -223,7 +223,7 @@ Transform:
   - {fileID: 7810117994087993145}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1734987805397933366
+--- !u!114 &4948182315103652455
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -232,16 +232,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 6062753440016442787}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e02843f9037be54aae9ea68122191f4, type: 3}
+  m_Script: {fileID: 11500000, guid: c9a5fc0c5dca6b4488de4191979daf76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  slot: {fileID: 0}
   title: {fileID: 5266998188540822850}
   art: {fileID: 8567668268619634666}
   highlight: {fileID: 2721004463860648226}
   autoClose: 0
+  onlyMatching: 0
+  cardLock: 0
+  grab: 0
+  fragments:
+    cards: []
+    aspects: []
+    matches: []
   actWindow: {fileID: 0}
   _slottedCard: {fileID: 0}
-  open: 0
 --- !u!1 &7243038272922166313
 GameObject:
   m_ObjectHideFlags: 0

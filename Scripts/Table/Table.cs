@@ -60,6 +60,7 @@ namespace CultistLike
                 eventData.pointerPressRaycast.gameObject.GetComponent<CardViz>() == null)
             {
                 UIManager.Instance?.cardInfo?.Unload();
+                UIManager.Instance?.aspectInfo?.Unload();
             }
         }
 
@@ -213,14 +214,14 @@ namespace CultistLike
         {
             foreach (var card in cards)
             {
-                card.SetHighlight(true);
+                card?.SetHighlight(true);
             }
 
             yield return new WaitForSeconds(1f);
 
             foreach (var card in cards)
             {
-                card.SetHighlight(false);
+                card?.SetHighlight(false);
             }
         }
     }

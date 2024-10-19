@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
+  m_Name: Kitten got extra food
+  m_EditorClassIdentifier: 
+  label: 
+  token: {fileID: 0}
+  initial: 0
+  time: 10
+  aspects: []
+  tests:
+  - canFail: 0
+    loc1: 0
+    fragment1: {fileID: 11400000, guid: a46ceb5ebda24c642835ccf7d042edef, type: 2}
+    op: 0
+    constant: 1
+    loc2: 0
+    fragment2: {fileID: 0}
+  actModifiers:
+  - op: 0
+    fragment: {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
+    level: 2
+    reference: {fileID: 11400000, guid: a46ceb5ebda24c642835ccf7d042edef, type: 2}
+  - op: 0
+    fragment: {fileID: 11400000, guid: a46ceb5ebda24c642835ccf7d042edef, type: 2}
+    level: -1
+    reference: {fileID: 11400000, guid: a46ceb5ebda24c642835ccf7d042edef, type: 2}
+  cardModifiers: []
+  tableModifiers: []
+  rules: []
+  slots: []
+  spawnGlobalSlots: 0
+  altActs: []
+  nextActs: []
+  text: Nom nom nom
+  endText: 

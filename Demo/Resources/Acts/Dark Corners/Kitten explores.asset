@@ -15,25 +15,29 @@ MonoBehaviour:
   label: 
   token: {fileID: 11400000, guid: e98474b25a29d8e4db622a41e0a0d8d0, type: 2}
   initial: 1
-  time: 30
-  aspects: []
+  time: 5
   tests: []
-  actModifiers:
-  - op: 0
-    fragment: {fileID: 11400000, guid: d10a489eb2498384e921ee099e5baef9, type: 2}
-    level: -1
-    reference: {fileID: 0}
+  testRules: []
+  onEnterRules: []
+  fragments: []
+  aspects: []
+  actModifiers: []
   cardModifiers: []
   tableModifiers: []
+  pathModifiers: []
+  deckModifiers: []
   rules: []
+  modRules: []
+  ignoreGlobalSlots: 0
   slots:
   - {fileID: 11400000, guid: d20aca91918d0eb46b233e0856aa2322, type: 2}
-  spawnGlobalSlots: 0
+  randomAltAct: 0
   altActs:
   - chance: 0
-    act: {fileID: 11400000, guid: 68ebbb543799b324baad688a4656e6f9, type: 2}
+    act: {fileID: 11400000, guid: 64c03e0d6d4a8534e9fbc17806a78e87, type: 2}
+  randomNextAct: 0
   nextActs:
   - chance: 0
-    act: {fileID: 11400000}
+    act: {fileID: 11400000, guid: 68ebbb543799b324baad688a4656e6f9, type: 2}
   text: "Your cat likes to explore dark corners. \nHe might not return."
   endText: 

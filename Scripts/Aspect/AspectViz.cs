@@ -10,7 +10,7 @@ namespace CultistLike
     public class AspectViz : MonoBehaviour, IPointerClickHandler
     {
         [Header("Aspect")]
-        public Aspect aspect;
+        public Fragment aspect;
 
         [Header("Layout")]
         [SerializeField] private Image art;
@@ -31,6 +31,24 @@ namespace CultistLike
             UIManager.Instance?.aspectInfo?.LoadAspect(aspect);
         }
 
+        public void LoadAspect(CardViz cardViz)
+        {
+            if (cardViz == null)
+                return;
+
+            this.aspect = cardViz.card;
+            if (aspect.art != null)
+            {
+                art.sprite = aspect.art;
+            }
+            else
+            {
+                art.color = aspect.color;
+            }
+
+            SetCount(1);
+        }
+
         public void LoadAspect(Aspect aspect)
         {
             if (aspect == null)
@@ -49,32 +67,20 @@ namespace CultistLike
             SetCount(1);
         }
 
-        public void LoadAspect(AspectViz aspectViz)
+        public void LoadAspect(HeldFragment frag)
         {
-            if (aspectViz == null)
-                return;
-
-            aspect = aspectViz.aspect;
-            if (aspectViz.art != null)
+            if (frag != null)
             {
-                art.sprite = aspectViz.art.sprite;
+                if (frag.cardViz != null)
+                {
+                    LoadAspect(frag.cardViz);
+                }
+                else if (frag.fragment != null && frag.fragment is Aspect)
+                {
+                    LoadAspect((Aspect)frag.fragment);
+                    SetCount(frag.count);
+                }
             }
-            else
-            {
-                art.color = aspectViz.art.color;
-            }
-
-            SetCount(aspectViz.count);
-        }
-
-        public void LoadAspect(HeldAspect heldAspect)
-        {
-            if (heldAspect == null)
-                return;
-
-            LoadAspect(heldAspect.aspect);
-
-            SetCount(heldAspect.count);
         }
 
         private void SetCount(int count)

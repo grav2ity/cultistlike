@@ -18,4 +18,16 @@ MonoBehaviour:
   description: Better treat him right
   fragments:
   - {fileID: 11400000, guid: 0b492a19e517d754ebc4c3ae8ef37742, type: 2}
-  - {fileID: 11400000, guid: a582d48a9b361d34c86ce390e1c1f9f6, type: 2}
+  - {fileID: 11400000, guid: 0b492a19e517d754ebc4c3ae8ef37742, type: 2}
+  - {fileID: 11400000, guid: 0b492a19e517d754ebc4c3ae8ef37742, type: 2}
+  - {fileID: 11400000, guid: 0b492a19e517d754ebc4c3ae8ef37742, type: 2}
+  - {fileID: 11400000, guid: 0b492a19e517d754ebc4c3ae8ef37742, type: 2}
+  - {fileID: 11400000, guid: 0b492a19e517d754ebc4c3ae8ef37742, type: 2}
+  rules:
+  - {fileID: 0}
+  oneForAll: 0
+  slots:
+  - {fileID: 11400000, guid: d20aca91918d0eb46b233e0856aa2322, type: 2}
+  - {fileID: 11400000, guid: 55cc2d7b3415b3741b3f5fc7cd294bf8, type: 2}
+  decayTo: {fileID: 0}
+  lifetime: 0

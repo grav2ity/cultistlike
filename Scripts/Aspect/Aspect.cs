@@ -7,18 +7,18 @@ using UnityEngine;
 namespace CultistLike
 {
     [CreateAssetMenu(menuName = "Aspect")]
-    public class Aspect : Fragment
+    public class Aspect : Fragment, IFrag
     {
         public override void AddToContainer(FragContainer fg) => fg.Add(this);
         public override void AdjustInContainer(FragContainer fg, int level) => fg.Adjust(this, level);
         public override void RemoveFromContainer(FragContainer fg) => fg.Remove(this);
         public override int CountInContainer(FragContainer fg) => fg.Count(this);
 
-        public void AdjustInList(List<HeldAspect> list, int level)
+        public void AdjustInList(List<HeldFragment> list, int level)
         {
             if (list != null)
             {
-                var r = list.Find(x => x.aspect == this);
+                var r = list.Find(x => x.fragment == this);
 
                 if (r != null)
                 {
@@ -32,33 +32,16 @@ namespace CultistLike
                 {
                     if (level > 0)
                     {
-                        list.Add(new HeldAspect(this, level));
+                        list.Add(new HeldFragment(this, level));
                     }
                 }
             }
         }
 
-        public void AddToList(List<HeldAspect> list) => AdjustInList(list, 1);
-        public void RemoveFromList(List<HeldAspect> list) => AdjustInList(list, -1);
-    }
+        public void AddToList(List<HeldFragment> list) => AdjustInList(list, 1);
+        public void RemoveFromList(List<HeldFragment> list) => AdjustInList(list, -1);
 
-    [Serializable]
-    public class HeldAspect
-    {
-        public Aspect aspect;
-        public int count;
-
-
-        public HeldAspect(Aspect aspect, int count)
-        {
-            this.aspect = aspect;
-            this.count = count;
-        }
-
-        public HeldAspect(Aspect aspect) : this(aspect, 1) {}
-        public HeldAspect(HeldAspect aspect) : this(aspect.aspect, aspect.count) {}
-
-        public void AddToList(List<HeldAspect> list) => aspect.AdjustInList(list, count);
-        public void RemoveFromList(List<HeldAspect> list) => aspect.AdjustInList(list, -count);
+        public override Fragment ToFragment() => this;
+        public override int Count() => 1;
     }
 }

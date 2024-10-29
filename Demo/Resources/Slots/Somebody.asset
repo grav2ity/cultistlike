@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8982c193c92b64445902a2eec82848b5, type: 3}
   m_Name: Somebody
   m_EditorClassIdentifier: 
-  title: 
+  label: Somebody
   text: 
   aspects: []
   spawnTests: []

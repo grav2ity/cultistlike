@@ -13,5 +13,6 @@ namespace CultistLike
         public Color color;
 
         public Slot slot;
+        public bool dissolve;
     }
 }

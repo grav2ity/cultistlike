@@ -15,59 +15,103 @@ namespace CultistLike
         public bool initial;
         [Space(10)]
         public float time;
-        [Space(10)]
-        public List<Aspect> aspects;
 
         [Header("Entry Tests")]
         [Tooltip("All Tests must pass to enter this Act.")]
         public List<Test> tests;
+        [Tooltip("All Rules must pass to enter this Act. Card matches do not carry from the Tests above nor between Rules.")]
+        public List<Rule> testRules;
 
-        [Header("Modifiers")]
+        [Header("On Enter")]
+        [Tooltip("All Modifiers from all the Rules will be applied. Tests are ignored.")]
+        public List<Rule> onEnterRules;
+
+        [Header("Fragments")]
+        public List<Fragment> fragments;
+
+        [Header("On Complete")]
         public List<ActModifier> actModifiers;
         public List<CardModifier> cardModifiers;
         public List<TableModifier> tableModifiers;
-
-        [Space(10)]
-        [Header("Followup Rules")]
-        [Tooltip("All Tests from all Rules must pass to enter. All Modifiers will be applied on completing the Act.")]
-        public List<Rule> rules;
+        public List<PathModifier> pathModifiers;
+        public List<DeckModifier> deckModifiers;
+        [Tooltip("All Modifiers from all the Rules will be applied on completing the Act.")]
+        public List<Rule> modRules;
 
         [Header("Slots")]
+        public bool ignoreGlobalSlots;
         public List<Slot> slots;
-        public bool spawnGlobalSlots;
 
-        [Header("Acts")]
+        [Header("Alt Acts")]
+        public bool randomAltAct;
         public List<ActLink> altActs;
+        [Header("Next Acts")]
+        public bool randomNextAct;
         public List<ActLink> nextActs;
 
         [Space(10)]
         [TextArea(3, 10)] public string text;
         [TextArea(3, 10)] public string endText;
 
-        public bool Attempt(FragContainer scope)
+        public bool Attempt(Context context)
         {
-            scope.matches = scope.cards;
-
             foreach (var test in tests)
             {
-                var r = test.Attempt(scope);
+                var r = test.Attempt(context);
                 if (test.canFail == false && r == false)
                 {
                     return false;
                 }
             }
 
-            foreach (var rule in rules)
+            foreach (var rule in testRules)
             {
-                scope.matches = scope.cards;
-                var r = rule.Attempt(scope);
-                if (r == false)
+                if (rule != null)
                 {
-                    return false;
+                    var r = rule.Evaluate(context);
+                    if (r == false)
+                    {
+                        return false;
+                    }
                 }
             }
 
             return true;
+        }
+
+        public void RunOnEnterRules(Context context)
+        {
+            foreach (var rule in onEnterRules)
+            {
+                rule?.Run(context);
+            }
+        }
+
+        public void ApplyModifiers(Context context)
+        {
+            if (context != null)
+            {
+                foreach (var actModifier in actModifiers)
+                {
+                    context.actModifiers.Add(actModifier.Evaluate(context));
+                }
+                foreach (var cardModifier in cardModifiers)
+                {
+                    context.cardModifiers.Add(cardModifier.Evaluate(context));
+                }
+                foreach (var tableModifier in tableModifiers)
+                {
+                    context.tableModifiers.Add(tableModifier.Evaluate(context));
+                }
+                foreach (var pathModifier in pathModifiers)
+                {
+                    context.pathModifiers.Add(pathModifier.Evaluate(context));
+                }
+                foreach (var deckModifier in deckModifiers)
+                {
+                    context.deckModifiers.Add(deckModifier.Evaluate(context));
+                }
+            }
         }
     }
 

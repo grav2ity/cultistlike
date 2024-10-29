@@ -10,15 +10,15 @@ using TMPro;
 
 namespace CultistLike
 {
-    public class CardViz : Viz, ICardDock, IDropHandler, IPointerClickHandler, IPointerEnterHandler
+    public class CardViz : Viz, ICardDock, IDropHandler, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
         [Header("Card")]
         public Card card;
 
-        [Header("Aspects")]
+        [Header("Fragments")]
         public FragContainer fragments;
 
-        public bool free;
+        [HideInInspector] public bool free;
 
         [Header("Layout")]
         [SerializeField] private TextMeshPro title;
@@ -26,13 +26,13 @@ namespace CultistLike
         [SerializeField] private SpriteRenderer art;
         [SerializeField] private Renderer highlight;
         [SerializeField] private CardStack cardStack;
+        [SerializeField] private CardDecay cardDecay;
 
         [Header("Table")]
         [Tooltip("Size on the table for an Array based table; final size is (1,1) + 2*(x,y)")]
         [SerializeField] private Vector2Int CellCount;
 
         [SerializeField, HideInInspector] private bool faceDown;
-        private bool doneSetup;
 
 
         public override Vector2Int GetCellSize() => CellCount;
@@ -117,7 +117,21 @@ namespace CultistLike
             }
         }
 
-        public void OnPointerEnter(PointerEventData eventData) {}
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (cardDecay.enabled == true)
+            {
+                cardDecay.ShowTimer();
+            }
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (cardDecay.enabled == true)
+            {
+                cardDecay.HideTimer();
+            }
+        }
 
         public virtual void OnCardDock(GameObject go)
         {
@@ -132,6 +146,36 @@ namespace CultistLike
         }
 
         public virtual void OnCardUndock(GameObject go) {}
+
+        public void OnDecayComplete(Card card)
+        {
+            interactive = false;
+
+            if (card != null)
+            {
+                var yScale = transform.localScale.y;
+                var targetScale = new Vector3(transform.localScale.x, 0f, transform.localScale.z);
+                transform.DOScale(targetScale, GameManager.Instance.scaleSpeed).
+                    OnComplete(() =>
+                    {
+                        Transform(card);
+                        var targetScale2 = new Vector3(transform.localScale.x, yScale, transform.localScale.z);
+                        transform.DOScale(targetScale2, GameManager.Instance.scaleSpeed).
+                            OnComplete(() => { interactive = true; });
+                    });
+            }
+            else
+            {
+                var targetScale = new Vector3(transform.localScale.x, 0f, transform.localScale.z);
+                transform.DOScale(targetScale, GameManager.Instance.scaleSpeed).
+                    OnComplete(() => { GameManager.Instance.DestroyCard(this); });
+            }
+        }
+
+        public void Decay(Card card, float time)
+        {
+            cardDecay.StartTimer(time, () => OnDecayComplete(card));
+        }
 
         public void Reverse(bool instant = false)
         {
@@ -182,14 +226,11 @@ namespace CultistLike
 
         public CardViz Yield() => cardStack.Count > 1 ? cardStack.Pop() : this;
 
-        public void LoadCard(Card card)
+        public void LoadCard(Card card, bool loadFragments = true)
         {
             if (card == null) return;
 
-            if (doneSetup == false)
-            {
-                SetCard(card);
-            }
+            this.card = card;
 
             title.text = card.label;
             if (card.art != null)
@@ -200,35 +241,56 @@ namespace CultistLike
             {
                 artBack.material.SetColor("_Color", card.color);
             }
+
+            if (loadFragments == true)
+            {
+                LoadFragments();
+            }
+
         }
 
-        public void SetCard(Card card)
+        public void Transform(Card card)
         {
-            if (card != null)
-            {
-                this.card = card;
+            LoadCard(card, false);
 
-                foreach (var frag in card.fragments)
+            if (card.lifetime > 0f)
+            {
+                Decay(card.decayTo, card.lifetime);
+            }
+        }
+
+        private void LoadFragments()
+        {
+            foreach (var frag in card.fragments)
+            {
+                if (frag != null)
                 {
-                    if (frag != null)
-                    {
-                        fragments.Add(frag);
-                    }
+                    fragments.Add(frag);
                 }
-                fragments.AddCardVizOnly(this);
-                doneSetup = true;
             }
         }
 
         private void Awake()
         {
-            fragments = new FragContainer();
+            if (card != null)
+            {
+                LoadCard(card);
+            }
         }
 
         private void Start()
         {
+            if (card == null)
+            {
+                Debug.LogError("Please set Card for " + this.name);
+            }
+
+            if (card.lifetime > 0f)
+            {
+                Decay(card.decayTo, card.lifetime);
+            }
+
             draggingPlane = GameManager.Instance.cardDragPlane;
-            LoadCard(card);
             GameManager.Instance.AddCard(this);
         }
     }

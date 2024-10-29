@@ -67,7 +67,6 @@ namespace CultistLike
         private void Awake()
         {
             GetComponentInChildren<Canvas>().worldCamera = Camera.main;
-            timeUpEvent = new UnityEvent();
 
             startTime = endTime = 0f;
             image.fillAmount = 0f;

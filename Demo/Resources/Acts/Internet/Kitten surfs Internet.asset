@@ -16,7 +16,6 @@ MonoBehaviour:
   token: {fileID: 11400000, guid: 4df1ed6ef9f7ee24d848ce7de38a0070, type: 2}
   initial: 1
   time: 10
-  aspects: []
   tests:
   - canFail: 0
     loc1: 0
@@ -25,22 +24,34 @@ MonoBehaviour:
     constant: 1
     loc2: 0
     fragment2: {fileID: 0}
+  testRules: []
+  onEnterRules: []
+  fragments: []
   actModifiers:
   - op: 0
     fragment: {fileID: 11400000, guid: f69d0cfbafb553242910b97267bae96e, type: 2}
     level: 1
     reference: {fileID: 0}
-  cardModifiers: []
+  cardModifiers:
+  - op: 0
+    onto: {fileID: 0}
+    what: {fileID: 0}
+    level: 0
+    reference: {fileID: 0}
   tableModifiers: []
-  rules: []
+  pathModifiers: []
+  deckModifiers: []
+  modRules: []
+  ignoreGlobalSlots: 0
   slots:
   - {fileID: 11400000, guid: 55cc2d7b3415b3741b3f5fc7cd294bf8, type: 2}
-  spawnGlobalSlots: 0
+  randomAltAct: 0
   altActs:
   - chance: 100
     act: {fileID: 11400000, guid: aaeea83a99ff1c847a666927c0d164f4, type: 2}
   - chance: 5
     act: {fileID: 11400000, guid: b771920c03e36094fa409e13048755aa, type: 2}
+  randomNextAct: 0
   nextActs: []
   text: Browsing for cat videos?
   endText: That went viral.

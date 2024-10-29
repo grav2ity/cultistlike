@@ -12,11 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8982c193c92b64445902a2eec82848b5, type: 3}
   m_Name: Food
   m_EditorClassIdentifier: 
-  title: Extra Food
+  label: Extra Food
   text: 
-  aspects: []
+  fragments: []
+  act: {fileID: 0}
   spawnTests: []
   spawnRules: []
+  required: []
+  essential: []
+  forbidden: []
   cardTests:
   - canFail: 0
     loc1: 0

@@ -7,56 +7,103 @@ namespace CultistLike
 {
     public class FragmentBar : MonoBehaviour
     {
-        private List<AspectViz> aspects = new List<AspectViz>();
+        public bool showCards;
+        public Aspect allowed;
+        public Aspect forbidden;
+
+        [SerializeField, HideInInspector] private List<FragmentViz> fragVizs;
+        [SerializeField, HideInInspector] private int index;
 
 
         public void Load(FragContainer fragments)
         {
-            if (fragments == null)
+            Unload();
+            if (fragments != null)
             {
-                Unload();
-            }
-            else
-            {
+                index = 0;
                 gameObject.SetActive(true);
 
-                ActivateVizs(fragments.aspects.Count);
-
-                for (int i = 0; i < fragments.aspects.Count; i++)
+                if (showCards == true)
                 {
-                    aspects[i].LoadAspect(fragments.aspects[i]);
-                    aspects[i].gameObject.SetActive(true);
+                    foreach (var card in fragments.cards)
+                    {
+                        Load(card);
+                    }
+                }
+                foreach (var frag in fragments.fragments)
+                {
+                    Load(frag);
+                }
+            }
+        }
+
+        public void Load(Slot slot)
+        {
+            Unload();
+            if (slot != null)
+            {
+                index = 0;
+                gameObject.SetActive(true);
+
+                if (slot.required.Count > 0)
+                {
+                    Load(allowed);
+                }
+                foreach (var frag in slot.required)
+                {
+                    Load(frag);
+                }
+                if (slot.forbidden.Count > 0)
+                {
+                    Load(forbidden);
+                }
+                foreach (var frag in slot.forbidden)
+                {
+                    Load(frag);
                 }
             }
         }
 
         public void Unload()
         {
-            for (int i = 0; i < aspects.Count; i++)
+            for (int i = 0; i < fragVizs.Count; i++)
             {
-                aspects[i].gameObject.SetActive(false);
+                fragVizs[i].gameObject.SetActive(false);
             }
 
+            index = 0;
             gameObject.SetActive(false);
         }
 
-        private void ActivateVizs(int count)
+        private void Load<T>(T frag) where T : IFrag
         {
-            if (count > aspects.Count)
+            if (index < fragVizs.Count)
             {
-                while (count > aspects.Count)
-                {
-                    var aspect = Instantiate(GameManager.Instance.aspectPrefab, transform);
-                    aspects.Add(aspect);
-                }
-
+                fragVizs[index].Load<T>(frag);
+                fragVizs[index].gameObject.SetActive(true);
+                index++;
             }
-            else if (count < aspects.Count)
+            else
             {
-                for (int i = aspects.Count; i > count; i--)
-                {
-                    aspects[i - 1].gameObject.SetActive(false);
-                }
+                var fragViz = Instantiate(GameManager.Instance.fragmentPrefab, transform);
+                fragVizs.Add(fragViz);
+                Load<T>(frag);
+            }
+        }
+
+        private void Load(CardViz frag)
+        {
+            if (index < fragVizs.Count)
+            {
+                fragVizs[index].Load(frag);
+                fragVizs[index].gameObject.SetActive(true);
+                index++;
+            }
+            else
+            {
+                var fragViz = Instantiate(GameManager.Instance.fragmentPrefab, transform);
+                fragVizs.Add(fragViz);
+                Load(frag);
             }
         }
 

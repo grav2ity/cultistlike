@@ -13,46 +13,30 @@ namespace CultistLike
         public Slot slot;
 
         [Header("Layout")]
-        [SerializeField] private TextMeshPro title;
+        [SerializeField] private TextMeshPro label;
         [SerializeField] private Renderer art;
         [SerializeField] private Renderer highlight;
 
-        [Header("Options")]
-        [Tooltip("Close when card is removed")]
-        public bool autoClose;
-        [Tooltip("Accept only matching cards")]
+        [Header("Card Options")]
+        [Tooltip("Accept only matching Cards.")]
         public bool onlyMatching;
-        [Tooltip("Cannot remove card from the slot")]
+        [Tooltip("Cannot remove Card from the Slot.")]
         public bool cardLock;
-
+        [Tooltip("Grabs Cards for itself.")]
         public bool grab;
 
-        [SerializeField, HideInInspector] private FragContainer fragments;
+        [Header("Options")]
+        [Tooltip("Close when Card is removed.")]
+        public bool autoClose;
+        [Tooltip("Removing Card will cause all other Slots to close.")]
+        public bool firstSlot;
 
         [SerializeField, HideInInspector] private ActWindow actWindow;
         [SerializeField, HideInInspector] private CardViz _slottedCard;
 
-        public string Title { get => title.text; set => title.text = value; }
-        //TODO 
-        public CardViz slottedCard
-        {
-            get => _slottedCard;
-            set
-            {
-                if (_slottedCard != null)
-                {
-                    actWindow.UnholdCard(_slottedCard);
-                    fragments.Remove(_slottedCard);
-                }
-                _slottedCard = value;
-                if (_slottedCard != null)
-                {
-                    actWindow.HoldCard(slottedCard);
-                    fragments.Add(slottedCard);
-                    actWindow.Check();
-                }
-            }
-        }
+        public string Label { get => label.text; set => label.text = value; }
+        public CardViz slottedCard { get => _slottedCard; set => _slottedCard = value; }
+
 
         public void OnDrop(PointerEventData eventData)
         {
@@ -88,12 +72,14 @@ namespace CultistLike
             List<CardViz> cardsToH = new List<CardViz>();
             foreach (var cardViz in GameManager.Instance.table.GetCards())
             {
-                if (AcceptsCard(cardViz) == true) 
+                if (AcceptsCard(cardViz) == true)
                 {
                     cardsToH.Add(cardViz);
                 }
             }
             GameManager.Instance.table.HighlightCards(cardsToH);
+
+            UIManager.Instance?.cardInfo?.Load(this);
         }
 
         public bool TrySlotCard(CardViz cardViz)
@@ -119,15 +105,16 @@ namespace CultistLike
             return false;
         }
 
-        public void SlotCard(CardViz cardViz, bool onlyFinalize = false)
+        public void SlotCard(CardViz cardViz)
+        {
+            SlotCardLogical(cardViz);
+            SlotCardPhysical(cardViz);
+        }
+
+        public void SlotCardPhysical(CardViz cardViz)
         {
             if (cardViz != null)
             {
-                if (onlyFinalize == false)
-                {
-                    slottedCard = cardViz;
-                }
-
                 cardViz.transform.SetParent(transform);
                 cardViz.transform.localPosition = Vector3.zero;
 
@@ -141,14 +128,37 @@ namespace CultistLike
             }
         }
 
+        public void SlotCardLogical(CardViz cardViz)
+        {
+            if (slottedCard != null)
+            {
+                actWindow.UnholdCard(slottedCard);
+            }
+            else
+            {
+                actWindow.UnholdCard(slottedCard);
+            }
+            slottedCard = cardViz;
+            if (slottedCard != null)
+            {
+                actWindow.HoldCard(slottedCard);
+                actWindow.Check();
+            }
+        }
+
         public CardViz UnslotCard()
         {
             var sc = slottedCard;
             if (slottedCard != null)
             {
                 slottedCard.free = true;
+                slottedCard.interactive = true;
                 slottedCard.transform.SetParent(null);
-                slottedCard = null;
+                SlotCardLogical(null);
+            }
+            if (firstSlot == true)
+            {
+                actWindow.FirstSlotEmpty();
             }
 
             // if (autoClose == true)
@@ -165,8 +175,7 @@ namespace CultistLike
             {
                 slottedCard.gameObject.SetActive(false);
                 slottedCard.transform.SetParent(actWindow.transform);
-                //TODO
-                _slottedCard = null;
+                slottedCard = null;
             }
             // if (autoClose == true)
             // {
@@ -183,7 +192,7 @@ namespace CultistLike
         //         GameManager.Instance.table.ReturnToTable(cardViz);
         //     }
         //     gameObject.SetActive(false);
-        //     open = false;
+        //     // open = false;
         // }
 
         // public void OpenSlot(string name = "")
@@ -210,7 +219,8 @@ namespace CultistLike
             {
                 GameManager.Instance.DestroyCard(slottedCard);
             }
-            slottedCard = null;
+            // slottedCard = null;
+            SlotCardLogical(null);
         }
 
         public void SetHighlight(bool p)
@@ -223,7 +233,7 @@ namespace CultistLike
             if (slot != null)
             {
                 this.slot = slot;
-                Title = slot.title;
+                Label = slot.label;
                 grab = slot.grab;
                 cardLock = slot.cardLock;
                 onlyMatching = slot.onlyMatching;

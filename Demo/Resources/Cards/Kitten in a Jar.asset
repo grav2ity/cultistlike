@@ -12,8 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d7ad74be29e3414894e2ccf6a7e39e6, type: 3}
   m_Name: Kitten in a Jar
   m_EditorClassIdentifier: 
-  label: Kitten in a Jar
+  label: Kitten          [in a Jar]
   art: {fileID: 21300000, guid: f87614236a0aed341979f939af6c7cd6, type: 3}
   color: {r: 0.9716981, g: 0.9716981, b: 0.9716981, a: 1}
   description: 
   fragments: []
+  rules: []
+  oneForAll: 0
+  slots: []
+  decayTo: {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
+  lifetime: 30

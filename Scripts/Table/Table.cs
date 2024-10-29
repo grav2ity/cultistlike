@@ -40,6 +40,9 @@ namespace CultistLike
         /// <returns></returns>
         public abstract List<T> FindFreeLocations(Viz viz, List<Viz> l);
 
+        public abstract void Remove(Viz viz);
+
+
         public virtual void OnDrop(PointerEventData eventData)
         {
             if (eventData.button == PointerEventData.InputButton.Left)

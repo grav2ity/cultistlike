@@ -46,10 +46,13 @@ MonoBehaviour:
   tableModifiers:
   - op: 1
     act: {fileID: 11400000, guid: 3781dd133eecea341b8f2ef5a559845c, type: 2}
+  pathModifiers: []
   rules: []
   slots: []
   spawnGlobalSlots: 0
+  randomAltAct: 0
   altActs: []
+  randomNextAct: 0
   nextActs: []
   text: Might be a pleasant evening after all.
   endText: Just a dream. Move on.

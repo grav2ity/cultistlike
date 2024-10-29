@@ -236,7 +236,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slot: {fileID: 0}
-  title: {fileID: 5266998188540822850}
+  label: {fileID: 5266998188540822850}
   art: {fileID: 8567668268619634666}
   highlight: {fileID: 2721004463860648226}
   autoClose: 0
@@ -261,7 +261,7 @@ GameObject:
   - component: {fileID: 5563033222769170415}
   - component: {fileID: 5266998188540822850}
   m_Layer: 0
-  m_Name: Ttile
+  m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

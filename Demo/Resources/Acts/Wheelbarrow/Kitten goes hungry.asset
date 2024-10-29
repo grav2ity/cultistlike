@@ -16,15 +16,30 @@ MonoBehaviour:
   token: {fileID: 0}
   initial: 0
   time: 10
-  aspects: []
   tests: []
-  actModifiers: []
-  cardModifiers: []
+  testRules: []
+  onEnterRules: []
+  fragments: []
+  actModifiers:
+  - op: 0
+    fragment: {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
+    level: 1
+    reference: {fileID: 0}
+  cardModifiers:
+  - op: 10
+    onto: {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
+    what: {fileID: 11400000, guid: f0844792f3a8dbe4885ee16837eb9830, type: 2}
+    level: 0
+    reference: {fileID: 0}
   tableModifiers: []
-  rules: []
+  pathModifiers: []
+  deckModifiers: []
+  modRules: []
+  ignoreGlobalSlots: 0
   slots: []
-  spawnGlobalSlots: 0
+  randomAltAct: 0
   altActs: []
+  randomNextAct: 0
   nextActs: []
   text: Kitten toils on empty stomach.
   endText: 

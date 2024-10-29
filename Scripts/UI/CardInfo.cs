@@ -18,8 +18,6 @@ namespace CultistLike
         [SerializeField] private FragmentBar fragmentBar;
 
 
-        private List<AspectViz> aspects = new List<AspectViz>();
-
         public string Description {
             get { return description.text; }
             set { description.text = value; }
@@ -50,6 +48,19 @@ namespace CultistLike
             }
 
             fragmentBar.Load(cardViz.fragments);
+        }
+
+        public void Load(SlotViz slotViz)
+        {
+            gameObject.SetActive(true);
+
+            CardName = slotViz.slot.label;
+            Description = slotViz.slot.description;
+
+            art.sprite = null;
+            art.color = Color.white;
+
+            fragmentBar.Load(slotViz.slot);
         }
 
         public void Unload()

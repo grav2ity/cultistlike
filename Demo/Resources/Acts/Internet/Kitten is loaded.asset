@@ -36,10 +36,13 @@ MonoBehaviour:
     reference: {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
   cardModifiers: []
   tableModifiers: []
+  pathModifiers: []
   rules: []
   slots: []
   spawnGlobalSlots: 0
+  randomAltAct: 0
   altActs: []
+  randomNextAct: 0
   nextActs: []
   text: Well, there's no telling what can happen from this.
   endText: What are you going to do about all these cakes your cat ordered?

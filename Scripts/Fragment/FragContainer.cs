@@ -10,29 +10,21 @@ namespace CultistLike
     public class FragContainer
     {
         public List<CardViz> cards;
-        public List<HeldAspect> aspects;
-
+        public List<HeldFragment> fragments;
         public List<CardViz> matches;
-
-
-        public FragContainer()
-        {
-            cards = new List<CardViz>();
-            aspects = new List<HeldAspect>();
-            matches = new List<CardViz>();
-        }
 
 
         public void Clear()
         {
             cards.Clear();
-            aspects.Clear();
             matches.Clear();
+
+            fragments.Clear();
         }
 
-        public void Add(Fragment frag) => frag.AddToContainer(this);
-        public void Adjust(Fragment frag, int level) => frag.AdjustInContainer(this, level);
-        public void Remove(Fragment frag, int level) => frag.RemoveFromContainer(this);
+        public void Add(Fragment frag) => frag?.AddToContainer(this);
+        public void Remove(Fragment frag) => frag?.RemoveFromContainer(this);
+        public void Adjust(Fragment frag, int level) => frag?.AdjustInContainer(this, level);
         public int Count(Fragment frag) => frag.CountInContainer(this);
 
 
@@ -40,15 +32,22 @@ namespace CultistLike
         {
             if (aspect != null)
             {
-                aspect.AddToList(aspects);
+                aspect.AddToList(fragments);
             }
         }
 
-        public void Add(HeldAspect aspect)
+        public void Add(HeldFragment frag)
         {
-            if (aspect != null)
+            if (frag != null)
             {
-                aspect.AddToList(aspects);
+                if (frag.cardViz != null)
+                {
+                    Add(frag.cardViz);
+                }
+                else
+                {
+                    frag.AddToList(fragments);
+                }
             }
         }
 
@@ -56,8 +55,7 @@ namespace CultistLike
         {
             if (card != null)
             {
-                var cardViz = UnityEngine.Object.Instantiate(GameManager.Instance.cardPrefab);
-                cardViz.SetCard(card);
+                var cardViz = GameManager.Instance.CreateCard(card);
                 Add(cardViz);
             }
         }
@@ -67,9 +65,9 @@ namespace CultistLike
             if (cardViz != null)
             {
                 cards.Add(cardViz);
-                foreach (var aspect in cardViz.fragments.aspects)
+                foreach (var frag in cardViz.fragments.fragments)
                 {
-                    Add(aspect);
+                    Add(frag);
                 }
             }
         }
@@ -84,47 +82,63 @@ namespace CultistLike
 
         public void Adjust(Aspect aspect, int level)
         {
-            if (level < 0)
+            if (aspect != null)
             {
-                for (int i=level; i<0; i++)
-                {
-                    DestroyCardWithAspect(aspect);
-                }
-            }
-            aspect.AdjustInList(aspects, level);
-        }
-
-        public void Addjust(Card card, int level)
-        {
-            if (level > 0)
-            {
-                while (level-- > 0)
-                {
-                    Add(card);
-                }
-            }
-            else if (level < 0)
-            {
-                while (level++ < 0)
-                {
-                    Remove(card);
-                }
+                aspect.AdjustInList(fragments, level);
             }
         }
 
-        public void DestroyCard(CardViz cardViz)
+        public void Adjust(HeldFragment frag, int level)
         {
-            cards.Remove(cardViz);
-            matches.Remove(cardViz);
-            GameManager.Instance.DestroyCard(cardViz);
+            if (frag.cardViz != null)
+            {
+                Adjust(frag.cardViz, level);
+            }
+            else
+            {
+                Adjust(frag.fragment, level);
+            }
         }
 
-        private void DestroyCardWithAspect(Aspect aspect)
+        public void Adjust(Card card, int level)
         {
-            var cardViz = cards.Find(x => x.card.fragments.Contains(aspect) != false);
-            if (cardViz != null)
+            if (card != null)
             {
-                DestroyCard(cardViz);
+                if (level > 0)
+                {
+                    while (level-- > 0)
+                    {
+                        Add(card);
+                    }
+                }
+                else if (level < 0)
+                {
+                    while (level++ < 0)
+                    {
+                        Remove(card);
+                    }
+                }
+            }
+        }
+
+        public void Adjust(CardViz card, int level)
+        {
+            if (card != null)
+            {
+                if (level > 0)
+                {
+                    while (level-- > 0)
+                    {
+                        Add(card);
+                    }
+                }
+                else if (level < 0)
+                {
+                    while (level++ < 0)
+                    {
+                        Remove(card);
+                    }
+                }
             }
         }
 
@@ -132,15 +146,22 @@ namespace CultistLike
         {
             if (aspect != null)
             {
-                aspect.RemoveFromList(aspects);
+                aspect.RemoveFromList(fragments);
             }
         }
 
-        public void Remove(HeldAspect aspect)
+        public void Remove(HeldFragment frag)
         {
-            if (aspect != null)
+            if (frag != null)
             {
-                aspect.RemoveFromList(aspects);
+                if (frag.cardViz != null)
+                {
+                    Remove(frag.cardViz);
+                }
+                else
+                {
+                    frag.RemoveFromList(fragments);
+                }
             }
         }
 
@@ -164,27 +185,31 @@ namespace CultistLike
             {
                 cards.Remove(cardViz);
                 matches.Remove(cardViz);
-                foreach (var aspect in cardViz.fragments.aspects)
+                foreach (var frag in cardViz.fragments.fragments)
                 {
-                    Remove(aspect);
+                    Remove(frag);
                 }
             }
             return cardViz;
         }
 
-        public HeldAspect Find(Aspect aspect) =>
-            aspects.Find(x => x.aspect == aspect);
+        public HeldFragment Find(Aspect aspect) =>
+            fragments.Find(x => x.fragment == aspect);
 
-        public HeldAspect Find(HeldAspect ha) =>
-            aspects.Find(x => x.aspect == ha.aspect && x.count >= ha.count);
+        // public HeldAspect Find(HeldAspect ha) =>
+        //     aspects.Find(x => x.aspect == ha.aspect && x.count >= ha.count);
 
-        public HeldAspect Find(Aspect a, Predicate<int> p) =>
-            aspects.Find(x => x.aspect == a && p(x.count) == true);
+        // public HeldAspect Find(Aspect a, Predicate<int> p) =>
+        //     aspects.Find(x => x.aspect == a && p(x.count) == true);
 
-        public HeldAspect Find(HeldAspect ha, Predicate<int> p) =>
-            aspects.Find(x => x.aspect == ha.aspect && p(x.count) == true);
+        // public HeldAspect Find(HeldAspect ha, Predicate<int> p) =>
+        //     aspects.Find(x => x.aspect == ha.aspect && p(x.count) == true);
 
         public CardViz Find(Card card) => cards.Find(x => x.card == card);
+        public List<CardViz> FindAll(Card card) => cards.FindAll(x => x.card == card);
+
+        public List<CardViz> FindAll(Aspect aspect) =>
+            cards.FindAll(x => x.fragments.Count(aspect) > 0);
 
         public int Count(Aspect aspect)
         {
@@ -193,5 +218,24 @@ namespace CultistLike
         }
 
         public int Count(Card card) => cards.FindAll(x => x.card == card).Count;
+
+        public int Count(HeldFragment frag)
+        {
+            if (frag != null)
+            {
+                if (frag.cardViz != null)
+                {
+                    return Count(frag.cardViz.card);
+                }
+                else
+                {
+                    return Count(frag.fragment);
+                }
+            }
+            else
+            {
+                return 0;
+            }
+        }
     }
 }

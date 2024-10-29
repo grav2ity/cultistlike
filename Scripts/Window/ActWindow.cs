@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 using DG.Tweening;
+
 using TMPro;
 
 
@@ -32,6 +33,8 @@ namespace CultistLike
         private TokenViz _tokenViz;
         private ActLogic actLogic;
 
+        private bool suspendUpdates;
+
         public TokenViz tokenViz { get => _tokenViz; private set => _tokenViz = value; }
 
         private List<SlotViz> slots => actStatus == ActStatus.Running ? runSlots : idleSlots;
@@ -52,6 +55,7 @@ namespace CultistLike
                 }
             }
         }
+
 
         public void BringUp()
         {
@@ -84,6 +88,17 @@ namespace CultistLike
             actLogic.RunAct(readyAct);
         }
 
+        public void FirstSlotEmpty()
+        {
+            suspendUpdates = true;
+            ReturnCardsToTable();
+            suspendUpdates = false;
+            if (actStatus != ActStatus.Running)
+            {
+                StatusIdle();
+            }
+        }
+
         public void ParentCardsToWindow()
         {
             foreach (var slot in slots)
@@ -92,7 +107,7 @@ namespace CultistLike
             }
         }
 
-        // //TODO has side effects
+        //TODO has side effects
         public bool MatchesAnyOpenSlot(CardViz card) => HighlightSlots(card, false) == true;
 
         //TODO
@@ -130,27 +145,64 @@ namespace CultistLike
             if (cardViz != null)
             {
                 actLogic.HoldCard(cardViz);
+                UpdateSlots();
+                if (actStatus == ActStatus.Running)
+                {
+                    ApplyStatus(ActStatus.Running);
+                }
             }
-            UpdateSlots();
-            // UpdateBars();
         }
 
         public CardViz UnholdCard(CardViz cardViz)
         {
-            var r = actLogic.UnholdCard(cardViz);
-            UpdateSlots();
-            // UpdateBars();
-            return r;
+            if (cardViz != null)
+            {
+                var r = actLogic.UnholdCard(cardViz);
+                UpdateSlots();
+                if (actStatus == ActStatus.Running)
+                {
+                    ApplyStatus(ActStatus.Running);
+                }
+                return r;
+            }
+
+            return null;
         }
 
         public void UpdateSlots()
         {
-            CloseSlots(slots);
-
-            var slotsToOpen = actLogic.CheckForSlots();
-            foreach (var slot in slotsToOpen)
+            if (suspendUpdates == false)
             {
-                OpenSlot(slot, slots);
+                suspendUpdates = true;
+
+                CloseSlots(slots);
+
+                var slotsToOpen = actLogic.CheckForSlots();
+                foreach (var slot in slotsToOpen)
+                {
+                    OpenSlot(slot, slots);
+                }
+
+                bool reUpdate = false;
+                foreach (var slot in slots)
+                {
+                    if (slot.gameObject.activeSelf == false)
+                    {
+                        var cardViz = slot.UnslotCard();
+                        if (cardViz != null)
+                        {
+                            reUpdate = true;
+                            GameManager.Instance.table.ReturnToTable(cardViz);
+                        }
+                    }
+                }
+
+                suspendUpdates = false;
+                if (reUpdate == true)
+                {
+                    UpdateSlots();
+                }
+                UpdateBars();
             }
         }
 
@@ -199,6 +251,12 @@ namespace CultistLike
                     if (count == 0)
                     {
                         StatusIdle();
+                        if (tokenViz.token.dissolve == true)
+                        {
+                            tokenViz.Dissolve();
+                            Close();
+                            Destroy(this, 1f);
+                        }
                     }
                     else
                     {
@@ -208,7 +266,6 @@ namespace CultistLike
                 default:
                     break;
             }
-            UpdateBars();
         }
 
         public void CollectAll()
@@ -224,6 +281,7 @@ namespace CultistLike
             resultLane.cards.Clear();
 
             Check();
+            UpdateBars();
         }
 
         public void LoadToken(TokenViz tokenViz)
@@ -265,7 +323,7 @@ namespace CultistLike
             {
                 if (slot.gameObject.activeSelf == true && slot.grab == true)
                 {
-                    foreach (var cardViz in GameManager.Instance.GetCards())
+                    foreach (var cardViz in GameManager.Instance.cards)
                     {
                         if (cardViz.gameObject.activeSelf == false)
                             continue;
@@ -286,9 +344,9 @@ namespace CultistLike
                                 OnCardUndock(cardVizY.gameObject);
                             cardVizY.gameObject.SetActive(true);
                             cardVizY.transform.SetParent(null);
-                            slot.slottedCard = cardVizY;
+                            slot.SlotCardLogical(cardVizY);
                             cardVizY.transform.DOMove(tokenViz.transform.position, GameManager.Instance.normalSpeed).
-                                OnComplete(() => { cardVizY.interactive = prevInteractive; slot.SlotCard(cardVizY, true); });
+                                OnComplete(() => { cardVizY.interactive = prevInteractive; slot.SlotCardPhysical(cardVizY); });
 
                             return;
                         }
@@ -312,7 +370,10 @@ namespace CultistLike
 
         public void UpdateBars()
         {
-            fragmentBar.Load(actLogic.fragments);
+            if (suspendUpdates == false)
+            {
+                fragmentBar.Load(actLogic.fragments);
+            }
         }
 
         /// <summary>
@@ -365,8 +426,8 @@ namespace CultistLike
             {
                 if (cardSlot.slottedCard != null)
                 {
-                    GameManager.Instance.table.ReturnToTable(cardSlot.slottedCard);
-                    cardSlot.UnslotCard();
+                    var cardViz = cardSlot.UnslotCard();
+                    GameManager.Instance.table.ReturnToTable(cardViz);
                 }
             }
         }

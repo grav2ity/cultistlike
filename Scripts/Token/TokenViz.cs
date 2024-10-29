@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
+using DG.Tweening;
 using TMPro;
 
 
@@ -11,6 +12,9 @@ namespace CultistLike
         [Header("Token")]
         public Token token;
         public Act autoPlay;
+        [Tooltip("Dissapears after completion.")]
+
+        [HideInInspector] public ActLogic parent;
 
         [Header("Layout")]
         [SerializeField] private TextMeshPro title;
@@ -51,6 +55,14 @@ namespace CultistLike
             actWindow.BringUp();
         }
 
+        public void Dissolve()
+        {
+            this.interactive = false;
+
+            transform.DOScale(new Vector3(0f, 0f, 0f), 1).
+                OnComplete(() => { GameManager.Instance.DestroyToken(this); });
+        }
+
         public void LoadToken(Token token)
         {
             if (token != null)
@@ -63,11 +75,6 @@ namespace CultistLike
                 }
                 artBack.material.SetColor("_Color", token.color);
             }
-        }
-
-        public void SetToken(Token token)
-        {
-            this.token = token;
         }
 
         public void SetResultCount(int count)
@@ -93,6 +100,14 @@ namespace CultistLike
             timer.gameObject.SetActive(p);
         }
 
+        private void Awake()
+        {
+            if (token != null)
+            {
+                LoadToken(token);
+            }
+        }
+
         private void Start()
         {
             draggingPlane = GameManager.Instance.cardDragPlane;
@@ -101,11 +116,11 @@ namespace CultistLike
             {
                 Debug.LogError("Please set Token for " + this.name);
             }
-            LoadToken(token);
 
             actWindow = Instantiate(GameManager.Instance.actWindowPrefab,
                                     GameManager.Instance.windowPlane);
             actWindow.LoadToken(this);
+            actWindow.GetComponent<ActLogic>().SetParent(parent);
 
             actWindow.timer.SetFollowing(timer);
             ShowTimer(false);

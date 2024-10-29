@@ -25,7 +25,7 @@ namespace CultistLike
         }
 
 
-        public void LoadAspect(Aspect aspect)
+        public void LoadAspect(Fragment aspect)
         {
             gameObject.SetActive(true);
 

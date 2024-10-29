@@ -34,6 +34,11 @@ namespace CultistLike
         public override Vector3 ToLocalPosition(Vector2Int v) => GridCoordsToLocal(v);
         public override Vector2Int FromLocalPosition(Vector3 v) => LocalToGridCoords(v);
 
+        public override void Remove(Viz viz)
+        {
+            OnCardUndock(viz.gameObject);
+        }
+
         public override void OnCardUndock(GameObject go)
         {
             base.OnCardUndock(go);
@@ -276,6 +281,7 @@ namespace CultistLike
         {
             public T[] array;
             private int w, h;
+
 
             public SArray(int w, int h)
             {

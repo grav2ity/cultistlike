@@ -34,6 +34,8 @@ namespace CultistLike
                 {
                     GameManager.Instance.table.ReturnToTable(cardViz);
                 }
+                actWindow.HoldCard(cardViz);
+                actWindow.UpdateBars();
             }
         }
 
@@ -44,7 +46,6 @@ namespace CultistLike
             {
                 cards.Remove(cardViz);
                 cardViz.ShowFace();
-                actWindow.UpdateBars();
 
                 if (actWindow.gameObject.activeInHierarchy == false)
                 {
@@ -52,6 +53,8 @@ namespace CultistLike
                     cardViz.transform.localPosition = Vector3.zero;
                 }
                 actWindow.UnholdCard(cardViz);
+                actWindow.UpdateBars();
+                actWindow.Check();
             }
         }
 
@@ -83,8 +86,6 @@ namespace CultistLike
 
         private void Awake()
         {
-            cards = new List<CardViz>();
-
             actWindow = GetComponentInParent<ActWindow>();
         }
     }

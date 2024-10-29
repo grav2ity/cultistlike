@@ -977,12 +977,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _fragments:
     cards: []
-    aspects: []
+    fragments: []
     matches: []
   _activeAct: {fileID: 0}
   _altAct: {fileID: 0}
   altActs: []
   nextActs: []
+  actWindow: {fileID: 0}
+  forceAct: {fileID: 0}
+  parent: {fileID: 0}
+  children: []
 --- !u!1 &6255190282301801516
 GameObject:
   m_ObjectHideFlags: 0
@@ -1646,6 +1650,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4948182315103652455, guid: be593928b20018543b676680c68a138a,
+        type: 3}
+      propertyPath: firstSlot
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5875277925063152557, guid: be593928b20018543b676680c68a138a,
         type: 3}
       propertyPath: m_Layer
@@ -1994,6 +2003,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4948182315103652455, guid: be593928b20018543b676680c68a138a,
+        type: 3}
+      propertyPath: firstSlot
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5875277925063152557, guid: be593928b20018543b676680c68a138a,
         type: 3}
       propertyPath: m_Layer
@@ -2287,6 +2301,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Fragment Bar
       objectReference: {fileID: 0}
+    - target: {fileID: 7013819266576955069, guid: e85bab7d1a9c8f04ba3fd04dc098c14d,
+        type: 3}
+      propertyPath: showCards
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8265062001254862253, guid: e85bab7d1a9c8f04ba3fd04dc098c14d,
         type: 3}
       propertyPath: m_Pivot.x
@@ -2320,7 +2339,7 @@ PrefabInstance:
     - target: {fileID: 8265062001254862253, guid: e85bab7d1a9c8f04ba3fd04dc098c14d,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 150
+      value: 292.99
       objectReference: {fileID: 0}
     - target: {fileID: 8265062001254862253, guid: e85bab7d1a9c8f04ba3fd04dc098c14d,
         type: 3}
@@ -2365,12 +2384,12 @@ PrefabInstance:
     - target: {fileID: 8265062001254862253, guid: e85bab7d1a9c8f04ba3fd04dc098c14d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -467.1
+      value: -395.6
       objectReference: {fileID: 0}
     - target: {fileID: 8265062001254862253, guid: e85bab7d1a9c8f04ba3fd04dc098c14d,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 3.8
+      value: 45
       objectReference: {fileID: 0}
     - target: {fileID: 8265062001254862253, guid: e85bab7d1a9c8f04ba3fd04dc098c14d,
         type: 3}

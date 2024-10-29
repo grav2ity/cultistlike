@@ -16,7 +16,7 @@ namespace CultistLike
         public CardViz cardPrefab;
         public TokenViz tokenPrefab;
         public ActWindow actWindowPrefab;
-        public AspectViz aspectPrefab;
+        public FragmentViz fragmentPrefab;
 
         [Header("Table")]
         public Table<Vector2Int> table;
@@ -25,23 +25,30 @@ namespace CultistLike
         public RectTransform windowPlane;
         public RectTransform cardDragPlane;
 
-        [Header("Card move speed")]
+        [Header("Card transform time")]
         public float normalSpeed;
         public float fastSpeed;
         public float rotateSpeed;
+        public float scaleSpeed;
 
-        public List<Slot> slotTypes;
+        [Header("Special fragments")]
+        public Fragment thisCard;
+        public Fragment matchedCard;
 
-        [HideInInspector] public List<TokenViz> tokens;
+        [HideInInspector] public List<Slot> slotSOS;
 
-        [SerializeField, HideInInspector] private List<CardViz> cards;
+        [SerializeField, HideInInspector] private List<TokenViz> _tokens;
+        [SerializeField, HideInInspector] private List<CardViz> _cards;
+
         [SerializeField, HideInInspector] private ActWindow _openWindow;
-
         [SerializeField, HideInInspector] private float elapsedTime;
-        private float timeScale;
 
+        private float timeScale;
         private List<Act> initialActs;
 
+
+        public List<CardViz> cards { get => _cards; }
+        public List<TokenViz> tokens { get => _tokens; }
 
         public ActWindow openWindow { get => _openWindow; private set => _openWindow = value; }
         public float time { get => elapsedTime; }
@@ -63,7 +70,18 @@ namespace CultistLike
 
         public void AddCard(CardViz cardViz)
         {
-            cards.Add(cardViz);
+            if (cardViz != null && cards.Contains(cardViz) == false)
+            {
+                cards.Add(cardViz);
+            }
+        }
+
+        public CardViz CreateCard(Card card)
+        {
+            var cardViz = UnityEngine.Object.Instantiate(cardPrefab);
+            cardViz.LoadCard(card);
+            AddCard(cardViz);
+            return cardViz;
         }
 
         public void DestroyCard(CardViz cardViz)
@@ -77,18 +95,39 @@ namespace CultistLike
             }
         }
 
-        public void SpawnAct(Act act, Viz viz)
+        public void AddToken(TokenViz tokenViz)
         {
-            if (act != null && act.token != null && viz != null)
+            if (tokenViz != null && tokens.Contains(tokenViz) == false)
+            {
+                tokens.Add(tokenViz);
+            }
+        }
+
+        public void DestroyToken(TokenViz tokenViz)
+        {
+            if (tokenViz != null)
+            {
+                tokens.Remove(tokenViz);
+                table.Remove(tokenViz);
+                tokenViz.gameObject.SetActive(false);
+                Destroy(tokenViz.gameObject, 1f);
+            }
+        }
+
+        public TokenViz SpawnAct(Act act, ActLogic parent)
+        {
+            if (act != null && act.token != null && parent != null && parent.tokenViz != null)
             {
 
-                var newTokenViz = SpawnToken(act.token, viz);
+                var newTokenViz = SpawnToken(act.token, parent.tokenViz);
                 if (newTokenViz != null)
                 {
-                    newTokenViz.SetToken(act.token);
                     newTokenViz.autoPlay = act;
+                    newTokenViz.parent = parent;
+                    return newTokenViz;
                 }
             }
+            return null;
         }
 
         public TokenViz SpawnToken(Token token, Viz viz)
@@ -97,7 +136,7 @@ namespace CultistLike
             {
                 var newTokenViz = UnityEngine.Object.Instantiate(GameManager.Instance.tokenPrefab,
                                                                  viz.transform.position, Quaternion.identity);
-                newTokenViz.SetToken(token);
+                newTokenViz.LoadToken(token);
 
                 var root = newTokenViz.transform;
                 var localScale = root.localScale;
@@ -112,10 +151,9 @@ namespace CultistLike
             return null;
         }
 
-        public List<CardViz> GetCards()
-        {
-            return cards;
-        }
+        // public List<CardViz> GetCards() {
+        //     return cards;
+        // }
 
         public void SetTimeScale(float ts)
         {
@@ -126,6 +164,7 @@ namespace CultistLike
 
         private void FindIninitalActs()
         {
+            initialActs = new List<Act>();
             var acts = Resources.LoadAll("", typeof(Act)).Cast<Act>().ToArray();
             foreach (var act in acts)
             {
@@ -136,22 +175,19 @@ namespace CultistLike
             }
         }
 
+        private void FindSlotSOS()
+        {
+            slotSOS = new List<Slot>(Resources.LoadAll("", typeof(Slot)).Cast<Slot>().ToArray());
+        }
+
         private void Awake()
         {
             Instance = this;
 
             timeScale = 1f;
 
-            tokens = new List<TokenViz>();
-            cards = new List<CardViz>();
-            initialActs = new List<Act>();
-
             FindIninitalActs();
-
-        #if UNITY_EDITOR
-            QualitySettings.vSyncCount = 0;
-            Application.targetFrameRate = 60;
-        #endif
+            FindSlotSOS();
         }
 
         private void Update()

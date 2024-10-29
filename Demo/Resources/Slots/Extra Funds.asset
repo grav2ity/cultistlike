@@ -12,11 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8982c193c92b64445902a2eec82848b5, type: 3}
   m_Name: Extra Funds
   m_EditorClassIdentifier: 
-  title: Extra Funds
-  text: 
-  aspects: []
+  label: Extra Funds
+  description: 
+  fragments: []
+  token: {fileID: 0}
+  unique: 0
+  allTokens: 0
+  allActs: 0
   spawnTests: []
   spawnRules: []
+  required: []
+  essential: []
+  forbidden: []
   cardTests:
   - canFail: 0
     loc1: 0
@@ -26,6 +33,6 @@ MonoBehaviour:
     loc2: 0
     fragment2: {fileID: 0}
   cardRules: []
-  onlyMatching: 1
+  onlyMatching: 0
   grab: 0
   cardLock: 0

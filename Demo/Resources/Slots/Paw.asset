@@ -12,16 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8982c193c92b64445902a2eec82848b5, type: 3}
   m_Name: Paw
   m_EditorClassIdentifier: 
-  title: Explore
-  text: 
-  aspects: []
+  label: Paw
+  description: 
+  fragments: []
+  token: {fileID: 0}
+  unique: 0
+  allTokens: 0
+  allActs: 0
   spawnTests: []
   spawnRules: []
+  required: []
+  essential: []
+  forbidden: []
   cardTests:
   - canFail: 0
     loc1: 0
     fragment1: {fileID: 11400000, guid: d10a489eb2498384e921ee099e5baef9, type: 2}
-    op: 1
+    op: 0
     constant: 1
     loc2: 0
     fragment2: {fileID: 0}

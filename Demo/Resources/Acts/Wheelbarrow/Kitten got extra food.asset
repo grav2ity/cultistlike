@@ -16,7 +16,6 @@ MonoBehaviour:
   token: {fileID: 0}
   initial: 0
   time: 10
-  aspects: []
   tests:
   - canFail: 0
     loc1: 0
@@ -25,21 +24,35 @@ MonoBehaviour:
     constant: 1
     loc2: 0
     fragment2: {fileID: 0}
+  - canFail: 0
+    loc1: 2
+    fragment1: {fileID: 11400000, guid: a46ceb5ebda24c642835ccf7d042edef, type: 2}
+    op: 0
+    constant: 1
+    loc2: 0
+    fragment2: {fileID: 0}
+  testRules: []
+  onEnterRules: []
+  fragments: []
   actModifiers:
   - op: 0
     fragment: {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
     level: 2
     reference: {fileID: 11400000, guid: a46ceb5ebda24c642835ccf7d042edef, type: 2}
-  - op: 0
-    fragment: {fileID: 11400000, guid: a46ceb5ebda24c642835ccf7d042edef, type: 2}
-    level: -1
-    reference: {fileID: 11400000, guid: a46ceb5ebda24c642835ccf7d042edef, type: 2}
+  - op: 100
+    fragment: {fileID: 11400000, guid: 359609367f1923146b1068c9f2375786, type: 2}
+    level: 1
+    reference: {fileID: 0}
   cardModifiers: []
   tableModifiers: []
-  rules: []
+  pathModifiers: []
+  deckModifiers: []
+  modRules: []
+  ignoreGlobalSlots: 0
   slots: []
-  spawnGlobalSlots: 0
+  randomAltAct: 0
   altActs: []
+  randomNextAct: 0
   nextActs: []
   text: Nom nom nom
   endText: 

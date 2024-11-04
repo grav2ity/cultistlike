@@ -44,33 +44,35 @@ namespace CultistLike
 
         public void Load<T>(T t) where T : IFrag
         {
-            if (t == null)
-                return;
-
-           fragment = t.ToFragment();
-            if (fragment.art != null)
+            if (t != null)
             {
-                art.sprite = fragment.art;
-                art.color = Color.white;
-            }
-            else
-            {
-                art.sprite = null;
-                art.color = fragment.color;
-            }
+                cardViz = null;
 
-            SetCount(t.Count());
+                fragment = t.ToFragment();
+                if (fragment.art != null)
+                {
+                    art.sprite = fragment.art;
+                    art.color = Color.white;
+                }
+                else
+                {
+                    art.sprite = null;
+                    art.color = fragment.color;
+                }
+
+                SetCount(t.Count());
+            }
         }
 
         public void Load(CardViz cardViz)
         {
-            if (cardViz == null)
-                return;
+            if (cardViz != null)
+            {
+                Load(cardViz.card);
+                this.cardViz = cardViz;
 
-            Load(cardViz.card);
-            this.cardViz = cardViz;
-
-            SetCount(1);
+                SetCount(1);
+            }
         }
 
         private void Awake()

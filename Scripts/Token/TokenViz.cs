@@ -12,7 +12,7 @@ namespace CultistLike
         [Header("Token")]
         public Token token;
         public Act autoPlay;
-        [Tooltip("Dissapears after completion.")]
+        public Rule initRule;
 
         [HideInInspector] public ActLogic parent;
 
@@ -57,7 +57,7 @@ namespace CultistLike
 
         public void Dissolve()
         {
-            this.interactive = false;
+            interactive = false;
 
             transform.DOScale(new Vector3(0f, 0f, 0f), 1).
                 OnComplete(() => { GameManager.Instance.DestroyToken(this); });
@@ -121,6 +121,7 @@ namespace CultistLike
                                     GameManager.Instance.windowPlane);
             actWindow.LoadToken(this);
             actWindow.GetComponent<ActLogic>().SetParent(parent);
+            actWindow.GetComponent<ActLogic>().ForceRule(initRule);
 
             actWindow.timer.SetFollowing(timer);
             ShowTimer(false);

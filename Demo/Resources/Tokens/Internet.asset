@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b90be55e95f4914094bbfa9c44b694b, type: 3}
   m_Name: Internet
   m_EditorClassIdentifier: 
-  label: 
+  label: Darknet
   description: 
   art: {fileID: 21300000, guid: cf86f53c87504f146b6c11c3aaae57d3, type: 3}
   color: {r: 0, g: 0, b: 0, a: 1}
   slot: {fileID: 11400000, guid: 9dba755aa634a174687efd6dc0fe9553, type: 2}
+  dissolve: 0
+  unique: 0

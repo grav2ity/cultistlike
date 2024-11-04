@@ -20,19 +20,15 @@ MonoBehaviour:
   allTokens: 0
   allActs: 0
   spawnTests: []
-  spawnRules: []
-  required: []
+  spawnRule: {fileID: 0}
+  required:
+  - fragment: {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
+    count: 1
+    cardViz: {fileID: 0}
   essential: []
   forbidden: []
-  cardTests:
-  - canFail: 0
-    loc1: 0
-    fragment1: {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
-    op: 0
-    constant: 1
-    loc2: 0
-    fragment2: {fileID: 0}
-  cardRules: []
+  cardTests: []
+  cardRule: {fileID: 0}
   onlyMatching: 0
   grab: 0
   cardLock: 0

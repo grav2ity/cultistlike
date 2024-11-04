@@ -199,7 +199,7 @@ GameObject:
   - component: {fileID: 3707799410444567590}
   - component: {fileID: 4948182315103652455}
   m_Layer: 0
-  m_Name: Card Slot
+  m_Name: Slot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -239,14 +239,11 @@ MonoBehaviour:
   label: {fileID: 5266998188540822850}
   art: {fileID: 8567668268619634666}
   highlight: {fileID: 2721004463860648226}
-  autoClose: 0
   onlyMatching: 0
   cardLock: 0
   grab: 0
-  fragments:
-    cards: []
-    aspects: []
-    matches: []
+  autoClose: 0
+  firstSlot: 0
   actWindow: {fileID: 0}
   _slottedCard: {fileID: 0}
 --- !u!1 &7243038272922166313

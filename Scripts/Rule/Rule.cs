@@ -11,8 +11,10 @@ namespace CultistLike
     {
         [Header("Tests")]
         public List<Test> tests;
-        [Tooltip("One of the Rules must pass. Modifiers are not applied.")]
-        public List<Rule> orRules;
+        [Tooltip("All of the AND Rules must pass. Modifiers are not applied.")]
+        public List<Rule> and;
+        [Tooltip("One of the OR Rules must pass. Modifiers are not applied.")]
+        public List<Rule> or;
         [Space(10)]
 
         [Header("Modfiers")]
@@ -21,11 +23,12 @@ namespace CultistLike
         public List<TableModifier> tableModifiers;
         public List<PathModifier> pathModifiers;
         public List<DeckModifier> deckModifiers;
-        [Tooltip("All modifiers are applied. Tests are ignored.")]
-        public List<Rule> modRules;
+
+        [Header("Furthermore")]
+        public List<Rule> furthermore;
 
 
-        public bool Evaluate(Context context)
+        public static bool Evaluate(Context context, List<Test> tests, List<Rule> and, List<Rule> or)
         {
             foreach (var test in tests)
             {
@@ -36,61 +39,91 @@ namespace CultistLike
                 }
             }
 
-            // foreach (var rule in orRules)
-            // {
-            //     context.ResetMatches();
-            //     if (rule.Evaluate(context) == true)
-            //     {
-            //         return true;
-            //     }
-            // }
+            foreach (var rule in and)
+            {
+                if (rule != null)
+                {
+                    using (var context2 = new Context(context))
+                    {
+                        var result = rule.Evaluate(context2);
+                        if (result == false)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
 
-            if (orRules.Count == 0)
+            foreach (var rule in or)
             {
-                return true;
+                if (rule != null)
+                {
+                    using (var context2 = new Context(context))
+                    {
+                        var result = rule.Evaluate(context2);
+                        if (result == true)
+                        {
+                            return true;
+                        }
+                    }
+                }
             }
-            else
-            {
-                return false;
-            }
+
+            return or.Count == 0;
         }
 
-        public void Execute(Context context)
+        public static void Execute(Context context, List<ActModifier> actMods,
+                                    List<CardModifier> cardMods, List<TableModifier> tableMods,
+                                    List<PathModifier> pathMods, List<DeckModifier> deckMods,
+                                    List<Rule> furthermore)
         {
             if (context != null)
             {
-                foreach (var actModifier in actModifiers)
+                foreach (var actMod in actMods)
                 {
-                    context.actModifiers.Add(actModifier.Evaluate(context));
+                    context.actModifiers.Add(actMod.Evaluate(context));
                 }
-                foreach (var cardModifier in cardModifiers)
+                foreach (var cardMod in cardMods)
                 {
-                    context.cardModifiers.Add(cardModifier.Evaluate(context));
+                    context.cardModifiers.Add(cardMod.Evaluate(context));
                 }
-                foreach (var tableModifier in tableModifiers)
+                foreach (var tableMod in tableMods)
                 {
-                    context.tableModifiers.Add(tableModifier.Evaluate(context));
+                    context.tableModifiers.Add(tableMod.Evaluate(context));
                 }
-                foreach (var pathModifier in pathModifiers)
+                foreach (var pathMod in pathMods)
                 {
-                    context.pathModifiers.Add(pathModifier.Evaluate(context));
+                    context.pathModifiers.Add(pathMod.Evaluate(context));
                 }
-                foreach (var deckModifier in deckModifiers)
+                foreach (var deckMod in deckMods)
                 {
-                    context.deckModifiers.Add(deckModifier.Evaluate(context));
+                    context.deckModifiers.Add(deckMod.Evaluate(context));
                 }
 
-                foreach (var rule in modRules)
+                foreach (var rule in furthermore)
                 {
-                    rule?.Execute(context);
+                    if (rule != null)
+                    {
+                        using (var context2 = new Context(context))
+                        {
+                            rule.Run(context2);
+                        }
+                    }
                 }
             }
             context.ResetMatches();
         }
 
+        public bool Evaluate(Context context) => Evaluate(context, tests, and, or);
+
+        public void Execute(Context context) => Execute(context, actModifiers,
+                                                        cardModifiers, tableModifiers,
+                                                        pathModifiers, deckModifiers,
+                                                        furthermore);
+
         public bool Run(Context context)
         {
-            if (context != null && context.source != null && context.actLogic != null)
+            if (context != null)
             {
                 if (Evaluate(context) == false)
                 {
@@ -104,6 +137,7 @@ namespace CultistLike
             }
             else
             {
+                //TODO ???
                 return true;
             }
         }

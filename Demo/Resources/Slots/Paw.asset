@@ -21,17 +21,13 @@ MonoBehaviour:
   allActs: 0
   spawnTests: []
   spawnRules: []
-  required: []
+  required:
+  - fragment: {fileID: 11400000, guid: d10a489eb2498384e921ee099e5baef9, type: 2}
+    count: 1
+    cardViz: {fileID: 0}
   essential: []
   forbidden: []
-  cardTests:
-  - canFail: 0
-    loc1: 0
-    fragment1: {fileID: 11400000, guid: d10a489eb2498384e921ee099e5baef9, type: 2}
-    op: 0
-    constant: 1
-    loc2: 0
-    fragment2: {fileID: 0}
+  cardTests: []
   cardRules: []
   onlyMatching: 1
   grab: 1

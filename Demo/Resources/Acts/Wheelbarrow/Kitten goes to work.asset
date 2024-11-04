@@ -19,35 +19,35 @@ MonoBehaviour:
   tests:
   - canFail: 0
     loc1: 0
-    loc11: 0
     fragment1: {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
-    op: 1
+    op: 0
     constant: 1
     loc2: 0
-    loc22: 0
     fragment2: {fileID: 0}
-  testRules: []
-  onEnterRules: []
+  and: []
+  or: []
   fragments: []
-  aspects: []
   actModifiers: []
   cardModifiers: []
   tableModifiers: []
   pathModifiers: []
   deckModifiers: []
-  rules: []
-  modRules: []
+  furthermore: []
   ignoreGlobalSlots: 0
   slots:
   - {fileID: 11400000, guid: 2e8557dfbcd3fd64ca95c8e1daa29ade, type: 2}
-  randomAltAct: 0
+  randomAlt: 0
   altActs:
-  - chance: 100
+  - chance: 0
     act: {fileID: 11400000, guid: 27891963cb71f014ca37a6b409f07b1b, type: 2}
-  randomNextAct: 0
+    actRule: {fileID: 0}
+  randomNext: 0
   nextActs:
-  - chance: 100
+  - chance: 0
     act: {fileID: 11400000, guid: f0abdd383ce6f6043a5e272a8c66a14e, type: 2}
+    actRule: {fileID: 0}
+  spawnedActs: []
+  onSpawn: {fileID: 0}
   text: Are you seriously going to send your cat to do this menial work for a meager
     pay?
   endText: 

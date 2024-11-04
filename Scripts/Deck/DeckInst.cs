@@ -18,7 +18,7 @@ namespace CultistLike
         {
             this.deck = deck;
 
-            index = 0;
+            // index = 0;
 
             if (deck.shuffle == true)
             {

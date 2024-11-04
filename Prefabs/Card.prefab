@@ -837,13 +837,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   text: {fileID: 135878409765785190}
+  art: {fileID: 6939245965619256764}
   decayTime: 0
   startTime: 0
   endTime: 0
   timeUpEvent:
     m_PersistentCalls:
       m_Calls: []
-  art: {fileID: 6939245965619256764}
   originalColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &5114472830425648139
 GameObject:
@@ -1023,8 +1023,6 @@ MonoBehaviour:
     fragments: []
     matches: []
   free: 1
-  decayTime: 0
-  decayTo: {fileID: 0}
   title: {fileID: 1629566531204144440}
   artBack: {fileID: 8567668268619634666}
   art: {fileID: 6939245965619256764}
@@ -1296,11 +1294,11 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4294967295
   m_fontSize: 2
-  m_fontSizeBase: 2
+  m_fontSizeBase: 3
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 1
+  m_fontSizeMax: 2
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -1310,7 +1308,7 @@ MonoBehaviour:
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
-  m_charWidthMaxAdj: 0
+  m_charWidthMaxAdj: 10
   m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0

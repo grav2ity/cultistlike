@@ -12,24 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8982c193c92b64445902a2eec82848b5, type: 3}
   m_Name: Food
   m_EditorClassIdentifier: 
-  label: Extra Food
-  text: 
+  label: Food
+  description: 
   fragments: []
-  act: {fileID: 0}
+  token: {fileID: 0}
+  unique: 0
+  allTokens: 0
+  allActs: 0
   spawnTests: []
-  spawnRules: []
-  required: []
+  spawnRule: {fileID: 0}
+  required:
+  - fragment: {fileID: 11400000, guid: a46ceb5ebda24c642835ccf7d042edef, type: 2}
+    count: 1
+    cardViz: {fileID: 0}
   essential: []
   forbidden: []
-  cardTests:
-  - canFail: 0
-    loc1: 0
-    fragment1: {fileID: 11400000, guid: a46ceb5ebda24c642835ccf7d042edef, type: 2}
-    op: 0
-    constant: 1
-    loc2: 0
-    fragment2: {fileID: 0}
-  cardRules: []
+  cardTests: []
+  cardRule: {fileID: 0}
   onlyMatching: 0
   grab: 0
   cardLock: 0

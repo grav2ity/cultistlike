@@ -16,9 +16,9 @@ namespace CultistLike
     /// <typeparam name="T"></typeparam>
     public abstract class Table<T> : MonoBehaviour, ICardDock, IDropHandler, IPointerDownHandler
     {
-        protected Dictionary<GameObject, T> lastLocations = new Dictionary<GameObject, T>();
+        public FragContainer fragments;
 
-        [SerializeField, HideInInspector] protected List<CardViz> cards;
+        protected Dictionary<GameObject, T> lastLocations = new Dictionary<GameObject, T>();
 
 
         public abstract Vector3 ToLocalPosition(T t);
@@ -91,7 +91,8 @@ namespace CultistLike
             var cardViz = go.GetComponent<CardViz>();
             if (cardViz != null)
             {
-                cards.Remove(cardViz);
+                // cards.Remove(cardViz);
+                fragments.Remove(cardViz);
             }
         }
 
@@ -161,20 +162,17 @@ namespace CultistLike
 
         public virtual List<CardViz> GetCards()
         {
-            return cards;
+            return fragments.cards;
         }
 
         public virtual void AddCard(CardViz cardViz)
         {
-            if (cardViz != null && cards.Contains(cardViz) == false)
-            {
-                cards.Add(cardViz);
-            }
+            fragments.Add(cardViz);
         }
 
         public virtual void RemoveCard(CardViz cardViz)
         {
-            cards.Remove(cardViz);
+            fragments.Remove(cardViz);
         }
 
         public virtual void HighlightCards(List<CardViz> cards)

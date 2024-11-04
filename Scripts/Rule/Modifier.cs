@@ -27,14 +27,14 @@ namespace CultistLike
         public CardModifierC Evaluate(Context context)
         {
             var result = new CardModifierC();
-            if (context != null && context.source != null)
+            if (context != null && context.scope != null)
             {
                 result.op = op;
 
                 result.onto = context.Resolve(onto);
                 result.what = context.Resolve(what);
                 result.reference = context.Resolve(reference);
-                result.level = result.reference != null ? level * context.source.Count(result.reference) : level;
+                result.level = result.reference != null ? level * context.scope.Count(result.reference) : level;
             }
             return result;
         }
@@ -51,7 +51,7 @@ namespace CultistLike
 
         public void Execute(Context context)
         {
-            if (context != null && context.source != null && onto != null && what != null)
+            if (context != null && context.scope != null && onto != null && what != null)
             {
                 List<CardViz> targetCards;
                 if (onto.cardViz != null)
@@ -61,11 +61,11 @@ namespace CultistLike
                 }
                 else if (onto.fragment is Card)
                 {
-                    targetCards = context.source.FindAll((Card)onto.fragment);
+                    targetCards = context.scope.FindAll((Card)onto.fragment);
                 }
                 else if (onto.fragment is Aspect)
                 {
-                    targetCards = context.source.FindAll((Aspect)onto.fragment);
+                    targetCards = context.scope.FindAll((Aspect)onto.fragment);
                 }
                 else
                 {
@@ -77,9 +77,8 @@ namespace CultistLike
                     case CardOp.FragmentAdditive:
                         foreach (var targetCard in targetCards)
                         {
+                            //TODO TEST THIS
                             targetCard.fragments.Adjust(what, level);
-                            //TODO wrong amount adjusted
-                            context.scope.Adjust(what, level);
                         }
                         break;
                     case CardOp.Transform:
@@ -116,8 +115,7 @@ namespace CultistLike
     public enum ActOp
     {
         Fragment = 0,
-        FragmentInParent = 10,
-        FragmentFromParent = 20,
+        TransferToParent = 30,
         Destroy = 100,
         Duplicate = 110
     }
@@ -136,13 +134,12 @@ namespace CultistLike
         {
             var result = new ActModifierC();
 
-            if (context != null && context.source != null)
+            if (context != null && context.scope != null)
             {
                 result.op = op;
-                // result.level = reference ? level * context.source.Count(reference) : level;
                 result.fragment = context.Resolve(fragment);
                 result.reference = context.Resolve(reference);
-                result.level = result.reference != null ? level * context.source.Count(result.reference) : level;
+                result.level = result.reference != null ? level * context.scope.Count(result.reference) : level;
             }
             return result;
         }
@@ -158,22 +155,27 @@ namespace CultistLike
 
         public void Execute(Context context)
         {
-            if (context != null && context.source != null && context.scope != null)
+            if (context != null && context.scope != null && context.scope != null)
             {
                 switch (op)
                 {
                     case ActOp.Fragment:
                         context.scope.Adjust(fragment, level);
                         break;
-                    case ActOp.FragmentInParent:
-                        context.parentScope?.Adjust(fragment, level);
-                        break;
-                    case ActOp.FragmentFromParent:
-                        if (context.parentSource != null)
+                    case ActOp.TransferToParent:
+                        if (context.parentScope != null)
                         {
-                            //TODO ???
-                            int levelF = reference != null ? level * context.parentSource.Count(reference) : level;
-                            context.scope.Adjust(fragment, levelF);
+                            //TODO update visuals
+                            if (level > 0)
+                            {
+                                int count = context.scope.Adjust(fragment, -level);
+                                context.parentScope.Adjust(fragment, -count);
+                            }
+                            else if (level < 0)
+                            {
+                                int count = context.parentScope.Adjust(fragment, level);
+                                context.scope.Adjust(fragment, -count);
+                            }
                         }
                         break;
                     case ActOp.Destroy:
@@ -181,7 +183,8 @@ namespace CultistLike
                         context.Destroy(fragment);
                         break;
                     case ActOp.Duplicate:
-                        context.scope.Add(fragment);
+                        //TODO seriously
+                        // context.scope.Add(fragment);
                         break;
                     default:
                         break;
@@ -260,18 +263,18 @@ namespace CultistLike
                 switch(op)
                 {
                     case DeckOp.Draw:
-                        context.actLogic.HoldFragment(deck.Draw());
+                        context.scope.Add(deck.Draw());
                         break;
                     case DeckOp.DrawNext:
                         {
                             var refer = reference != null ? reference : context.matches[0].card;
-                            context.actLogic.HoldFragment(deck.DrawOffset(refer, 1));
+                            context.scope.Add(deck.DrawOffset(refer, 1));
                             break;
                         }
                     case DeckOp.DrawPrevious:
                         {
                             var refer = reference != null ? reference : context.matches[0].card;
-                            context.actLogic.HoldFragment(deck.DrawOffset(refer, -1));
+                            context.scope.Add(deck.DrawOffset(refer, -1));
                             break;
                         }
                     default:

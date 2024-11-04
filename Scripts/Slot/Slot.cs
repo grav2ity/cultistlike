@@ -25,11 +25,10 @@ namespace CultistLike
         [Tooltip("Attempt to spawn in all running Acts.")]
         public bool allActs;
 
-        [Header("Spawn Tests")]
+        [Header("Spawn")]
         [Tooltip("All the Tests must pass for this Slot to spawn.")]
         public List<Test> spawnTests;
-        [Tooltip("One of the Rules must pass for this Slot to spawn.")]
-        public List<Rule> spawnRules;
+        public Rule spawnRule;
 
         [Header("Accepted Fragments")]
         [Tooltip("Card must have one of these to be accepted.")]
@@ -42,8 +41,7 @@ namespace CultistLike
         [Header("Additional Card Tests")]
         [Tooltip("All the Tests must pass to accept Card. This will not show in the tooltip.")]
         public List<Test> cardTests;
-        [Tooltip("One of the Rules must pass to accept Card. This will not show in the tooltip.")]
-        public List<Rule> cardRules;
+        public Rule cardRule;
 
         [Header("Options")]
         public bool onlyMatching;
@@ -55,7 +53,7 @@ namespace CultistLike
 
         public bool Opens(ActLogic actLogic)
         {
-            if (spawnTests.Count == 0 && spawnRules.Count == 0)
+            if (spawnTests.Count == 0 && spawnRule == null)
             {
                 return true;
             }
@@ -71,20 +69,15 @@ namespace CultistLike
                     }
                 }
 
-                if (spawnRules.Count == 0)
+                if (spawnRule == null)
                 {
                     return true;
                 }
-
-                foreach (var rule in spawnRules)
+                else
                 {
                     context.ResetMatches();
-                    if (rule != null && rule.Evaluate(context) == true)
-                    {
-                        return true;
-                    }
+                    return spawnRule.Evaluate(context);
                 }
-                return false;
             }
         }
 
@@ -92,21 +85,21 @@ namespace CultistLike
         {
             foreach (var fragL in essential)
             {
-                if (fragL.fragment != null && cardViz.fragments.Count(fragL.fragment) < fragL.count)
+                if (cardViz.fragments.Count(fragL) < fragL.count)
                 {
                     return false;
                 }
             }
             foreach (var fragL in forbidden)
             {
-                if (fragL.fragment != null && cardViz.fragments.Count(fragL.fragment) >= fragL.count)
+                if (cardViz.fragments.Count(fragL) >= fragL.count)
                 {
                     return false;
                 }
             }
             foreach (var fragL in required)
             {
-                if (fragL.fragment != null && cardViz.fragments.Count(fragL.fragment) >= fragL.count)
+                if (cardViz.fragments.Count(fragL) >= fragL.count)
                 {
                     return true;
                 }
@@ -118,7 +111,7 @@ namespace CultistLike
         {
             if (cardViz != null && CheckFragRules(cardViz) == true)
             {
-                if (cardTests.Count == 0 && cardRules.Count == 0)
+                if (cardTests.Count == 0 && cardRule == null)
                 {
                     return true;
                 }
@@ -134,18 +127,14 @@ namespace CultistLike
                         }
                     }
 
-                    if (cardRules.Count == 0)
+                    if (cardRule == null)
                     {
                         return true;
                     }
-
-                    foreach (var rule in cardRules)
+                    else
                     {
                         context.ResetMatches();
-                        if (rule != null && rule.Evaluate(context) == true)
-                        {
-                            return true;
-                        }
+                        return cardRule.Evaluate(context);
                     }
                 }
             }

@@ -12,11 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
   m_Name: No more paws
   m_EditorClassIdentifier: 
-  label: 
+  label: Dark Corners
   token: {fileID: 0}
   initial: 0
-  time: 20
-  aspects: []
+  time: 10
   tests:
   - canFail: 0
     loc1: 0
@@ -25,13 +24,22 @@ MonoBehaviour:
     constant: 0
     loc2: 0
     fragment2: {fileID: 0}
+  and: []
+  or: []
+  fragments: []
   actModifiers: []
   cardModifiers: []
   tableModifiers: []
-  rules: []
+  pathModifiers: []
+  deckModifiers: []
+  furthermore: []
+  ignoreGlobalSlots: 0
   slots: []
-  spawnGlobalSlots: 0
+  randomAlt: 0
   altActs: []
+  randomNext: 0
   nextActs: []
+  spawnedActs: []
+  onSpawn: {fileID: 0}
   text: 
   endText: Your kitten has no more Paws! How could You!

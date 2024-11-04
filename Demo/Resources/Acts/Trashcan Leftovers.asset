@@ -15,7 +15,7 @@ MonoBehaviour:
   label: 
   token: {fileID: 11400000, guid: 3cab6ca1ed0cd3e46a74957835403c96, type: 2}
   initial: 1
-  time: 5
+  time: 10
   tests:
   - canFail: 0
     loc1: 0
@@ -24,10 +24,9 @@ MonoBehaviour:
     constant: 1
     loc2: 0
     fragment2: {fileID: 0}
-  testRules: []
-  onEnterRules: []
+  and: []
+  or: []
   fragments: []
-  aspects: []
   actModifiers:
   - op: 0
     fragment: {fileID: 11400000, guid: 81fd3c01bb1bc104aa7ee20bf354b578, type: 2}
@@ -42,19 +41,20 @@ MonoBehaviour:
     level: 4
     reference: {fileID: 0}
   cardModifiers: []
-  tableModifiers:
-  - op: 0
-    act: {fileID: 11400000, guid: 7110755d538aa384bb94aa969db8c336, type: 2}
-    spawnRule: {fileID: 0}
+  tableModifiers: []
   pathModifiers: []
   deckModifiers: []
-  rules: []
-  modRules: []
+  furthermore: []
   ignoreGlobalSlots: 0
   slots: []
-  randomAltAct: 0
+  randomAlt: 0
   altActs: []
-  randomNextAct: 0
+  randomNext: 0
   nextActs: []
+  spawnedActs:
+  - chance: 0
+    act: {fileID: 11400000, guid: 7110755d538aa384bb94aa969db8c336, type: 2}
+    actRule: {fileID: 0}
+  onSpawn: {fileID: 0}
   text: Infernal noises! Hungry cats fighting for scraps.
   endText: 

@@ -12,32 +12,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
   m_Name: Kitten explores
   m_EditorClassIdentifier: 
-  label: 
+  label: Dark Corners
   token: {fileID: 11400000, guid: e98474b25a29d8e4db622a41e0a0d8d0, type: 2}
   initial: 1
-  time: 5
+  time: 10
   tests: []
-  testRules: []
-  onEnterRules: []
+  and: []
+  or: []
   fragments: []
-  aspects: []
   actModifiers: []
   cardModifiers: []
   tableModifiers: []
   pathModifiers: []
   deckModifiers: []
-  rules: []
-  modRules: []
+  furthermore: []
   ignoreGlobalSlots: 0
   slots:
   - {fileID: 11400000, guid: d20aca91918d0eb46b233e0856aa2322, type: 2}
-  randomAltAct: 0
+  randomAlt: 0
   altActs:
   - chance: 0
     act: {fileID: 11400000, guid: 64c03e0d6d4a8534e9fbc17806a78e87, type: 2}
-  randomNextAct: 0
+    actRule: {fileID: 0}
+  randomNext: 0
   nextActs:
   - chance: 0
     act: {fileID: 11400000, guid: 68ebbb543799b324baad688a4656e6f9, type: 2}
+    actRule: {fileID: 0}
+  spawnedActs: []
+  onSpawn: {fileID: 0}
   text: "Your cat likes to explore dark corners. \nHe might not return."
   endText: 

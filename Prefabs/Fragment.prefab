@@ -260,6 +260,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fragment: {fileID: 0}
+  cardViz: {fileID: 0}
   art: {fileID: 2402140842977280781}
   countText: {fileID: 8935406059925282972}
   _count: 0

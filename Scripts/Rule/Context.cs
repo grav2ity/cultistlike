@@ -12,15 +12,11 @@ namespace CultistLike
         public ActLogic actLogic;
         public ActLogic parent;
 
-        public FragContainer source;
-        public FragContainer parentSource;
-
         public FragContainer scope;
         public FragContainer parentScope;
 
-        public List<CardViz> matches;
-
         public CardViz card;
+        public List<CardViz> matches;
 
         public List<ActModifierC> actModifiers = new List<ActModifierC>();
         public List<CardModifierC> cardModifiers = new List<CardModifierC>();
@@ -31,20 +27,21 @@ namespace CultistLike
         private List<CardViz> toDestroy = new List<CardViz>();
 
 
+        public Context(Context context, bool keepMatches = false) : this(context.actLogic, keepMatches) {}
+
         public Context(FragContainer fragments, bool keepMatches = false)
         {
             if (fragments != null)
             {
                 scope = fragments;
-                source = fragments;
 
                 if (keepMatches == true)
                 {
-                    matches = source.matches;
+                    matches = scope.matches;
                 }
                 else
                 {
-                    matches = source.cards.GetRange(0, fragments.cards.Count);
+                    matches = scope.cards.GetRange(0, fragments.cards.Count);
                 }
             }
         }
@@ -58,7 +55,6 @@ namespace CultistLike
                 if (actLogic.parent != null)
                 {
                     this.parent = actLogic.parent;
-                    parentSource = actLogic.parent.fragments;
                     parentScope = actLogic.parent.fragments;
                 }
             }
@@ -69,7 +65,6 @@ namespace CultistLike
             if (cardViz != null)
             {
                 card = cardViz;
-                scope.AddCardVizOnly(cardViz);
             }
         }
 
@@ -112,7 +107,7 @@ namespace CultistLike
 
         public void ResetMatches()
         {
-            matches = source.cards.GetRange(0, actLogic.fragments.cards.Count);
+            matches = scope.cards.GetRange(0, actLogic.fragments.cards.Count);
         }
 
         public void SaveMatches()

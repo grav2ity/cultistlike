@@ -15,8 +15,7 @@ MonoBehaviour:
   label: 
   token: {fileID: 11400000, guid: 42718ad57dbe0ea4a93c3271a3d1a831, type: 2}
   initial: 1
-  time: 5
-  aspects: []
+  time: 10
   tests:
   - canFail: 0
     loc1: 0
@@ -25,8 +24,11 @@ MonoBehaviour:
     constant: 1
     loc2: 0
     fragment2: {fileID: 0}
+  and: []
+  or: []
+  fragments: []
   actModifiers:
-  - op: 0
+  - op: 30
     fragment: {fileID: 11400000, guid: 219db864b5c9cf84a9e11127db781ccb, type: 2}
     level: -1
     reference: {fileID: 0}
@@ -38,21 +40,20 @@ MonoBehaviour:
     fragment: {fileID: 11400000, guid: f5f0fa7b9f3f88e4eaf16fca23caa0e8, type: 2}
     level: 1
     reference: {fileID: 0}
-  - op: 0
-    fragment: {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
-    level: 1
-    reference: {fileID: 0}
   cardModifiers: []
   tableModifiers:
-  - op: 1
+  - op: 10
     act: {fileID: 11400000, guid: 3781dd133eecea341b8f2ef5a559845c, type: 2}
   pathModifiers: []
-  rules: []
+  deckModifiers: []
+  furthermore: []
+  ignoreGlobalSlots: 0
   slots: []
-  spawnGlobalSlots: 0
-  randomAltAct: 0
+  randomAlt: 0
   altActs: []
-  randomNextAct: 0
+  randomNext: 0
   nextActs: []
+  spawnedActs: []
+  onSpawn: {fileID: 0}
   text: Might be a pleasant evening after all.
   endText: Just a dream. Move on.

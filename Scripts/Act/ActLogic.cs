@@ -17,9 +17,12 @@ namespace CultistLike
         // [SerializeField, HideInInspector] private List<Act> nextActs;
         [SerializeField, HideInInspector] public List<Act> altActs;
         [SerializeField, HideInInspector] public List<Act> nextActs;
+        [SerializeField, HideInInspector] public List<Act> spawnedActs;
+
+        [SerializeField, HideInInspector] private Act forceAct;
+        [SerializeField, HideInInspector] private Rule forceRule;
 
         public ActWindow actWindow;
-        [SerializeField, HideInInspector] private Act forceAct;
 
         public ActLogic parent;
         public List<ActLogic> children;
@@ -48,7 +51,7 @@ namespace CultistLike
                 {
                     foreach (var slot in GameManager.Instance.slotSOS)
                     {
-                        if ((slot.allActs == true))
+                        if (slot.allActs == true)
                         {
                             slotsToAttempt.Add(slot);
                         }
@@ -57,7 +60,10 @@ namespace CultistLike
             }
             else
             {
-                slotsToOpen.Add(actWindow.tokenViz?.token?.slot);
+                if (actWindow.tokenViz?.token?.slot != null)
+                {
+                    slotsToOpen.Add(actWindow.tokenViz?.token?.slot);
+                }
 
                 foreach (var cardViz in fragments.cards)
                 {
@@ -76,7 +82,7 @@ namespace CultistLike
 
                 foreach (var slot in GameManager.Instance.slotSOS)
                 {
-                    if ((slot.allTokens == true))
+                    if (slot.allTokens == true || slot.token == actWindow.tokenViz?.token)
                     {
                         slotsToAttempt.Add(slot);
                     }
@@ -103,9 +109,13 @@ namespace CultistLike
             activeAct = act;
             forceAct = null;
 
-            using (var context = new Context(this))
+            if (forceRule != null)
             {
-                activeAct.RunOnEnterRules(context);
+                using (var context = new Context(this))
+                {
+                    forceRule.Run(context);
+                }
+                forceRule = null;
             }
 
             foreach (var frag in activeAct.fragments)
@@ -113,15 +123,13 @@ namespace CultistLike
                 fragments.Add(frag);
             }
 
-
+            ParentCardsToWindow();
             actWindow.UpdateBars();
-            actWindow.ParentCardsToWindow();
             //need this for correct slots
             actWindow.ApplyStatus(ActStatus.Running);
             actWindow.UpdateSlots();
-            actWindow.Grab();
 
-            PopulateActLists(act.altActs, altActs, act.randomAltAct);
+            PopulateActList(act.altActs, altActs, act.randomAlt);
 
             altAct = AttemptAltActs();
 
@@ -147,16 +155,15 @@ namespace CultistLike
             altAct = null;
 
             fragments.Clear();
-
         }
 
-        private void PopulateActLists(List<ActLink> source, List<Act> target, bool randomOrder = false)
+        private void PopulateActList(List<ActLink> source, List<Act> target, bool randomOrder = false)
         {
             if (source != null && target != null)
             {
                 target.Clear();
 
-                if (source.Count == 1 && source[0].chance == 0)
+                if (source.Count == 1 && source[0].chance == 0 && source[0].actRule == null)
                 {
                     target.Add(source[0].act);
                 }
@@ -164,8 +171,23 @@ namespace CultistLike
                 {
                     foreach (var actLink in source)
                     {
-                        int r = Random.Range(0, 100);
-                        if (r < actLink.chance)
+                        bool passed = false;
+                        if (actLink.actRule != null)
+                        {
+                            using (var context = new Context(this))
+                            {
+                                passed = actLink.actRule.Evaluate(context);
+                            }
+                        }
+                        else
+                        {
+                            int r = Random.Range(0, 100);
+                            if (r < actLink.chance)
+                            {
+                                passed = true;
+                            }
+                        }
+                        if (passed == true)
                         {
                             if (randomOrder == false)
                             {
@@ -173,7 +195,7 @@ namespace CultistLike
                             }
                             else
                             {
-                                int i = Random.Range(0, target.Count);
+                                int i = Random.Range(0, target.Count + 1);
                                 target.Insert(i, actLink.act);
                             }
                         }
@@ -197,14 +219,14 @@ namespace CultistLike
                 activeAct.ApplyModifiers(context);
             }
 
-            actWindow.ParentCardsToWindow();
-            actWindow.UpdateBars();
-
-            foreach (var cardViz in fragments.cards)
+            PopulateActList(activeAct?.spawnedActs, spawnedActs, false);
+            foreach (var spawnedAct in spawnedActs)
             {
-                cardViz.gameObject.SetActive(false);
-                cardViz.transform.SetParent(transform);
+                GameManager.Instance.SpawnAct(spawnedAct, this);
             }
+
+            ParentCardsToWindow();
+            actWindow.UpdateBars();
 
             if (forceAct != null)
             {
@@ -212,7 +234,7 @@ namespace CultistLike
             }
             else
             {
-                PopulateActLists(activeAct.nextActs, nextActs, activeAct.randomNextAct);
+                PopulateActList(activeAct.nextActs, nextActs, activeAct.randomNext);
                 var nextAct = AttemptNextActs();
                 if (nextAct != null)
                 {
@@ -236,6 +258,7 @@ namespace CultistLike
         }
 
         public void ForceAct(Act act) => forceAct = act;
+        public void ForceRule(Rule rule) => forceRule = rule;
 
         public Act AttemptAct(Act act)
         {
@@ -254,7 +277,7 @@ namespace CultistLike
             return null;
         }
 
-        public Act AttemptActs(List<Act> acts)
+        private Act AttemptActs(List<Act> acts)
         {
             Context context = new Context(this);
             Act pAct = null;
@@ -271,56 +294,79 @@ namespace CultistLike
             return pAct;
         }
 
-
         public Act AttemptAltActs() => AttemptActs(altActs);
-        public Act AttemptNextActs() => AttemptActs(nextActs);
+        private Act AttemptNextActs() => AttemptActs(nextActs);
 
         private void ApplyCardRules()
         {
             using (var context = new Context(this))
             {
-                foreach (var cardViz in context.source.cards)
+                foreach (var cardViz in context.scope.cards)
                 {
                     context.card = cardViz;
                     foreach (var rule in cardViz.card.rules)
                     {
                         rule?.Run(context);
                     }
+
+                    foreach (var frag in cardViz.fragments.fragments)
+                    {
+                        if (frag.fragment != null)
+                        {
+                            foreach (var rule in frag.fragment.rules)
+                            {
+                                rule?.Run(context);
+                            }
+                        }
+                    }
                 }
             }
         }
 
-        public void HoldCard(CardViz cardViz)
+        public void HoldCard(CardViz cardViz, Slot slot = null)
         {
             if (cardViz != null)
             {
                 fragments.Add(cardViz);
+                if (slot != null)
+                {
+                    foreach (var frag in slot.fragments)
+                    {
+                        fragments.Add(frag);
+                    }
+                }
                 actWindow.UpdateBars();
                 altAct = AttemptAltActs();
             }
         }
 
-        public CardViz UnholdCard(CardViz cardViz)
+        public CardViz UnholdCard(CardViz cardViz, Slot slot = null)
         {
             if (cardViz != null)
             {
                 fragments.Remove(cardViz);
+                if (slot != null)
+                {
+                    foreach (var frag in slot.fragments)
+                    {
+                        fragments.Remove(frag);
+                    }
+                }
+
                 actWindow.UpdateBars();
                 altAct = AttemptAltActs();
             }
             return cardViz;
         }
 
-        public void HoldFragment(Fragment frag)
+        private void ParentCardsToWindow()
         {
-            fragments.Add(frag);
-            actWindow.UpdateBars();
-            altAct = AttemptAltActs();
-        }
-
-        public void AdjustFragment(Fragment frag, int level)
-        {
-            fragments.Adjust(frag, level);
+            actWindow.ParentCardsToWindow();
+            foreach (var cardViz in fragments.cards)
+            {
+                cardViz.gameObject.SetActive(false);
+                cardViz.transform.SetParent(transform);
+            }
         }
 
         public void SetParent(ActLogic parent)

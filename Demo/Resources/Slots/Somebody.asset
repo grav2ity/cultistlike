@@ -13,19 +13,22 @@ MonoBehaviour:
   m_Name: Somebody
   m_EditorClassIdentifier: 
   label: Somebody
-  text: 
-  aspects: []
+  description: 
+  fragments: []
+  token: {fileID: 11400000, guid: 42718ad57dbe0ea4a93c3271a3d1a831, type: 2}
+  unique: 0
+  allTokens: 0
+  allActs: 0
   spawnTests: []
-  spawnRules: []
-  cardTests:
-  - canFail: 0
-    loc1: 0
-    fragment1: {fileID: 11400000, guid: 219db864b5c9cf84a9e11127db781ccb, type: 2}
-    op: 1
-    constant: 1
-    loc2: 0
-    fragment2: {fileID: 0}
-  cardRules: []
+  spawnRule: {fileID: 0}
+  required:
+  - fragment: {fileID: 11400000, guid: 219db864b5c9cf84a9e11127db781ccb, type: 2}
+    count: 1
+    cardViz: {fileID: 0}
+  essential: []
+  forbidden: []
+  cardTests: []
+  cardRule: {fileID: 0}
   onlyMatching: 0
   grab: 0
   cardLock: 0

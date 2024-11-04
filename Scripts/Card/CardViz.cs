@@ -57,7 +57,7 @@ namespace CultistLike
 
                 foreach(var tokenViz in GameManager.Instance.tokens)
                 {
-                    if (tokenViz.actWindow.MatchesAnyOpenSlot(this) == true)
+                    if (tokenViz.actWindow.AcceptsCard(this) != null)
                     {
                         tokenViz.SetHighlight(true);
                     }
@@ -114,6 +114,41 @@ namespace CultistLike
             else
             {
                 UIManager.Instance?.cardInfo?.LoadCard(this);
+            }
+
+            if (eventData.clickCount == 2)
+            {
+                var slot = GetComponentInParent<SlotViz>();
+                if (slot != null)
+                {
+                    slot.UnslotCard();
+                    GameManager.Instance.table.ReturnToTable(this);
+                }
+                else
+                {
+                    SlotViz readySlot = null;
+                    if (GameManager.Instance.openWindow != null)
+                    {
+                        readySlot = GameManager.Instance.openWindow.AcceptsCard(this, true);
+                    }
+                    if (readySlot == null)
+                    {
+                        foreach(var tokenViz in GameManager.Instance.tokens)
+                        {
+                            readySlot = tokenViz.actWindow.AcceptsCard(this, true);
+                            if (readySlot != null)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    if (readySlot != null)
+                    {
+                        gameObject.transform.parent?.
+                            GetComponentInParent<ICardDock>(true)?.OnCardUndock(gameObject);
+                        readySlot.Grab(this, true);
+                    }
+                }
             }
         }
 
@@ -251,12 +286,33 @@ namespace CultistLike
 
         public void Transform(Card card)
         {
+            fragments.RemoveCardVizOnly(this);
             LoadCard(card, false);
 
             if (card.lifetime > 0f)
             {
                 Decay(card.decayTo, card.lifetime);
             }
+        }
+
+        public CardViz Duplicate()
+        {
+            var newCardViz = GameManager.Instance.CreateCard(card);
+            newCardViz.fragments.fragments.Clear();
+            foreach (var frag in fragments.fragments)
+            {
+                newCardViz.fragments.Add(frag);
+            }
+            foreach (var cardViz in fragments.cards)
+            {
+                if (cardViz != this)
+                {
+                    newCardViz.fragments.cards.Add(cardViz);
+                }
+            }
+            newCardViz.fragments.parent = fragments.parent;
+
+            return newCardViz;
         }
 
         private void LoadFragments()
@@ -268,6 +324,7 @@ namespace CultistLike
                     fragments.Add(frag);
                 }
             }
+            fragments.AddCardVizOnly(this);
         }
 
         private void Awake()

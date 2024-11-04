@@ -17,8 +17,8 @@ MonoBehaviour:
   initial: 0
   time: 10
   tests: []
-  testRules: []
-  onEnterRules: []
+  and: []
+  or: []
   fragments: []
   actModifiers:
   - op: 0
@@ -34,12 +34,14 @@ MonoBehaviour:
   tableModifiers: []
   pathModifiers: []
   deckModifiers: []
-  modRules: []
+  furthermore: []
   ignoreGlobalSlots: 0
   slots: []
-  randomAltAct: 0
+  randomAlt: 0
   altActs: []
-  randomNextAct: 0
+  randomNext: 0
   nextActs: []
+  spawnedActs: []
+  onSpawn: {fileID: 0}
   text: Kitten toils on empty stomach.
   endText: 

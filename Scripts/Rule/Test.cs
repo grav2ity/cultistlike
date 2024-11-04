@@ -2,22 +2,25 @@
 using System.Collections.Generic;
 
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 
 namespace CultistLike
 {
     public enum ReqOp
     {
-        MoreOrEqual,
-        Equal,
-        LessOrEqual,
-        More,
-        NotEqual,
-        Less,
+        MoreOrEqual = 0,
+        Equal = 1,
+        LessOrEqual = 2,
+        More = 3,
+        NotEqual = 4,
+        Less = 5,
+        RandomChallenge = 10,
+        RandomClash = 20
     }
 
     [Flags]
-    public enum ReqLoc2
+    public enum ReqLoc
     {
         Scope      = 0,
         Matched    = 1 << 5,
@@ -32,14 +35,14 @@ namespace CultistLike
     {
         [Tooltip("This Test can fail. Use this option to match Cards. You can reference matched Cards.")]
         public bool canFail;
-        public ReqLoc2 loc1;
+        public ReqLoc loc1;
         public Fragment fragment1;
         [Space(10)]
         public ReqOp op;
         [Space(10)]
         [Tooltip("Fragment2 not set - value. Fragment2 set - multiplier. Accepts negative values.")]
         public int constant;
-        public ReqLoc2 loc2;
+        public ReqLoc loc2;
         public Fragment fragment2;
 
 
@@ -72,13 +75,18 @@ namespace CultistLike
                     return max > right;
                 case ReqOp.MoreOrEqual:
                     return max >= right;
+                case ReqOp.RandomChallenge:
+                    return constant * max > Random.Range(0, 100);
+                case ReqOp.RandomClash:
+                    float chance = ((float)max / (float)(max + right));
+                    return chance > Random.Range(0f, 1f);
                 default:
                     return false;
             }
         }
 
 
-        public int GetCount(out int min, out int max, Context context, ReqLoc2 loc, Fragment fragment, bool updateMatches)
+        public int GetCount(out int min, out int max, Context context, ReqLoc loc, Fragment fragment, bool updateMatches)
         {
             var scope = context.scope;
             var parent = context.parent;
@@ -88,7 +96,7 @@ namespace CultistLike
             max = 0;
             int total = 0;
 
-            if ((loc & ReqLoc2.Parent) != 0)
+            if ((loc & ReqLoc.Parent) != 0)
             {
                 if (parent != null)
                 {
@@ -100,9 +108,13 @@ namespace CultistLike
                     return 0;
                 }
             }
+            else if ((loc & ReqLoc.Table) != 0)
+            {
+                scope = GameManager.Instance.table.fragments;
+            }
 
             List<CardViz> cards;
-            if ((loc & ReqLoc2.Matched) != 0)
+            if ((loc & ReqLoc.Matched) != 0)
             {
                 cards = context.matches;
             }
@@ -111,11 +123,11 @@ namespace CultistLike
                 cards = scope.cards;
             }
 
-            if (loc == 0)
+            if (loc == ReqLoc.Scope || loc == ReqLoc.Table)
             {
                 total = fragment.CountInContainer(scope);
             }
-            else if ((loc & (ReqLoc2.Card | ReqLoc2.Cards)) != 0)
+            else if ((loc & (ReqLoc.Card | ReqLoc.Cards)) != 0)
             {
                 if (fragment == null) //just count cards
                 {
@@ -160,7 +172,7 @@ namespace CultistLike
                 }
             }
 
-            if ((loc & ReqLoc2.Card) == 0)
+            if ((loc & ReqLoc.Card) == 0)
             {
                 max = total;
                 min = total;

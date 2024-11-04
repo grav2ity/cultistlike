@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+using DG.Tweening;
 using TMPro;
 
 
@@ -34,8 +35,8 @@ namespace CultistLike
         [SerializeField, HideInInspector] private ActWindow actWindow;
         [SerializeField, HideInInspector] private CardViz _slottedCard;
 
-        public string Label { get => label.text; set => label.text = value; }
-        public CardViz slottedCard { get => _slottedCard; set => _slottedCard = value; }
+        public string Label { get => label.text; private set => label.text = value; }
+        public CardViz slottedCard { get => _slottedCard; private set => _slottedCard = value; }
 
 
         public void OnDrop(PointerEventData eventData)
@@ -118,7 +119,10 @@ namespace CultistLike
                 cardViz.transform.SetParent(transform);
                 cardViz.transform.localPosition = Vector3.zero;
 
-                cardViz.UnhighlightTargets();
+                if (cardViz.isDragging == true)
+                {
+                    cardViz.UnhighlightTargets();
+                }
 
                 if (cardLock == true)
                 {
@@ -132,16 +136,12 @@ namespace CultistLike
         {
             if (slottedCard != null)
             {
-                actWindow.UnholdCard(slottedCard);
-            }
-            else
-            {
-                actWindow.UnholdCard(slottedCard);
+                actWindow.UnholdCard(slottedCard, slot);
             }
             slottedCard = cardViz;
             if (slottedCard != null)
             {
-                actWindow.HoldCard(slottedCard);
+                actWindow.HoldCard(slottedCard, slot);
                 actWindow.Check();
             }
         }
@@ -183,23 +183,36 @@ namespace CultistLike
             // }
         }
 
-        // public void CloseSlot()
-        // {
-        //     if (slottedCard != null)
-        //     {
-        //         var cardViz = slottedCard;
-        //         UnslotCard();
-        //         GameManager.Instance.table.ReturnToTable(cardViz);
-        //     }
-        //     gameObject.SetActive(false);
-        //     // open = false;
-        // }
+        public void CloseSlot()
+        {
+            gameObject.SetActive(false);
+            if (grab == true)
+            {
+                GameManager.Instance.onCardInPlay.RemoveListener(GrabAction);
+            }
+            // if (slottedCard != null)
+            // {
+            //     var cardViz = slottedCard;
+            //     UnslotCard();
+            //     GameManager.Instance.table.ReturnToTable(cardViz);
+            // }
+        }
 
-        // public void OpenSlot(string name = "")
-        // {
-        //     gameObject.SetActive(true);
-        //     open = true;
-        // }
+        public void OpenSlot()
+        {
+            gameObject.SetActive(true);
+            if (grab == true && slottedCard == null)
+            {
+                foreach (var cardViz in GameManager.Instance.cards)
+                {
+                    if (Grab(cardViz) == true)
+                    {
+                        return;
+                    }
+                }
+                GameManager.Instance.onCardInPlay.AddListener(GrabAction);
+            }
+        }
 
         public bool AcceptsCard(CardViz cardViz)
         {
@@ -219,13 +232,20 @@ namespace CultistLike
             {
                 GameManager.Instance.DestroyCard(slottedCard);
             }
-            // slottedCard = null;
             SlotCardLogical(null);
         }
 
         public void SetHighlight(bool p)
         {
             highlight.enabled = p;
+        }
+
+        public void GrabAction(CardViz cardViz)
+        {
+            if (Grab(cardViz) == true)
+            {
+                GameManager.Instance.onCardInPlay.RemoveListener(GrabAction);
+            }
         }
 
         public void LoadSlot(Slot slot)
@@ -238,6 +258,54 @@ namespace CultistLike
                 cardLock = slot.cardLock;
                 onlyMatching = slot.onlyMatching;
             }
+        }
+
+        public bool Grab(CardViz cardViz, bool bringUp = false)
+        {
+            if (cardViz.gameObject.activeSelf == true && AcceptsCard(cardViz) == true)
+            {
+                var cardVizY = cardViz.Yield();
+
+                if (cardVizY.free == true)
+                {
+                    cardVizY.free = false;
+                    cardVizY.transform.DOComplete(true);
+                    bool prevInteractive = cardVizY.interactive;
+                    cardVizY.interactive = false;
+                    cardVizY.transform.parent?.GetComponentInParent<ICardDock>(true)?.
+                        OnCardUndock(cardVizY.gameObject);
+                    cardVizY.gameObject.SetActive(true);
+                    cardVizY.transform.SetParent(null);
+                    SlotCardLogical(cardVizY);
+
+                    Vector3 target;
+                    if (gameObject.activeInHierarchy == true)
+                    {
+                        target = transform.position;
+                    }
+                    else
+                    {
+                        target =  actWindow.tokenViz.transform.position;
+                    }
+
+                    var pos = cardVizY.transform.position;
+                    cardVizY.transform.position = new Vector3(pos.x, pos.y, GameManager.Instance.cardDragPlane.position.z);
+
+                    cardVizY.transform.DOMove(target, GameManager.Instance.normalSpeed).
+                        OnComplete(() =>
+                        {
+                            cardVizY.interactive = prevInteractive;
+                            SlotCardPhysical(cardVizY);
+                            if (bringUp == true)
+                            {
+                                actWindow.BringUp();
+                            }
+                        });
+
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void Awake()

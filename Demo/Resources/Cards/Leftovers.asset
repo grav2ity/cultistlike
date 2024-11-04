@@ -18,3 +18,8 @@ MonoBehaviour:
   description: 
   fragments:
   - {fileID: 11400000, guid: a46ceb5ebda24c642835ccf7d042edef, type: 2}
+  rules: []
+  oneForAll: 0
+  slots: []
+  decayTo: {fileID: 0}
+  lifetime: 0

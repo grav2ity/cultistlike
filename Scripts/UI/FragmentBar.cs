@@ -7,9 +7,20 @@ namespace CultistLike
 {
     public class FragmentBar : MonoBehaviour
     {
+        [Header("Layout")]
+        public GameObject horizontalGO;
+        public GameObject verticalGO;
+
+        [Header("Options")]
+        public bool vertical;
+        public bool showAspects;
         public bool showCards;
+        public bool showSpecial;
+
+        [Header("Special fragments")]
         public Aspect allowed;
         public Aspect forbidden;
+
 
         [SerializeField, HideInInspector] private List<FragmentViz> fragVizs;
         [SerializeField, HideInInspector] private int index;
@@ -30,9 +41,12 @@ namespace CultistLike
                         Load(card);
                     }
                 }
-                foreach (var frag in fragments.fragments)
+                if (showAspects == true)
                 {
-                    Load(frag);
+                    foreach (var frag in fragments.fragments)
+                    {
+                        Load(frag);
+                    }
                 }
             }
         }
@@ -45,7 +59,7 @@ namespace CultistLike
                 index = 0;
                 gameObject.SetActive(true);
 
-                if (slot.required.Count > 0)
+                if (slot.required.Count > 0 && showSpecial == true)
                 {
                     Load(allowed);
                 }
@@ -53,7 +67,7 @@ namespace CultistLike
                 {
                     Load(frag);
                 }
-                if (slot.forbidden.Count > 0)
+                if (slot.forbidden.Count > 0 && showSpecial == true)
                 {
                     Load(forbidden);
                 }
@@ -85,7 +99,8 @@ namespace CultistLike
             }
             else
             {
-                var fragViz = Instantiate(GameManager.Instance.fragmentPrefab, transform);
+                var fragViz = Instantiate(GameManager.Instance.fragmentPrefab,
+                                          vertical == true ? verticalGO.transform : horizontalGO.transform);
                 fragVizs.Add(fragViz);
                 Load<T>(frag);
             }
@@ -101,7 +116,8 @@ namespace CultistLike
             }
             else
             {
-                var fragViz = Instantiate(GameManager.Instance.fragmentPrefab, transform);
+                var fragViz = Instantiate(GameManager.Instance.fragmentPrefab,
+                                          vertical == true ? verticalGO.transform : horizontalGO.transform);
                 fragVizs.Add(fragViz);
                 Load(frag);
             }

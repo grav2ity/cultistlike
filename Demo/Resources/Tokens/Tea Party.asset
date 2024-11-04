@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b90be55e95f4914094bbfa9c44b694b, type: 3}
   m_Name: Tea Party
   m_EditorClassIdentifier: 
-  label: 
+  label: Tea Party
   description: Imaginary most likely.
   art: {fileID: 21300000, guid: d338a618af01975409f43009e4a49012, type: 3}
   color: {r: 0, g: 0, b: 0, a: 1}
-  slot: {fileID: 11400000, guid: a5927e1e8e57ba344be0b64f06a56288, type: 2}
+  slot: {fileID: 0}
+  dissolve: 0
+  unique: 0

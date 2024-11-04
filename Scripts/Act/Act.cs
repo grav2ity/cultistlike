@@ -19,12 +19,10 @@ namespace CultistLike
         [Header("Entry Tests")]
         [Tooltip("All Tests must pass to enter this Act.")]
         public List<Test> tests;
-        [Tooltip("All Rules must pass to enter this Act. Card matches do not carry from the Tests above nor between Rules.")]
-        public List<Rule> testRules;
-
-        [Header("On Enter")]
-        [Tooltip("All Modifiers from all the Rules will be applied. Tests are ignored.")]
-        public List<Rule> onEnterRules;
+        [Tooltip("All of the AND Rules must pass. Modifiers are not applied.")]
+        public List<Rule> and;
+        [Tooltip("One of the OR Rules must pass. Modifiers are not applied.")]
+        public List<Rule> or;
 
         [Header("Fragments")]
         public List<Fragment> fragments;
@@ -35,91 +33,45 @@ namespace CultistLike
         public List<TableModifier> tableModifiers;
         public List<PathModifier> pathModifiers;
         public List<DeckModifier> deckModifiers;
-        [Tooltip("All Modifiers from all the Rules will be applied on completing the Act.")]
-        public List<Rule> modRules;
+
+        [Header("Furthermore")]
+        public List<Rule> furthermore;
 
         [Header("Slots")]
         public bool ignoreGlobalSlots;
         public List<Slot> slots;
 
         [Header("Alt Acts")]
-        public bool randomAltAct;
+        public bool randomAlt;
         public List<ActLink> altActs;
         [Header("Next Acts")]
-        public bool randomNextAct;
+        public bool randomNext;
         public List<ActLink> nextActs;
+        [Header("Spawned Acts")]
+        public List<ActLink> spawnedActs;
+
+        [Header("On Spawn")]
+        public Rule onSpawn;
 
         [Space(10)]
         [TextArea(3, 10)] public string text;
         [TextArea(3, 10)] public string endText;
 
-        public bool Attempt(Context context)
-        {
-            foreach (var test in tests)
-            {
-                var r = test.Attempt(context);
-                if (test.canFail == false && r == false)
-                {
-                    return false;
-                }
-            }
+        public bool Attempt(Context context) => Rule.Evaluate(context, tests, and, or);
 
-            foreach (var rule in testRules)
-            {
-                if (rule != null)
-                {
-                    var r = rule.Evaluate(context);
-                    if (r == false)
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        public void RunOnEnterRules(Context context)
-        {
-            foreach (var rule in onEnterRules)
-            {
-                rule?.Run(context);
-            }
-        }
-
-        public void ApplyModifiers(Context context)
-        {
-            if (context != null)
-            {
-                foreach (var actModifier in actModifiers)
-                {
-                    context.actModifiers.Add(actModifier.Evaluate(context));
-                }
-                foreach (var cardModifier in cardModifiers)
-                {
-                    context.cardModifiers.Add(cardModifier.Evaluate(context));
-                }
-                foreach (var tableModifier in tableModifiers)
-                {
-                    context.tableModifiers.Add(tableModifier.Evaluate(context));
-                }
-                foreach (var pathModifier in pathModifiers)
-                {
-                    context.pathModifiers.Add(pathModifier.Evaluate(context));
-                }
-                foreach (var deckModifier in deckModifiers)
-                {
-                    context.deckModifiers.Add(deckModifier.Evaluate(context));
-                }
-            }
-        }
+        public void ApplyModifiers(Context context) => Rule.Execute(context, actModifiers,
+                                                                    cardModifiers, tableModifiers,
+                                                                    pathModifiers, deckModifiers,
+                                                                    furthermore);
     }
 
     [Serializable]
     public class ActLink
     {
-        [Tooltip("% chance of attempting this Act. Attemtping does not equal succeeding and Act's entry Tests must be passed. If there is only one element 0% becomes 100%")]
+        [Tooltip("% chance of attempting this Act. If there is only one element 0% becomes 100%")]
         [Range(0, 100)] public int chance;
         public Act act;
+        [Tooltip("Rule's tests must pass to attempt this Act. If this is set, 'Chance' field is disregarded.")]
+        public Rule actRule;
     }
 }

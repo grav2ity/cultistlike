@@ -40,6 +40,9 @@ namespace CultistLike
         {
             startTime = GameManager.Instance.time;
             endTime = startTime + time;
+        #if UNITY_EDITOR
+            endTime = startTime + GameManager.Instance.DevTime(time);
+        #endif
             enabled = true;
             timeUpEvent.RemoveAllListeners();
             timeUpEvent.AddListener(action);

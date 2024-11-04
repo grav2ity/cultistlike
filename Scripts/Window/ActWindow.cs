@@ -3,8 +3,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-using DG.Tweening;
-
 using TMPro;
 
 
@@ -13,15 +11,16 @@ namespace CultistLike
     public class ActWindow : Drag
     {
         [Header("Layout")]
+        [SerializeField] private TextMeshPro label;
         [SerializeField] private TextMeshPro text;
         [SerializeField] private GameObject idleSlotsGO;
         [SerializeField] private GameObject runSlotsGO;
         [SerializeField] private CardLane resultLane;
-        [SerializeField] private FragmentBar fragmentBar;
-        [SerializeField] private GameObject timerGO;
+        [SerializeField] private FragmentBar aspectBar;
+        [SerializeField] private FragmentBar cardBar;
+        [SerializeField] private Timer _timer;
         [SerializeField] private Button okButton;
         [SerializeField] private Button collectButton;
-        public Timer timer;
 
         [Header("Slots")]
         [SerializeField] private List<SlotViz> idleSlots;
@@ -35,27 +34,64 @@ namespace CultistLike
 
         private bool suspendUpdates;
 
+
         public TokenViz tokenViz { get => _tokenViz; private set => _tokenViz = value; }
+        public Timer timer { get => _timer; }
 
         private List<SlotViz> slots => actStatus == ActStatus.Running ? runSlots : idleSlots;
         private string runText => actLogic.altAct ? actLogic.altAct.text : actLogic.activeAct.text;
+        private string runLabel => actLogic.altAct ? actLogic.altAct.label : actLogic.activeAct.label;
 
 
-        public void TrySlotAndBringUp(CardViz cardViz)
+        public bool TrySlotAndBringUp(CardViz cardViz)
         {
             if (actStatus != ActStatus.Finished)
             {
-                foreach (var slot in slots)
+                var slotViz = AcceptsCard(cardViz);
+                if (slotViz != null && slotViz.TrySlotCard(cardViz) == true)
                 {
-                    if (slot.TrySlotCard(cardViz) == true)
+                    BringUp();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public IEnumerable<SlotViz> MatchingSlots(CardViz cardViz, bool onlyEmpty = false)
+        {
+            if (cardViz != null)
+            {
+                if (actStatus != ActStatus.Finished)
+                {
+                    foreach (var slotViz in slots)
                     {
-                        BringUp();
-                        return;
+                        if (slotViz.gameObject.activeSelf == true && slotViz.AcceptsCard(cardViz) == true)
+                        {
+                            if (onlyEmpty == false || slotViz.slottedCard == null)
+                            {
+                                yield return slotViz;
+                            }
+                        }
                     }
                 }
             }
+            else
+            {
+                yield return null;
+            }
         }
 
+        public SlotViz AcceptsCard(CardViz cardViz, bool onlyEmpty = false)
+        {
+            foreach (var slotViz in MatchingSlots(cardViz, onlyEmpty))
+            {
+                if (slotViz != null)
+                {
+                    return slotViz;
+                }
+            }
+            return null;
+        }
 
         public void BringUp()
         {
@@ -90,12 +126,15 @@ namespace CultistLike
 
         public void FirstSlotEmpty()
         {
-            suspendUpdates = true;
-            ReturnCardsToTable();
-            suspendUpdates = false;
-            if (actStatus != ActStatus.Running)
+            if (suspendUpdates == false)
             {
-                StatusIdle();
+                suspendUpdates = true;
+                ReturnCardsToTable();
+                suspendUpdates = false;
+                if (actStatus != ActStatus.Running)
+                {
+                    StatusIdle();
+                }
             }
         }
 
@@ -107,44 +146,30 @@ namespace CultistLike
             }
         }
 
-        //TODO has side effects
-        public bool MatchesAnyOpenSlot(CardViz card) => HighlightSlots(card, false) == true;
-
-        //TODO
-        public bool HighlightSlots(CardViz cardViz, bool p = true)
+        public void HighlightSlots(CardViz cardViz, bool p = true)
         {
-            bool highlighted = false;
-            if (actStatus != ActStatus.Finished)
+            foreach (var slotViz in MatchingSlots(cardViz))
             {
-                foreach (var slot in slots)
-                {
-                    if (slot.gameObject.activeSelf == true && slot.AcceptsCard(cardViz))
-                    {
-                        slot.SetHighlight(p);
-                        highlighted = true;
-                    }
-                }
+                slotViz.SetHighlight(p);
             }
-            return highlighted;
         }
 
-        //TODO
         public void UnhighlightSlots()
         {
-            foreach (var slot in slots)
+            foreach (var slotViz in slots)
             {
-                if (slot.gameObject.activeSelf)
+                if (slotViz.gameObject.activeSelf)
                 {
-                    slot.SetHighlight(false);
+                    slotViz.SetHighlight(false);
                 }
             }
         }
 
-        public void HoldCard(CardViz cardViz)
+        public void HoldCard(CardViz cardViz, Slot slot = null)
         {
             if (cardViz != null)
             {
-                actLogic.HoldCard(cardViz);
+                actLogic.HoldCard(cardViz, slot);
                 UpdateSlots();
                 if (actStatus == ActStatus.Running)
                 {
@@ -153,11 +178,11 @@ namespace CultistLike
             }
         }
 
-        public CardViz UnholdCard(CardViz cardViz)
+        public CardViz UnholdCard(CardViz cardViz, Slot slot = null)
         {
             if (cardViz != null)
             {
-                var r = actLogic.UnholdCard(cardViz);
+                var r = actLogic.UnholdCard(cardViz, slot);
                 UpdateSlots();
                 if (actStatus == ActStatus.Running)
                 {
@@ -210,7 +235,7 @@ namespace CultistLike
         {
             foreach (var slotViz in slots)
             {
-                slotViz.gameObject.SetActive(false);
+                slotViz.CloseSlot();
             }
         }
 
@@ -221,7 +246,7 @@ namespace CultistLike
                 if (slotViz.gameObject.activeSelf == false)
                 {
                     slotViz.LoadSlot(slot);
-                    slotViz.gameObject.SetActive(true);
+                    slotViz.OpenSlot();
                     break;
                 }
             }
@@ -232,7 +257,7 @@ namespace CultistLike
             resultLane.PlaceCards(cards);
             tokenViz.SetResultCount(cards.Count);
 
-            ApplyStatus(ActStatus.Finished, actLogic.activeAct.endText);
+            ApplyStatus(ActStatus.Finished);
         }
 
         /// <summary>
@@ -309,49 +334,11 @@ namespace CultistLike
 
             if (readyAct != null)
             {
-                ApplyStatus(ActStatus.Ready, readyAct.text);
+                ApplyStatus(ActStatus.Ready);
             }
             else
             {
                 ApplyStatus(ActStatus.Idle);
-            }
-        }
-
-        public void Grab()
-        {
-            foreach (var slot in slots)
-            {
-                if (slot.gameObject.activeSelf == true && slot.grab == true)
-                {
-                    foreach (var cardViz in GameManager.Instance.cards)
-                    {
-                        if (cardViz.gameObject.activeSelf == false)
-                            continue;
-
-                        if (slot.AcceptsCard(cardViz) == true)
-                        {
-                            var cardVizY = cardViz.Yield();
-
-                            if (cardVizY.free == false)
-                                continue;
-
-                            cardVizY.free = false;
-                            cardVizY.transform.DOComplete(true);
-                            bool prevInteractive = cardVizY.interactive;
-                            cardVizY.interactive = false;
-
-                            cardVizY.transform.parent?.GetComponentInParent<ICardDock>(true)?.
-                                OnCardUndock(cardVizY.gameObject);
-                            cardVizY.gameObject.SetActive(true);
-                            cardVizY.transform.SetParent(null);
-                            slot.SlotCardLogical(cardVizY);
-                            cardVizY.transform.DOMove(tokenViz.transform.position, GameManager.Instance.normalSpeed).
-                                OnComplete(() => { cardVizY.interactive = prevInteractive; slot.SlotCardPhysical(cardVizY); });
-
-                            return;
-                        }
-                    }
-                }
             }
         }
 
@@ -372,15 +359,12 @@ namespace CultistLike
         {
             if (suspendUpdates == false)
             {
-                fragmentBar.Load(actLogic.fragments);
+                aspectBar.Load(actLogic.fragments);
+                cardBar.Load(actLogic.fragments);
             }
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="actStatus"></param>
-        /// <param name="tex"></param>
-        public void ApplyStatus(ActStatus actStatus, string tex = "")
+        public void ApplyStatus(ActStatus actStatus)
         {
             this.actStatus = actStatus;
             switch (actStatus)
@@ -394,26 +378,32 @@ namespace CultistLike
                     tokenViz.SetResultCount(0);
                     if (tokenViz != null)
                     {
+                        label.text = tokenViz?.token?.label;
                         text.text = tokenViz?.token?.description;
                     }
                     break;
                 case ActStatus.Ready:
-                    okButton.interactable = true;
-                    text.text = tex;
+                    if (readyAct != null)
+                    {
+                        okButton.interactable = true;
+                        label.text = readyAct.label;
+                        text.text = readyAct.text;
+                    }
                     break;
                 case ActStatus.Running:
-                    timerGO.SetActive(true);
+                    timer.gameObject.SetActive(true);
                     idleSlotsGO.SetActive(false);
                     runSlotsGO.SetActive(true);
                     okButton.interactable = false;
+                    label.text = runLabel;
                     text.text = runText;
                     break;
                 case ActStatus.Finished:
-                    timerGO.SetActive(false);
+                    timer.gameObject.SetActive(false);
                     runSlotsGO.SetActive(false);
                     resultLane.gameObject.SetActive(true);
                     collectButton.interactable = true;
-                    text.text = tex;
+                    text.text = actLogic.activeAct.endText;
                     break;
                 default:
                     break;
@@ -441,15 +431,13 @@ namespace CultistLike
         {
             GetComponent<Drag>().draggingPlane = GameManager.Instance.windowPlane;
 
-            timerGO.SetActive(false);
+            timer.gameObject.SetActive(false);
             collectButton.interactable = false;
             tokenViz.SetResultCount(0);
-
             gameObject.SetActive(false);
 
             CloseSlots(idleSlots);
             CloseSlots(runSlots);
-            StatusIdle();
 
             foreach(var c in gameObject.GetComponentsInChildren<Canvas>())
             {
@@ -460,6 +448,10 @@ namespace CultistLike
             {
                 readyAct = tokenViz.autoPlay;
                 GoForIt();
+            }
+            else
+            {
+                StatusIdle();
             }
         }
     }

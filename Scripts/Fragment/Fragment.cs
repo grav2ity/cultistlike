@@ -8,7 +8,7 @@ namespace CultistLike
 {
     public class Fragment : ScriptableObject, IFrag
     {
-        public string label;
+        [Multiline] public string label;
         public Sprite art;
         public Color color;
         [TextArea(3, 10)] public string description;
@@ -22,13 +22,13 @@ namespace CultistLike
         public bool oneForAll;
 
         [Header("Slots")]
-        [Tooltip("Slot that will open inside of an Act if this Fragment is present.")]
+        [Tooltip("Slots that will attempt to open if this Fragment is present.")]
         public List<Slot> slots;
 
 
         public virtual void AddToContainer(FragContainer fg) {}
         public virtual void RemoveFromContainer(FragContainer fg) {}
-        public virtual void AdjustInContainer(FragContainer fg, int level) {}
+        public virtual int AdjustInContainer(FragContainer fg, int level) { return 0; }
         public virtual int CountInContainer(FragContainer fg) { return 0; }
 
         public virtual Fragment ToFragment() => this;
@@ -41,7 +41,7 @@ namespace CultistLike
         public Fragment fragment;
         public int count;
 
-        public CardViz cardViz;
+        [HideInInspector] public CardViz cardViz;
 
 
         public HeldFragment(Fragment fragment, int count)
@@ -58,7 +58,7 @@ namespace CultistLike
         public HeldFragment(Fragment fragment) : this(fragment, 1) {}
         public HeldFragment(HeldFragment fragment) : this(fragment.fragment, fragment.count) {}
 
-        public void AdjustInList(List<HeldFragment> list, int level)
+        public static int AdjustInList(List<HeldFragment> list, Fragment fragment, int level)
         {
             if (list != null && fragment != null)
             {
@@ -66,23 +66,33 @@ namespace CultistLike
 
                 if (r != null)
                 {
+                    int oldC = r.count;
                     r.count += level;
                     if (r.count <= 0)
                     {
                         list.Remove(r);
                     }
+                    return Math.Max(0, r.count) - oldC;
                 }
                 else
                 {
                     if (level > 0)
                     {
-                        list.Add(new HeldFragment(fragment, count));
+                        list.Add(new HeldFragment(fragment, level));
+                        return level;
+                    }
+                    else
+                    {
+                        return 0;
                     }
                 }
             }
+            return 0;
         }
-        public void AddToList(List<HeldFragment> list) => AdjustInList(list, count);
-        public void RemoveFromList(List<HeldFragment> list) => AdjustInList(list, -count);
+
+        public int AddToList(List<HeldFragment> list) => HeldFragment.AdjustInList(list, fragment, count);
+        public int RemoveFromList(List<HeldFragment> list) => HeldFragment.AdjustInList(list, fragment, -count);
+
         public Fragment ToFragment() => fragment;
         public int Count() => count;
     }

@@ -82,6 +82,11 @@ namespace CultistLike
                 cardViz.transform.localPosition = o;
                 o += spacing;
             }
+
+            for (int i = cards.Count - 1; i >= 0; i--)
+            {
+                GameManager.Instance.CardInPlay(cards[i]);
+            }
         }
 
         private void Awake()

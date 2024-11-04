@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
+using UnityEngine.Events;
 
 using DG.Tweening;
 
@@ -35,6 +37,11 @@ namespace CultistLike
         public Fragment thisCard;
         public Fragment matchedCard;
 
+        [Header("Dev tools")]
+        public float maxTime;
+        public float allTime;
+
+        [HideInInspector] public UnityEvent<CardViz> onCardInPlay;
         [HideInInspector] public List<Slot> slotSOS;
 
         [SerializeField, HideInInspector] private List<TokenViz> _tokens;
@@ -53,6 +60,22 @@ namespace CultistLike
         public ActWindow openWindow { get => _openWindow; private set => _openWindow = value; }
         public float time { get => elapsedTime; }
 
+
+        public float DevTime(float time)
+        {
+            if (maxTime > 0)
+            {
+                return Math.Min(time, maxTime);
+            }
+            else if (allTime > 0)
+            {
+                return allTime;
+            }
+            else
+            {
+                return time;
+            }
+        }
 
         public void CloseWindow()
         {
@@ -74,6 +97,11 @@ namespace CultistLike
             {
                 cards.Add(cardViz);
             }
+        }
+
+        public void CardInPlay(CardViz cardViz)
+        {
+            onCardInPlay.Invoke(cardViz);
         }
 
         public CardViz CreateCard(Card card)
@@ -118,11 +146,11 @@ namespace CultistLike
         {
             if (act != null && act.token != null && parent != null && parent.tokenViz != null)
             {
-
                 var newTokenViz = SpawnToken(act.token, parent.tokenViz);
                 if (newTokenViz != null)
                 {
                     newTokenViz.autoPlay = act;
+                    newTokenViz.initRule = act.onSpawn;
                     newTokenViz.parent = parent;
                     return newTokenViz;
                 }
@@ -134,30 +162,41 @@ namespace CultistLike
         {
             if (token != null && viz != null)
             {
-                var newTokenViz = UnityEngine.Object.Instantiate(GameManager.Instance.tokenPrefab,
-                                                                 viz.transform.position, Quaternion.identity);
-                newTokenViz.LoadToken(token);
+                if (token.unique == false || tokens.Find(x => x.token == token) == null)
+                {
+                    var newTokenViz = UnityEngine.Object.Instantiate(GameManager.Instance.tokenPrefab,
+                                                                     viz.transform.position, Quaternion.identity);
+                    newTokenViz.LoadToken(token);
 
-                var root = newTokenViz.transform;
-                var localScale = root.localScale;
+                    var root = newTokenViz.transform;
+                    var localScale = root.localScale;
 
-                GameManager.Instance.table.Place(viz, new List<Viz> { newTokenViz });
+                    GameManager.Instance.table.Place(viz, new List<Viz> { newTokenViz });
 
-                root.localScale = new Vector3(0f, 0f, 0f);
-                root.DOScale(localScale, 1);
+                    root.localScale = new Vector3(0f, 0f, 0f);
+                    root.DOScale(localScale, 1);
 
-                return newTokenViz;
+                    return newTokenViz;
+                }
             }
             return null;
         }
 
-        // public List<CardViz> GetCards() {
-        //     return cards;
-        // }
-
         public void SetTimeScale(float ts)
         {
             timeScale = ts;
+        }
+
+        public void SetMaxTime(float time)
+        {
+            maxTime = time;
+            allTime = 0f;
+        }
+
+        public void SetAllTime(float time)
+        {
+            allTime = time;
+            maxTime = 0f;
         }
 
         public List<Act> GetInitialActs() => initialActs;
@@ -186,8 +225,8 @@ namespace CultistLike
 
             timeScale = 1f;
 
-            FindIninitalActs();
             FindSlotSOS();
+            FindIninitalActs();
         }
 
         private void Update()

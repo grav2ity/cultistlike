@@ -14,5 +14,6 @@ namespace CultistLike
 
         public Slot slot;
         public bool dissolve;
+        public bool unique;
     }
 }

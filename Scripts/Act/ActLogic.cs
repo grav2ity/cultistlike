@@ -13,24 +13,24 @@ namespace CultistLike
         [SerializeField, HideInInspector] private Act _activeAct;
         [SerializeField, HideInInspector] private Act _altAct;
 
-        // [SerializeField, HideInInspector] private List<Act> altActs;
-        // [SerializeField, HideInInspector] private List<Act> nextActs;
-        [SerializeField, HideInInspector] public List<Act> altActs;
-        [SerializeField, HideInInspector] public List<Act> nextActs;
-        [SerializeField, HideInInspector] public List<Act> spawnedActs;
+        [SerializeField, HideInInspector] private List<Act> altActs;
+        [SerializeField, HideInInspector] private List<Act> nextActs;
+        [SerializeField, HideInInspector] private List<Act> spawnedActs;
 
         [SerializeField, HideInInspector] private Act forceAct;
         [SerializeField, HideInInspector] private Rule forceRule;
 
-        public ActWindow actWindow;
+        [SerializeField, HideInInspector] private ActLogic _parent;
+        [SerializeField, HideInInspector] private List<ActLogic> children;
 
-        public ActLogic parent;
-        public List<ActLogic> children;
+        private ActWindow actWindow;
 
 
         public FragContainer fragments { get => _fragments; private set => _fragments = value; }
         public Act activeAct { get => _activeAct; private set => _activeAct = value; }
         public Act altAct { get => _altAct; set => _altAct = value; }
+
+        public ActLogic parent  { get => _parent; private set => _parent = value; }
 
         public TokenViz tokenViz { get => actWindow.tokenViz; }
 
@@ -60,9 +60,9 @@ namespace CultistLike
             }
             else
             {
-                if (actWindow.tokenViz?.token?.slot != null)
+                if (tokenViz?.token?.slot != null)
                 {
-                    slotsToOpen.Add(actWindow.tokenViz?.token?.slot);
+                    slotsToOpen.Add(tokenViz?.token?.slot);
                 }
 
                 foreach (var cardViz in fragments.cards)
@@ -82,7 +82,7 @@ namespace CultistLike
 
                 foreach (var slot in GameManager.Instance.slotSOS)
                 {
-                    if (slot.allTokens == true || slot.token == actWindow.tokenViz?.token)
+                    if (slot.allTokens == true || slot.token == tokenViz?.token)
                     {
                         slotsToAttempt.Add(slot);
                     }
@@ -123,7 +123,7 @@ namespace CultistLike
                 fragments.Add(frag);
             }
 
-            ParentCardsToWindow();
+            actWindow.ParentCardsToWindow();
             actWindow.UpdateBars();
             //need this for correct slots
             actWindow.ApplyStatus(ActStatus.Running);
@@ -225,7 +225,6 @@ namespace CultistLike
                 GameManager.Instance.SpawnAct(spawnedAct, this);
             }
 
-            ParentCardsToWindow();
             actWindow.UpdateBars();
 
             if (forceAct != null)
@@ -257,6 +256,13 @@ namespace CultistLike
             activeAct = null;
         }
 
+        public void AddNextAct(Act act)
+        {
+            if (nextActs.Contains(act) == false)
+            {
+                nextActs.Add(act);
+            }
+        }
         public void ForceAct(Act act) => forceAct = act;
         public void ForceRule(Rule rule) => forceRule = rule;
 
@@ -264,7 +270,7 @@ namespace CultistLike
         {
             if (act != null)
             {
-                if (act.token != null && act.token != actWindow.tokenViz.token)
+                if (act.token != null && act.token != tokenViz.token)
                 {
                     return null;
                 }
@@ -359,14 +365,10 @@ namespace CultistLike
             return cardViz;
         }
 
-        private void ParentCardsToWindow()
+        public void ParentCardToWindow(CardViz cardViz)
         {
-            actWindow.ParentCardsToWindow();
-            foreach (var cardViz in fragments.cards)
-            {
-                cardViz.gameObject.SetActive(false);
-                cardViz.transform.SetParent(transform);
-            }
+            cardViz.gameObject.SetActive(false);
+            cardViz.transform.SetParent(transform);
         }
 
         public void SetParent(ActLogic parent)
@@ -401,6 +403,7 @@ namespace CultistLike
         private void Awake()
         {
             actWindow = GetComponent<ActWindow>();
+            fragments.onCreateCard = actWindow.ParentCardToWindow;
         }
     }
 }

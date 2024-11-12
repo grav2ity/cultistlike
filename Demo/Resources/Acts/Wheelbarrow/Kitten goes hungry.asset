@@ -27,14 +27,15 @@ MonoBehaviour:
     reference: {fileID: 0}
   cardModifiers:
   - op: 10
-    onto: {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
+    target: {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
     what: {fileID: 11400000, guid: f0844792f3a8dbe4885ee16837eb9830, type: 2}
-    level: 0
+    level: 1
     reference: {fileID: 0}
   tableModifiers: []
   pathModifiers: []
   deckModifiers: []
-  furthermore: []
+  furthermore:
+  - {fileID: 0}
   ignoreGlobalSlots: 0
   slots: []
   randomAlt: 0

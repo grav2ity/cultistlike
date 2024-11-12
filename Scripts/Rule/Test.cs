@@ -19,15 +19,12 @@ namespace CultistLike
         RandomClash = 20
     }
 
-    [Flags]
     public enum ReqLoc
     {
-        Scope      = 0,
-        Matched    = 1 << 5,
-        Card       = 1 << 1,
-        Cards      = 1 << 2,
-        Parent     = 1 << 3,
-        Table      = 1 << 4,
+        Scope          = 0,
+        MatchedCards   = 1 << 5,
+        Parent         = 1 << 3,
+        Table          = 1 << 4,
     }
 
     [Serializable]
@@ -35,6 +32,7 @@ namespace CultistLike
     {
         [Tooltip("This Test can fail. Use this option to match Cards. You can reference matched Cards.")]
         public bool canFail;
+        public bool cardTest;
         public ReqLoc loc1;
         public Fragment fragment1;
         [Space(10)]
@@ -46,21 +44,76 @@ namespace CultistLike
         public Fragment fragment2;
 
 
-        public bool Attempt(Context context, ActLogic parent = null)
+        public bool Attempt(Context context)
         {
-            int min, max;
             int right;
+
             if (fragment2 == null)
             {
                 right = constant;
             }
             else
             {
-                right = constant * GetCount(out min, out max, context, loc2, fragment2, false);
+                right = constant * GetCount(context, loc2, fragment2);
             }
 
-            int left = GetCount(out min, out max, context, loc1, fragment1, true);
+            if (cardTest == true)
+            {
+                var scope = GetScope(context, loc1);
 
+                List<CardViz> cards;
+                if ((loc1 & ReqLoc.MatchedCards) != 0)
+                {
+                    cards = context.matches;
+                }
+                else
+                {
+                    cards = scope.cards;
+                }
+
+                bool passed = false;
+                if (fragment1 == null)
+                {
+                    if (right > 0 && right < context.matches.Count)
+                    {
+                        //TODO
+                        // context.matches = context.matches.Slice(0, right);
+                    }
+                }
+                else if (fragment1 is Aspect)
+                {
+                    List<CardViz> newMatches = new List<CardViz>();
+                    var aspect = (Aspect)fragment1;
+                    int left;
+                    foreach (var card in cards)
+                    {
+                        bool result = false;
+                        left = card.fragments.Count(aspect);
+
+                        result = Compare(op, constant, left, right);
+                        if (result == true)
+                        {
+                            newMatches.Add(card);
+                            passed = true;
+                        }
+                    }
+
+                    context.matches.Clear();
+                    context.matches.InsertRange(0, newMatches);
+                }
+
+
+                return passed;
+            }
+            else
+            {
+                int left = GetCount(context, loc1, fragment1);
+                return Compare(op, constant, left, right);
+            }
+        }
+
+        public bool Compare(ReqOp op, int constant, int left, int right)
+        {
             switch (op)
             {
                 case ReqOp.Equal:
@@ -68,71 +121,59 @@ namespace CultistLike
                 case ReqOp.NotEqual:
                     return left != right;
                 case ReqOp.Less:
-                    return min < right;
+                    return left < right;
                 case ReqOp.LessOrEqual:
-                    return min <= right;
+                    return left <= right;
                 case ReqOp.More:
-                    return max > right;
+                    return left > right;
                 case ReqOp.MoreOrEqual:
-                    return max >= right;
+                    return left >= right;
                 case ReqOp.RandomChallenge:
-                    return constant * max > Random.Range(0, 100);
+                    return constant * left > Random.Range(0, 100);
                 case ReqOp.RandomClash:
-                    float chance = ((float)max / (float)(max + right));
+                    float chance = ((float)left / (float)(left + right));
                     return chance > Random.Range(0f, 1f);
                 default:
                     return false;
             }
         }
 
-
-        public int GetCount(out int min, out int max, Context context, ReqLoc loc, Fragment fragment, bool updateMatches)
+        public FragContainer GetScope(Context context, ReqLoc loc)
         {
-            var scope = context.scope;
-            var parent = context.parent;
-
-            List<CardViz> newMatches = new List<CardViz>();
-            min = 0;
-            max = 0;
-            int total = 0;
-
-            if ((loc & ReqLoc.Parent) != 0)
+            if (loc == ReqLoc.Parent)
             {
-                if (parent != null)
+                if (context.parent != null)
                 {
-                    scope = parent.fragments;
+                    return context.parent.fragments;
                 }
                 else
                 {
                     //ERROR
-                    return 0;
+                    return null;
                 }
             }
-            else if ((loc & ReqLoc.Table) != 0)
+            else if (loc == ReqLoc.Table)
             {
-                scope = GameManager.Instance.table.fragments;
-            }
-
-            List<CardViz> cards;
-            if ((loc & ReqLoc.Matched) != 0)
-            {
-                cards = context.matches;
+                return GameManager.Instance.table.fragments;
             }
             else
             {
-                cards = scope.cards;
+                return context.scope;
             }
+        }
 
-            if (loc == ReqLoc.Scope || loc == ReqLoc.Table)
+        public int GetCount(Context context, ReqLoc loc, Fragment fragment)
+        {
+
+            int total = 0;
+
+            if (loc == ReqLoc.MatchedCards)
             {
-                total = fragment.CountInContainer(scope);
-            }
-            else if ((loc & (ReqLoc.Card | ReqLoc.Cards)) != 0)
-            {
+                List<CardViz> cards = context.matches;
+
                 if (fragment == null) //just count cards
                 {
                     total = cards.Count;
-
                 }
                 else if (fragment is Aspect)
                 {
@@ -143,10 +184,7 @@ namespace CultistLike
                         ha = card.fragments.Find(aspect);
                         if (ha != null)
                         {
-                            newMatches.Add(card);
                             total += ha.count;
-                            max = Math.Max(max, ha.count);
-                            min = Math.Min(min, ha.count);
                             ha = null;
                         }
                     }
@@ -158,25 +196,18 @@ namespace CultistLike
                     {
                         if (card.card == car)
                         {
-                            newMatches.Add(card);
-                            total +=1;
+                            total += 1;
                         }
                     }
-                    max = total;
-                    min = total;
                 }
-                if (updateMatches == true)
-                {
-                    context.matches.Clear();
-                    context.matches.InsertRange(0, newMatches);
-                }
+            }
+            else
+            {
+                var scope = GetScope(context, loc);
+
+                total = fragment.CountInContainer(scope);
             }
 
-            if ((loc & ReqLoc.Card) == 0)
-            {
-                max = total;
-                min = total;
-            }
             return total;
         }
     }

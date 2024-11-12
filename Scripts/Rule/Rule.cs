@@ -137,8 +137,7 @@ namespace CultistLike
             }
             else
             {
-                //TODO ???
-                return true;
+                return false;
             }
         }
     }

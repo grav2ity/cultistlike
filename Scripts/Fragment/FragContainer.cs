@@ -15,6 +15,9 @@ namespace CultistLike
 
         public FragContainer parent;
 
+        public Action<CardViz> onCreateCard;
+
+
         public void Clear()
         {
             cards.Clear();
@@ -71,6 +74,10 @@ namespace CultistLike
             {
                 var cardViz = GameManager.Instance.CreateCard(card);
                 Add(cardViz);
+                if (onCreateCard != null)
+                {
+                    onCreateCard(cardViz);
+                }
             }
         }
 
@@ -97,21 +104,13 @@ namespace CultistLike
             }
         }
 
-
         public int Adjust(HeldFragment frag, int level)
         {
             if (frag != null)
             {
                 if (frag.cardViz != null)
                 {
-                    if (level < 0)
-                    {
-                        Remove(frag.cardViz);
-                    }
-                    else if (level > 0)
-                    {
-                        //TODO COPY
-                    }
+                    Adjust(frag.cardViz, level);
                 }
                 else if (frag.fragment != null)
                 {
@@ -125,38 +124,70 @@ namespace CultistLike
         {
             if (card != null)
             {
-                int count = 0;
                 if (level > 0)
                 {
+                    int count = level;
                     while (level-- > 0)
                     {
-                        count++;
                         Add(card);
                     }
+                    return count;
                 }
                 else if (level < 0)
                 {
+                    int count = 0;
                     while (level++ < 0)
                     {
                         if (Remove(card) != null)
                         {
-                            count++;
+                            count--;
                         }
                         else
                         {
-                            break; 
+                            break;
                         }
                     }
+                    return count;
                 }
-                return count;
             }
-            else
-            {
-                return 0;
-            }
+            return 0;
         }
 
-        // public int Adjust(CardViz cardViz, int level) => Adjust(cardViz?.card, level);
+        public int Adjust(CardViz cardViz, int level)
+        {
+            if (cardViz != null)
+            {
+                if (level > 0)
+                {
+                    int count = level;
+                    Add(cardViz);
+                    level--;
+
+                    while (level-- > 0)
+                    {
+                        var newCardViz = cardViz.Duplicate();
+                        Add(newCardViz);
+                        if (onCreateCard != null)
+                        {
+                            onCreateCard(newCardViz);
+                        }
+                    }
+                    return count;
+                }
+                else if (level < 0)
+                {
+                    if (Remove(cardViz) != null)
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+                }
+            }
+            return 0;
+        }
 
         public void Remove(HeldFragment frag)
         {
@@ -211,7 +242,7 @@ namespace CultistLike
             if (cardViz != null)
             {
                 cards.Remove(cardViz);
-                //TODO ?? maybe not
+                //TODO ??
                 matches.Remove(cardViz);
             }
             return cardViz;
@@ -234,7 +265,6 @@ namespace CultistLike
 
         public List<CardViz> FindAll(Aspect aspect) =>
             cards.FindAll(x => x.fragments.Count(aspect) > 0);
-
 
         public int Count(Card card) => cards.FindAll(x => x.card == card).Count;
 

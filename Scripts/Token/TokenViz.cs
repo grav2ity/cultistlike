@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 using DG.Tweening;
@@ -98,6 +100,32 @@ namespace CultistLike
         public void ShowTimer(bool p = true)
         {
             timer.gameObject.SetActive(p);
+        }
+
+        public bool Grab(CardViz cardViz, bool bringUp = false)
+        {
+            if (cardViz.gameObject.activeSelf == true)
+            {
+                Vector3 target;
+                if (actWindow.gameObject.activeInHierarchy == true)
+                {
+                    target = actWindow.transform.position;
+                }
+                else
+                {
+                    target = transform.position;
+                }
+
+                // Action<CardViz> onStart = x => SlotCardLogical(x);
+                Action<CardViz> onComplete = x =>
+                {
+                    actWindow.ParentCardToWindow(x);
+                };
+
+                cardViz.Grab(target, null, onComplete);
+                return true;
+            }
+            return false;
         }
 
         private void Awake()

@@ -31,7 +31,6 @@ namespace CultistLike
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            //TODO
             if (cardViz == null)
             {
                 UIManager.Instance?.aspectInfo?.LoadAspect(fragment);

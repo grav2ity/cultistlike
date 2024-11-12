@@ -119,7 +119,7 @@ namespace CultistLike
             if (eventData.clickCount == 2)
             {
                 var slot = GetComponentInParent<SlotViz>();
-                if (slot != null)
+                if (slot != null && slot.cardLock == false)
                 {
                     slot.UnslotCard();
                     GameManager.Instance.table.ReturnToTable(this);
@@ -203,13 +203,22 @@ namespace CultistLike
             {
                 var targetScale = new Vector3(transform.localScale.x, 0f, transform.localScale.z);
                 transform.DOScale(targetScale, GameManager.Instance.scaleSpeed).
-                    OnComplete(() => { GameManager.Instance.DestroyCard(this); });
+                    OnComplete(() => { Destroy(); });
             }
         }
 
         public void Decay(Card card, float time)
         {
             cardDecay.StartTimer(time, () => OnDecayComplete(card));
+        }
+
+        public void Destroy()
+        {
+            if (fragments.parent != null)
+            {
+                fragments.parent.Remove(this);
+            }
+            GameManager.Instance.DestroyCard(this);
         }
 
         public void Reverse(bool instant = false)
@@ -286,7 +295,6 @@ namespace CultistLike
 
         public void Transform(Card card)
         {
-            fragments.RemoveCardVizOnly(this);
             LoadCard(card, false);
 
             if (card.lifetime > 0f)
@@ -313,6 +321,45 @@ namespace CultistLike
             newCardViz.fragments.parent = fragments.parent;
 
             return newCardViz;
+        }
+
+        public bool Grab(Vector3 target, Action<CardViz> onStart, Action<CardViz> onComplete)
+        {
+            if (gameObject.activeSelf == true)
+            {
+                var cardVizY = this.Yield();
+
+                if (cardVizY.free == true)
+                {
+                    cardVizY.free = false;
+                    cardVizY.transform.DOComplete(true);
+                    bool prevInteractive = cardVizY.interactive;
+                    cardVizY.interactive = false;
+                    cardVizY.transform.parent?.GetComponentInParent<ICardDock>(true)?.
+                        OnCardUndock(cardVizY.gameObject);
+                    cardVizY.gameObject.SetActive(true);
+                    cardVizY.transform.SetParent(null);
+
+                    if (onStart != null)
+                    {
+                        onStart(cardVizY);
+                    }
+
+                    var pos = cardVizY.transform.position;
+                    cardVizY.transform.position = new Vector3(pos.x, pos.y, GameManager.Instance.cardDragPlane.position.z);
+                    cardVizY.transform.DOMove(target, GameManager.Instance.normalSpeed).
+                        OnComplete(() =>
+                        {
+                            cardVizY.interactive = prevInteractive;
+                            if (onComplete != null)
+                            {
+                                onComplete(cardVizY);
+                            }
+                        });
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void LoadFragments()

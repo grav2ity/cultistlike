@@ -18,6 +18,7 @@ MonoBehaviour:
   time: 10
   tests:
   - canFail: 0
+    cardTest: 0
     loc1: 0
     fragment1: {fileID: 11400000, guid: 81fd3c01bb1bc104aa7ee20bf354b578, type: 2}
     op: 0

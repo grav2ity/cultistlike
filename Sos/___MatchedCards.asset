@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6d7ad74be29e3414894e2ccf6a7e39e6, type: 3}
-  m_Name: ___MatchedCard
+  m_Name: ___MatchedCards
   m_EditorClassIdentifier: 
   label: ThisCard
   art: {fileID: 0}

@@ -16,14 +16,7 @@ MonoBehaviour:
   token: {fileID: 11400000, guid: 5701f165dec7a2d4db96c726b68268f0, type: 2}
   initial: 1
   time: 10
-  tests:
-  - canFail: 0
-    loc1: 0
-    fragment1: {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
-    op: 0
-    constant: 1
-    loc2: 0
-    fragment2: {fileID: 0}
+  tests: []
   and: []
   or: []
   fragments: []

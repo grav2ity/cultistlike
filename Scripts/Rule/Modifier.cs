@@ -6,6 +6,30 @@ using UnityEngine;
 
 namespace CultistLike
 {
+    public class Target
+    {
+        public Fragment fragment;
+        public List<CardViz> cards;
+
+
+        public Target(Fragment frag)
+        {
+            fragment = frag;
+        }
+
+        public Target(CardViz cardViz)
+        {
+            cards = new List<CardViz>();
+            cards.Add(cardViz);
+        }
+
+        public Target(List<CardViz> cards)
+        {
+            this.cards = cards.GetRange(0, cards.Count);
+        }
+    }
+
+
     public enum CardOp
     {
         FragmentAdditive = 0,
@@ -17,11 +41,10 @@ namespace CultistLike
     public struct CardModifier
     {
         public CardOp op;
-        public Fragment onto;
+        public Fragment target;
         public Fragment what;
         public int level;
         public Fragment reference;
-        //TODO probability
 
 
         public CardModifierC Evaluate(Context context)
@@ -31,10 +54,10 @@ namespace CultistLike
             {
                 result.op = op;
 
-                result.onto = context.Resolve(onto);
+                result.target = context.ResolveTarget(target);
                 result.what = context.Resolve(what);
-                result.reference = context.Resolve(reference);
-                result.level = result.reference != null ? level * context.scope.Count(result.reference) : level;
+                var resolvedRef = context.Resolve(reference);
+                result.level = resolvedRef != null ? level * context.scope.Count(resolvedRef) : level;
             }
             return result;
         }
@@ -43,31 +66,17 @@ namespace CultistLike
     public struct CardModifierC
     {
         public CardOp op;
-        public HeldFragment onto;
+        public Target target;
         public HeldFragment what;
         public int level;
-        public HeldFragment reference;
 
 
         public void Execute(Context context)
         {
-            if (context != null && context.scope != null && onto != null && what != null)
+            if (context?.scope != null && target != null && what != null)
             {
-                List<CardViz> targetCards;
-                if (onto.cardViz != null)
-                {
-                    targetCards = new List<CardViz>();
-                    targetCards.Add(onto.cardViz);
-                }
-                else if (onto.fragment is Card)
-                {
-                    targetCards = context.scope.FindAll((Card)onto.fragment);
-                }
-                else if (onto.fragment is Aspect)
-                {
-                    targetCards = context.scope.FindAll((Aspect)onto.fragment);
-                }
-                else
+                var targetCards = context.ResolveTargetCards(target, context.scope);
+                if (targetCards == null)
                 {
                     return;
                 }
@@ -77,16 +86,19 @@ namespace CultistLike
                     case CardOp.FragmentAdditive:
                         foreach (var targetCard in targetCards)
                         {
-                            //TODO TEST THIS
                             targetCard.fragments.Adjust(what, level);
                         }
                         break;
                     case CardOp.Transform:
                         if (what.fragment is Card)
                         {
-                            foreach (var targetCard in targetCards)
+                            if (level > 0)
                             {
-                                targetCard.Transform((Card)what.fragment);
+                                foreach (var targetCard in targetCards)
+                                {
+                                    targetCard.Transform((Card)what.fragment);
+                                    context.scope.Adjust(targetCard, level);
+                                }
                             }
                         }
                         break;
@@ -114,10 +126,9 @@ namespace CultistLike
 
     public enum ActOp
     {
-        Fragment = 0,
-        TransferToParent = 30,
-        Destroy = 100,
-        Duplicate = 110
+        Adjust = 0,
+        Grab = 20,
+        // TransferToParent = 30,
     }
 
     [Serializable]
@@ -137,9 +148,9 @@ namespace CultistLike
             if (context != null && context.scope != null)
             {
                 result.op = op;
-                result.fragment = context.Resolve(fragment);
-                result.reference = context.Resolve(reference);
-                result.level = result.reference != null ? level * context.scope.Count(result.reference) : level;
+                result.target = context.ResolveTarget(fragment);
+                var resolvedRef = context.Resolve(reference);
+                result.level = resolvedRef != null ? level * context.scope.Count(resolvedRef) : level;
             }
             return result;
         }
@@ -148,44 +159,57 @@ namespace CultistLike
     public struct ActModifierC
     {
         public ActOp op;
-        public HeldFragment fragment;
+        public Target target;
         [Tooltip("Reference not set - value. Reference set - multiplier. Accepts negative values.")]
         public int level;
-        public HeldFragment reference;
+
 
         public void Execute(Context context)
         {
-            if (context != null && context.scope != null && context.scope != null)
+            if (context?.scope != null && target != null)
             {
                 switch (op)
                 {
-                    case ActOp.Fragment:
-                        context.scope.Adjust(fragment, level);
-                        break;
-                    case ActOp.TransferToParent:
-                        if (context.parentScope != null)
+                    case ActOp.Adjust:
+                        if (target.cards != null)
                         {
-                            //TODO update visuals
-                            if (level > 0)
+                            foreach (var cardViz in target.cards)
                             {
-                                int count = context.scope.Adjust(fragment, -level);
-                                context.parentScope.Adjust(fragment, -count);
+                               var count = context.scope.Adjust(cardViz, level);
+                                if (level < 0 && count < 0)
+                                {
+                                    context.Destroy(cardViz);
+                                }
                             }
-                            else if (level < 0)
+                        }
+                        else if (target.fragment is Card && level < 0)
+                        {
+                            var cards = context.scope.FindAll((Card)target.fragment);
+                            var count = context.scope.Adjust(target.fragment, level);
+                            for (int i=0; i<count && i<cards.Count; i++)
                             {
-                                int count = context.parentScope.Adjust(fragment, level);
-                                context.scope.Adjust(fragment, -count);
+                                context.Destroy(cards[i]);
+                            }
+                        }
+                        else
+                        {
+                            context.scope.Adjust(target.fragment, level);
+                        }
+                        break;
+                    case ActOp.Grab:
+                        var targetCards = context.ResolveTargetCards(target,
+                                                                     GameManager.Instance.table.fragments);
+                        if (targetCards != null)
+                        {
+                            for (int i=0; i<level && i<targetCards.Count; i++)
+                            {
+                                context.scope.Add(targetCards[i]);
+                                context.actLogic.tokenViz.Grab(targetCards[i]);
                             }
                         }
                         break;
-                    case ActOp.Destroy:
-                        context.scope.Remove(fragment);
-                        context.Destroy(fragment);
-                        break;
-                    case ActOp.Duplicate:
-                        //TODO seriously
-                        // context.scope.Add(fragment);
-                        break;
+                    // case ActOp.TransferToParent:
+                        // break;
                     default:
                         break;
                 }
@@ -194,10 +218,10 @@ namespace CultistLike
         }
     }
 
+
     public enum PathOp
     {
         NextAct = 0,
-        AltAct = 10,
         ForceAct = 20,
     }
 
@@ -220,10 +244,7 @@ namespace CultistLike
                 switch (op)
                 {
                     case PathOp.NextAct:
-                        context.actLogic.nextActs.Add(act);
-                        break;
-                    case PathOp.AltAct:
-                        context.actLogic.altActs.Add(act);
+                        context.actLogic.AddNextAct(act);
                         break;
                     case PathOp.ForceAct:
                         context.actLogic.ForceAct(act);
@@ -235,6 +256,7 @@ namespace CultistLike
             return;
         }
     }
+
 
     public enum DeckOp
     {
@@ -250,11 +272,25 @@ namespace CultistLike
         public Deck deck;
         public Fragment reference;
 
-
-        public DeckModifier Evaluate(Context context)
+        public DeckModifierC Evaluate(Context context)
         {
-            return this;
+            var result = new DeckModifierC();
+            if (context != null && context.scope != null)
+            {
+                result.op = op;
+                result.deck = deck;
+                result.reference = context.Resolve(reference);
+            }
+            return result;
         }
+    }
+
+    [Serializable]
+    public struct DeckModifierC
+    {
+        public DeckOp op;
+        public Deck deck;
+        public HeldFragment reference;
 
         public void Execute(Context context)
         {
@@ -267,14 +303,20 @@ namespace CultistLike
                         break;
                     case DeckOp.DrawNext:
                         {
-                            var refer = reference != null ? reference : context.matches[0].card;
-                            context.scope.Add(deck.DrawOffset(refer, 1));
+                            if (reference != null)
+                            {
+                                var refer = reference.cardViz != null ? reference.cardViz.card : reference.fragment;
+                                context.scope.Add(deck.DrawOffset(refer, 1));
+                            }
                             break;
                         }
                     case DeckOp.DrawPrevious:
                         {
-                            var refer = reference != null ? reference : context.matches[0].card;
-                            context.scope.Add(deck.DrawOffset(refer, -1));
+                            if (reference != null)
+                            {
+                                var refer = reference.cardViz != null ? reference.cardViz.card : reference.fragment;
+                                context.scope.Add(deck.DrawOffset(refer, -1));
+                            }
                             break;
                         }
                     default:
@@ -283,6 +325,7 @@ namespace CultistLike
             }
         }
     }
+
 
     public enum TableOp
     {

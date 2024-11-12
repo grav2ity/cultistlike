@@ -22,7 +22,7 @@ namespace CultistLike
         public List<CardModifierC> cardModifiers = new List<CardModifierC>();
         public List<TableModifier> tableModifiers = new List<TableModifier>();
         public List<PathModifier> pathModifiers = new List<PathModifier>();
-        public List<DeckModifier> deckModifiers = new List<DeckModifier>();
+        public List<DeckModifierC> deckModifiers = new List<DeckModifierC>();
 
         private List<CardViz> toDestroy = new List<CardViz>();
 
@@ -93,15 +93,28 @@ namespace CultistLike
 
             foreach (var cardViz in toDestroy)
             {
-                GameManager.Instance.DestroyCard(cardViz);
+                cardViz.Destroy();
             }
         }
 
-        public void Destroy(HeldFragment frag)
+        public void Destroy(HeldFragment frag) => Destroy(frag?.cardViz);
+
+        public void Destroy(CardViz cardViz)
         {
-            if (frag.cardViz != null)
+            if (cardViz != null)
             {
-                toDestroy.Add(frag.cardViz);
+                toDestroy.Add(cardViz);
+            }
+        }
+
+        public void Destroy(Target target)
+        {
+            if (target?.cards != null)
+            {
+                foreach (var cardViz in target.cards)
+                {
+                    toDestroy.Add(cardViz);
+                }
             }
         }
 
@@ -143,6 +156,71 @@ namespace CultistLike
             {
                 return null;
             }
+        }
+
+        public Target ResolveTarget(Fragment frag)
+        {
+            if (frag != null)
+            {
+                if (frag == GameManager.Instance.thisCard)
+                {
+                    return new Target(card);
+                }
+                if (frag == GameManager.Instance.matchedCard)
+                {
+                    return new Target(matches);
+                }
+                else
+                {
+                    return new Target(frag);
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public List<CardViz> ResolveTargetCards(HeldFragment fragment, FragContainer scope)
+        {
+            List<CardViz> targetCards = null;
+            if (fragment != null)
+            {
+                if (fragment.cardViz != null)
+                {
+                    targetCards = new List<CardViz>();
+                    targetCards.Add(fragment.cardViz);
+                }
+                else if (fragment.fragment is Card)
+                {
+                    targetCards = scope.FindAll((Card)fragment.fragment);
+                }
+                else if (fragment.fragment is Aspect)
+                {
+                    targetCards = scope.FindAll((Aspect)fragment.fragment);
+                }
+            }
+            return targetCards;
+        }
+
+        public List<CardViz> ResolveTargetCards(Target target, FragContainer scope)
+        {
+            if (target != null)
+            {
+                if (target.cards != null)
+                {
+                    return target.cards;
+                }
+                else if (target.fragment is Card)
+                {
+                   return scope.FindAll((Card)target.fragment);
+                }
+                else if (target.fragment is Aspect)
+                {
+                    return scope.FindAll((Aspect)target.fragment);
+                }
+            }
+            return null;
         }
     }
 }

@@ -29,6 +29,6 @@ MonoBehaviour:
   forbidden: []
   cardTests: []
   cardRule: {fileID: 0}
-  onlyMatching: 0
+  acceptAll: 0
   grab: 0
   cardLock: 0

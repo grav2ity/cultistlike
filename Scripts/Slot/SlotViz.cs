@@ -1,9 +1,9 @@
+using System;
 using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-using DG.Tweening;
 using TMPro;
 
 
@@ -19,12 +19,12 @@ namespace CultistLike
         [SerializeField] private Renderer highlight;
 
         [Header("Card Options")]
-        [Tooltip("Accept only matching Cards.")]
-        public bool onlyMatching;
-        [Tooltip("Cannot remove Card from the Slot.")]
-        public bool cardLock;
+        [Tooltip("Accept all Cards.")]
+        public bool acceptAll;
         [Tooltip("Grabs Cards for itself.")]
         public bool grab;
+        [Tooltip("Cannot remove Card from the Slot.")]
+        public bool cardLock;
 
         [Header("Options")]
         [Tooltip("Close when Card is removed.")]
@@ -87,7 +87,7 @@ namespace CultistLike
         {
             if (gameObject.activeSelf == true && cardViz != null)
             {
-                if (onlyMatching != true || AcceptsCard(cardViz) != false)
+                if (acceptAll == true || AcceptsCard(cardViz) == true)
                 {
                     if (slottedCard == null)
                     {
@@ -230,7 +230,7 @@ namespace CultistLike
         {
             if (slottedCard != null)
             {
-                GameManager.Instance.DestroyCard(slottedCard);
+                slottedCard.Destroy();
             }
             SlotCardLogical(null);
         }
@@ -256,7 +256,7 @@ namespace CultistLike
                 Label = slot.label;
                 grab = slot.grab;
                 cardLock = slot.cardLock;
-                onlyMatching = slot.onlyMatching;
+                acceptAll = slot.acceptAll;
             }
         }
 
@@ -264,48 +264,32 @@ namespace CultistLike
         {
             if (cardViz.gameObject.activeSelf == true && AcceptsCard(cardViz) == true)
             {
-                var cardVizY = cardViz.Yield();
-
-                if (cardVizY.free == true)
+                Vector3 target;
+                if (gameObject.activeInHierarchy == true)
                 {
-                    cardVizY.free = false;
-                    cardVizY.transform.DOComplete(true);
-                    bool prevInteractive = cardVizY.interactive;
-                    cardVizY.interactive = false;
-                    cardVizY.transform.parent?.GetComponentInParent<ICardDock>(true)?.
-                        OnCardUndock(cardVizY.gameObject);
-                    cardVizY.gameObject.SetActive(true);
-                    cardVizY.transform.SetParent(null);
-                    SlotCardLogical(cardVizY);
-
-                    Vector3 target;
-                    if (gameObject.activeInHierarchy == true)
-                    {
-                        target = transform.position;
-                    }
-                    else
-                    {
-                        target =  actWindow.tokenViz.transform.position;
-                    }
-
-                    var pos = cardVizY.transform.position;
-                    cardVizY.transform.position = new Vector3(pos.x, pos.y, GameManager.Instance.cardDragPlane.position.z);
-
-                    cardVizY.transform.DOMove(target, GameManager.Instance.normalSpeed).
-                        OnComplete(() =>
-                        {
-                            cardVizY.interactive = prevInteractive;
-                            SlotCardPhysical(cardVizY);
-                            if (bringUp == true)
-                            {
-                                actWindow.BringUp();
-                            }
-                        });
-
-                    return true;
+                    target = transform.position;
                 }
+                else
+                {
+                    target =  actWindow.tokenViz.transform.position;
+                }
+
+                Action<CardViz> onStart = x => SlotCardLogical(x);
+                Action<CardViz> onComplete = x =>
+                {
+                    SlotCardPhysical(x);
+                    if (bringUp == true)
+                    {
+                        actWindow.BringUp();
+                    }
+                };
+
+                return cardViz.Grab(target, onStart, onComplete);
             }
-            return false;
+            else
+            {
+                return false;
+            }
         }
 
         private void Awake()

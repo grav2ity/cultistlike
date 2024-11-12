@@ -18,7 +18,8 @@ MonoBehaviour:
   time: 10
   tests:
   - canFail: 0
-    loc1: 2
+    cardTest: 1
+    loc1: 0
     fragment1: {fileID: 11400000, guid: a46ceb5ebda24c642835ccf7d042edef, type: 2}
     op: 0
     constant: 1
@@ -28,14 +29,14 @@ MonoBehaviour:
   or: []
   fragments: []
   actModifiers:
-  - op: 100
-    fragment: {fileID: 11400000, guid: 359609367f1923146b1068c9f2375786, type: 2}
-    level: 1
-    reference: {fileID: 0}
   - op: 0
     fragment: {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
     level: 2
     reference: {fileID: 11400000, guid: a46ceb5ebda24c642835ccf7d042edef, type: 2}
+  - op: 0
+    fragment: {fileID: 11400000, guid: 359609367f1923146b1068c9f2375786, type: 2}
+    level: -1
+    reference: {fileID: 0}
   cardModifiers: []
   tableModifiers: []
   pathModifiers: []

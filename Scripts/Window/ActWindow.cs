@@ -138,6 +138,12 @@ namespace CultistLike
             }
         }
 
+        public void ParentCardToWindow(CardViz cardViz)
+        {
+            cardViz.gameObject.SetActive(false);
+            cardViz.transform.SetParent(transform);
+        }
+
         public void ParentCardsToWindow()
         {
             foreach (var slot in slots)
@@ -276,6 +282,7 @@ namespace CultistLike
                     if (count == 0)
                     {
                         StatusIdle();
+                        UpdateBars();
                         if (tokenViz.token.dissolve == true)
                         {
                             tokenViz.Dissolve();

@@ -44,7 +44,8 @@ namespace CultistLike
         public Rule cardRule;
 
         [Header("Options")]
-        public bool onlyMatching;
+        [Tooltip("Accept all Cards.")]
+        public bool acceptAll;
         [Tooltip("Grabs Cards for itself.")]
         public bool grab;
         [Tooltip("Cannot remove Card from the slot.")]

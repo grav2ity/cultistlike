@@ -15,6 +15,7 @@ namespace CultistLike
 
         private Dictionary<Deck, DeckInst> decDict;
 
+
         public DeckInst GetDeckInst(Deck deck)
         {
             if (decDict.ContainsKey(deck) == true)
@@ -29,7 +30,6 @@ namespace CultistLike
                 return deckInst;
             }
         }
-
 
         private void PopulateDict()
         {

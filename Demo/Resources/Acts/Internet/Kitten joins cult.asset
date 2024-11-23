@@ -16,31 +16,37 @@ MonoBehaviour:
   token: {fileID: 0}
   initial: 0
   time: 10
-  aspects: []
   tests:
-  - canFail: 0
+  - cardTest: 0
+    canFail: 0
     loc1: 0
     fragment1: {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
     op: 1
     constant: 1
     loc2: 0
     fragment2: {fileID: 0}
-  actModifiers:
-  - op: 0
-    fragment: {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
-    level: -1
-    reference: {fileID: 0}
-  - op: 0
+  and: []
+  or: []
+  fragments: []
+  actModifiers: []
+  cardModifiers:
+  - op: 10
+    target: {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
     fragment: {fileID: 11400000, guid: d0d10cf31c33c8e46a4ea3d302139382, type: 2}
     level: 1
     reference: {fileID: 0}
-  cardModifiers: []
   tableModifiers: []
-  rules: []
+  pathModifiers: []
+  deckModifiers: []
+  furthermore: []
+  ignoreGlobalSlots: 0
   slots: []
-  spawnGlobalSlots: 0
+  randomAlt: 0
   altActs: []
+  randomNext: 0
   nextActs: []
+  spawnedActs: []
+  onSpawn: {fileID: 0}
   text: 
   endText: While browsing for litter your cat clicked on some shady links and has
     fallen in with a Cathulu worshipping cult. Is he safe to be around?

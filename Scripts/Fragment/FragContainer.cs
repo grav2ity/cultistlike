@@ -53,20 +53,7 @@ namespace CultistLike
         }
 
 
-        public void Add(HeldFragment frag)
-        {
-            if (frag != null)
-            {
-                if (frag.cardViz != null)
-                {
-                    Add(frag.cardViz);
-                }
-                else
-                {
-                    frag.AddToList(fragments);
-                }
-            }
-        }
+        public void Add(HeldFragment frag) => frag?.AddToList(fragments);
 
         public void Add(Card card)
         {
@@ -104,17 +91,20 @@ namespace CultistLike
             }
         }
 
-        public int Adjust(HeldFragment frag, int level)
+        public int Adjust(Target target, int level)
         {
-            if (frag != null)
+            if (target != null)
             {
-                if (frag.cardViz != null)
+                if (target.cards != null)
                 {
-                    Adjust(frag.cardViz, level);
+                    foreach (var cardViz in target.cards)
+                    {
+                        Adjust(cardViz, level);
+                    }
                 }
-                else if (frag.fragment != null)
+                else if (target.fragment != null)
                 {
-                    return Adjust(frag.fragment, level);
+                    return Adjust(target.fragment, level);
                 }
             }
             return 0;
@@ -160,8 +150,8 @@ namespace CultistLike
                 if (level > 0)
                 {
                     int count = level;
-                    Add(cardViz);
-                    level--;
+                    // Add(cardViz);
+                    // level--;
 
                     while (level-- > 0)
                     {
@@ -189,20 +179,7 @@ namespace CultistLike
             return 0;
         }
 
-        public void Remove(HeldFragment frag)
-        {
-            if (frag != null)
-            {
-                if (frag.cardViz != null)
-                {
-                    Remove(frag.cardViz);
-                }
-                else
-                {
-                    frag.RemoveFromList(fragments);
-                }
-            }
-        }
+        public void Remove(HeldFragment frag) => frag?.RemoveFromList(fragments);
 
         public CardViz Remove(Card card)
         {
@@ -251,15 +228,6 @@ namespace CultistLike
         public HeldFragment Find(Aspect aspect) =>
             fragments.Find(x => x.fragment == aspect);
 
-        // public HeldAspect Find(HeldAspect ha) =>
-        //     aspects.Find(x => x.aspect == ha.aspect && x.count >= ha.count);
-
-        // public HeldAspect Find(Aspect a, Predicate<int> p) =>
-        //     aspects.Find(x => x.aspect == a && p(x.count) == true);
-
-        // public HeldAspect Find(HeldAspect ha, Predicate<int> p) =>
-        //     aspects.Find(x => x.aspect == ha.aspect && p(x.count) == true);
-
         public CardViz Find(Card card) => cards.Find(x => x.card == card);
         public List<CardViz> FindAll(Card card) => cards.FindAll(x => x.card == card);
 
@@ -268,23 +236,6 @@ namespace CultistLike
 
         public int Count(Card card) => cards.FindAll(x => x.card == card).Count;
 
-        public int Count(HeldFragment frag)
-        {
-            if (frag != null)
-            {
-                if (frag.cardViz != null)
-                {
-                    return Count(frag.cardViz.card);
-                }
-                else
-                {
-                    return Count(frag.fragment);
-                }
-            }
-            else
-            {
-                return 0;
-            }
-        }
+        public int Count(HeldFragment frag) => frag != null ? Count(frag.fragment) : 0;
     }
 }

@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 
 using TMPro;
 
@@ -13,34 +12,33 @@ namespace CultistLike
         [SerializeField] private TextMeshPro text;
         [SerializeField] private SpriteRenderer art;
 
-        [SerializeField, HideInInspector] private float decayTime;
+        [Header("Options")]
+        public bool pauseOnHide;
 
-        [SerializeField, HideInInspector] private float startTime;
-        [SerializeField, HideInInspector] private float endTime;
+        [SerializeField, HideInInspector] private bool paused;
+
+        [SerializeField, HideInInspector] private float decayTime;
+        [SerializeField, HideInInspector] private float elapsedTime;
 
         [SerializeField, HideInInspector] private UnityEvent timeUpEvent;
 
-        private Renderer timerRenderer;
-
         [SerializeField, HideInInspector] private Color originalColor;
+
+        private Renderer timerRenderer;
 
 
         public float timeLeft
         {
-            get => endTime - GameManager.Instance.time;
+            get => decayTime - elapsedTime;
         }
 
-        public float duration
-        {
-            get => endTime - startTime;
-        }
 
         public void StartTimer(float time, UnityAction action = null)
         {
+            elapsedTime = 0f;
             decayTime = time;
+
             timerRenderer.enabled = false;
-            startTime = GameManager.Instance.time;
-            endTime = startTime + time;
             enabled = true;
             timeUpEvent.RemoveAllListeners();
 
@@ -50,7 +48,7 @@ namespace CultistLike
             {
                 timeUpEvent.AddListener(action);
             }
-            UpdateDisplay(duration);
+            UpdateDisplay(time);
         }
 
         private void UpdateDisplay(float time)
@@ -74,12 +72,28 @@ namespace CultistLike
             timerRenderer.enabled = false;
         }
 
+        public void Pause()
+        {
+            if (enabled == true)
+            {
+                paused = true;
+                enabled = false;
+            }
+        }
+
+        public void Unpause()
+        {
+            if (paused == true)
+            {
+                paused = false;
+                enabled = true;
+            }
+        }
+
         private void Awake()
         {
             originalColor = art.color;
-
             timerRenderer = text.GetComponent<MeshRenderer>();
-            startTime = endTime = 0f;
         }
 
         private void Start()
@@ -89,11 +103,12 @@ namespace CultistLike
 
         private void Update()
         {
+            elapsedTime += Time.deltaTime * GameManager.Instance.timeScale;
+
             UpdateDisplay(timeLeft);
 
             if (timeLeft <= 0f)
             {
-                startTime = endTime = 0f;
                 enabled = false;
                 timeUpEvent.Invoke();
                 art.color = originalColor;

@@ -27,15 +27,12 @@ namespace CultistLike
         public bool cardLock;
 
         [Header("Options")]
-        [Tooltip("Close when Card is removed.")]
-        public bool autoClose;
         [Tooltip("Removing Card will cause all other Slots to close.")]
         public bool firstSlot;
 
         [SerializeField, HideInInspector] private ActWindow actWindow;
         [SerializeField, HideInInspector] private CardViz _slottedCard;
 
-        public string Label { get => label.text; private set => label.text = value; }
         public CardViz slottedCard { get => _slottedCard; private set => _slottedCard = value; }
 
 
@@ -44,12 +41,10 @@ namespace CultistLike
             if (eventData.button == PointerEventData.InputButton.Left)
             {
                 Drag drag = eventData.pointerDrag?.GetComponent<Drag>();
-                if (drag == null || drag.isDragging == false)
+                if (drag != null && drag.isDragging == true)
                 {
-                    return;
+                    OnCardDock(eventData.pointerDrag);
                 }
-
-                OnCardDock(eventData.pointerDrag);
             }
         }
 
@@ -108,8 +103,16 @@ namespace CultistLike
 
         public void SlotCard(CardViz cardViz)
         {
-            SlotCardLogical(cardViz);
-            SlotCardPhysical(cardViz);
+            //handles dropping whole stack on a slot
+            var cardVizY = cardViz.Yield();
+
+            SlotCardLogical(cardVizY);
+            SlotCardPhysical(cardVizY);
+
+            if (cardViz != cardVizY)
+            {
+                GameManager.Instance.table.ReturnToTable(cardViz);
+            }
         }
 
         public void SlotCardPhysical(CardViz cardViz)
@@ -161,11 +164,6 @@ namespace CultistLike
                 actWindow.FirstSlotEmpty();
             }
 
-            // if (autoClose == true)
-            // {
-            //     CloseSlot();
-            // }
-
             return sc;
         }
 
@@ -173,14 +171,11 @@ namespace CultistLike
         {
             if (slottedCard != null)
             {
-                slottedCard.gameObject.SetActive(false);
+                slottedCard.Hide();
+                slottedCard.free = false;
                 slottedCard.transform.SetParent(actWindow.transform);
                 slottedCard = null;
             }
-            // if (autoClose == true)
-            // {
-            //     CloseSlot();
-            // }
         }
 
         public void CloseSlot()
@@ -190,12 +185,6 @@ namespace CultistLike
             {
                 GameManager.Instance.onCardInPlay.RemoveListener(GrabAction);
             }
-            // if (slottedCard != null)
-            // {
-            //     var cardViz = slottedCard;
-            //     UnslotCard();
-            //     GameManager.Instance.table.ReturnToTable(cardViz);
-            // }
         }
 
         public void OpenSlot()
@@ -253,7 +242,7 @@ namespace CultistLike
             if (slot != null)
             {
                 this.slot = slot;
-                Label = slot.label;
+                label.text = slot.label;
                 grab = slot.grab;
                 cardLock = slot.cardLock;
                 acceptAll = slot.acceptAll;
@@ -262,7 +251,7 @@ namespace CultistLike
 
         public bool Grab(CardViz cardViz, bool bringUp = false)
         {
-            if (cardViz.gameObject.activeSelf == true && AcceptsCard(cardViz) == true)
+            if (cardViz != null && cardViz.free == true && AcceptsCard(cardViz) == true)
             {
                 Vector3 target;
                 if (gameObject.activeInHierarchy == true)
@@ -271,7 +260,7 @@ namespace CultistLike
                 }
                 else
                 {
-                    target =  actWindow.tokenViz.transform.position;
+                    target =  actWindow.tokenViz.targetPosition;
                 }
 
                 Action<CardViz> onStart = x => SlotCardLogical(x);

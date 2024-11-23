@@ -61,7 +61,7 @@ MonoBehaviour:
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
+  m_ReverseArrangement: 1
 --- !u!1 &2344022428666938829
 GameObject:
   m_ObjectHideFlags: 0
@@ -174,13 +174,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2a5ddc81872c054e92d43d18d0809bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showCards: 1
-  showAspects: 1
-  showSpecial: 1
-  vertical: 0
-  allowed: {fileID: 11400000, guid: d9bffe678047ce74b8ab5f91a9f29e6d, type: 2}
-  forbidden: {fileID: 11400000, guid: f305adb0b4084b14f909871f8351d374, type: 2}
   horizontalGO: {fileID: 2344022428666938829}
   verticalGO: {fileID: 543399014672607862}
+  vertical: 0
+  showAspects: 1
+  showCards: 1
+  showSpecial: 1
+  allowed: {fileID: 11400000, guid: d9bffe678047ce74b8ab5f91a9f29e6d, type: 2}
+  forbidden: {fileID: 11400000, guid: f305adb0b4084b14f909871f8351d374, type: 2}
   fragVizs: []
   index: 0

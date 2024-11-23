@@ -12,7 +12,7 @@ namespace CultistLike
     {
         [Header("Layout")]
         [SerializeField] private TextMeshPro label;
-        [SerializeField] private TextMeshPro text;
+        [SerializeField] private TextMeshProUGUI text;
         [SerializeField] private GameObject idleSlotsGO;
         [SerializeField] private GameObject runSlotsGO;
         [SerializeField] private CardLane resultLane;
@@ -57,29 +57,6 @@ namespace CultistLike
             return false;
         }
 
-        public IEnumerable<SlotViz> MatchingSlots(CardViz cardViz, bool onlyEmpty = false)
-        {
-            if (cardViz != null)
-            {
-                if (actStatus != ActStatus.Finished)
-                {
-                    foreach (var slotViz in slots)
-                    {
-                        if (slotViz.gameObject.activeSelf == true && slotViz.AcceptsCard(cardViz) == true)
-                        {
-                            if (onlyEmpty == false || slotViz.slottedCard == null)
-                            {
-                                yield return slotViz;
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                yield return null;
-            }
-        }
 
         public SlotViz AcceptsCard(CardViz cardViz, bool onlyEmpty = false)
         {
@@ -116,9 +93,6 @@ namespace CultistLike
             GameManager.Instance.CloseWindow();
         }
 
-        /// <summary>
-        /// Run the ready rule.
-        /// </summary>
         public void GoForIt()
         {
             actLogic.RunAct(readyAct);
@@ -140,7 +114,8 @@ namespace CultistLike
 
         public void ParentCardToWindow(CardViz cardViz)
         {
-            cardViz.gameObject.SetActive(false);
+            cardViz.Hide();
+            cardViz.free = false;
             cardViz.transform.SetParent(transform);
         }
 
@@ -156,7 +131,10 @@ namespace CultistLike
         {
             foreach (var slotViz in MatchingSlots(cardViz))
             {
-                slotViz.SetHighlight(p);
+                if (slotViz.slottedCard == null || slotViz.cardLock == false)
+                {
+                    slotViz.SetHighlight(p);
+                }
             }
         }
 
@@ -200,6 +178,9 @@ namespace CultistLike
             return null;
         }
 
+        // closing a slot will remove a slotted card
+        // since slotted cards influence which slots are open
+        // reUpdate needs to be done
         public void UpdateSlots()
         {
             if (suspendUpdates == false)
@@ -324,50 +305,12 @@ namespace CultistLike
             }
         }
 
-        public void AttemptReadyAct()
-        {
-            foreach (var act in GameManager.Instance.GetInitialActs())
-            {
-                if (act.token == null || act.token != tokenViz.token)
-                {
-                    continue;
-                }
-                readyAct = actLogic.AttemptAct(act);
-                if (readyAct != null)
-                {
-                    break;
-                }
-            }
-
-            if (readyAct != null)
-            {
-                ApplyStatus(ActStatus.Ready);
-            }
-            else
-            {
-                ApplyStatus(ActStatus.Idle);
-            }
-        }
-
-        private List<CardViz> GetResultCards()
-        {
-            return resultLane.cards;
-        }
-
-        private void StatusIdle()
-        {
-            actLogic.Reset();
-            UpdateSlots();
-
-            ApplyStatus(ActStatus.Idle);
-        }
-
         public void UpdateBars()
         {
             if (suspendUpdates == false)
             {
-                aspectBar.Load(actLogic.fragments);
-                cardBar.Load(actLogic.fragments);
+                aspectBar?.Load(actLogic.fragments);
+                cardBar?.Load(actLogic.fragments);
             }
         }
 
@@ -417,6 +360,46 @@ namespace CultistLike
             }
         }
 
+        private void AttemptReadyAct()
+        {
+            if (tokenViz.token != null)
+            {
+                foreach (var act in GameManager.Instance.initialActs)
+                {
+                    if (act.token == tokenViz.token)
+                    {
+                        readyAct = actLogic.AttemptAct(act);
+                        if (readyAct != null)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                if (readyAct != null)
+                {
+                    ApplyStatus(ActStatus.Ready);
+                }
+                else
+                {
+                    ApplyStatus(ActStatus.Idle);
+                }
+            }
+        }
+
+        private List<CardViz> GetResultCards()
+        {
+            return resultLane.cards;
+        }
+
+        private void StatusIdle()
+        {
+            actLogic.Reset();
+            UpdateSlots();
+
+            ApplyStatus(ActStatus.Idle);
+        }
+
         private void ReturnCardsToTable()
         {
             foreach (var cardSlot in idleSlots)
@@ -426,6 +409,30 @@ namespace CultistLike
                     var cardViz = cardSlot.UnslotCard();
                     GameManager.Instance.table.ReturnToTable(cardViz);
                 }
+            }
+        }
+
+        private IEnumerable<SlotViz> MatchingSlots(CardViz cardViz, bool onlyEmpty = false)
+        {
+            if (cardViz != null)
+            {
+                if (actStatus != ActStatus.Finished)
+                {
+                    foreach (var slotViz in slots)
+                    {
+                        if (slotViz.gameObject.activeSelf == true && slotViz.AcceptsCard(cardViz) == true)
+                        {
+                            if (onlyEmpty == false || slotViz.slottedCard == null)
+                            {
+                                yield return slotViz;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                yield return null;
             }
         }
 

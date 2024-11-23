@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8982c193c92b64445902a2eec82848b5, type: 3}
-  m_Name: Somebody
+  m_Name: Guest
   m_EditorClassIdentifier: 
-  label: Somebody
+  label: Guest
   description: 
   fragments: []
   token: {fileID: 11400000, guid: 42718ad57dbe0ea4a93c3271a3d1a831, type: 2}
@@ -24,11 +24,10 @@ MonoBehaviour:
   required:
   - fragment: {fileID: 11400000, guid: 219db864b5c9cf84a9e11127db781ccb, type: 2}
     count: 1
-    cardViz: {fileID: 0}
   essential: []
   forbidden: []
   cardTests: []
   cardRule: {fileID: 0}
-  onlyMatching: 0
+  acceptAll: 0
   grab: 0
   cardLock: 0

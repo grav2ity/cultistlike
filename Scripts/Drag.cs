@@ -1,3 +1,5 @@
+using System;
+
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -23,9 +25,14 @@ namespace CultistLike
         private Vector3 dragOrigin;
         private ICardDock dragOriginDock;
 
+        private bool isBeingMoved;
+        private Vector3 moveTarget;
+
 
         public bool isDragging { get => _isDragging; private set => _isDragging = value; }
         public bool interactive { get => _interactive; set => _interactive = value; }
+
+        public Vector3 targetPosition => isBeingMoved == true ? moveTarget : transform.position;
 
 
         public virtual void OnBeginDrag(PointerEventData eventData)
@@ -41,6 +48,7 @@ namespace CultistLike
             dragOriginDock = transform.parent?.GetComponentInParent<ICardDock>();
             dragOriginDock?.OnCardUndock(gameObject);
 
+            // foreach(var collider in gameObject.GetComponentsInChildren<Collider>(true))
             foreach(var collider in gameObject.GetComponentsInChildren<Collider>())
             {
                 collider.enabled = false;
@@ -82,6 +90,7 @@ namespace CultistLike
 
             isDragging = false;
 
+            // foreach(var collider in gameObject.GetComponentsInChildren<Collider>(true))
             foreach(var collider in gameObject.GetComponentsInChildren<Collider>())
             {
                 collider.enabled = true;
@@ -93,15 +102,27 @@ namespace CultistLike
             }
         }
 
-        public void Undrag()
+        public void DOMove(Vector3 target, float speed, Action onComplete)
         {
             bool prevInteractive = interactive;
             interactive = false;
-            transform.DOMove(dragOrigin, GameManager.Instance.normalSpeed).
-                OnComplete(() => {
+
+            moveTarget = target;
+            isBeingMoved = true;
+
+            transform.DOMove(target, speed).
+                OnComplete(() =>
+                {
                     interactive = prevInteractive;
-                    dragOriginDock?.OnCardDock(gameObject);
+                    isBeingMoved = false;
+                    onComplete();
                 });
+        }
+
+        public void Undrag()
+        {
+            DOMove(dragOrigin, GameManager.Instance.normalSpeed, () =>
+                   dragOriginDock?.OnCardDock(gameObject));
         }
 
         private bool CanDrag(PointerEventData eventData) =>

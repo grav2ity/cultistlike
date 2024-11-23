@@ -76,9 +76,9 @@ namespace CultistLike
 
             foreach (var cardViz in cards)
             {
-                cardViz.gameObject.SetActive(true);
+                cardViz.Show();
+                cardViz.free = true;
                 cardViz.transform.SetParent(transform);
-                cardViz.ShowBack();
                 cardViz.transform.localPosition = o;
                 o += spacing;
             }

@@ -15,7 +15,7 @@ MonoBehaviour:
   label: Dark Corners
   token: {fileID: 11400000, guid: e98474b25a29d8e4db622a41e0a0d8d0, type: 2}
   initial: 1
-  time: 10
+  time: 60
   tests: []
   and: []
   or: []

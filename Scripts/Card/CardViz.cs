@@ -15,12 +15,11 @@ namespace CultistLike
         [Header("Card")]
         public Card card;
 
-        [Header("Fragments")]
-        public FragContainer fragments;
-
+        [HideInInspector] public FragContainer fragments;
         [HideInInspector] public bool free;
 
         [Header("Layout")]
+        [SerializeField] private GameObject visualsGO;
         [SerializeField] private TextMeshPro title;
         [SerializeField] private Renderer artBack;
         [SerializeField] private SpriteRenderer art;
@@ -42,7 +41,8 @@ namespace CultistLike
         {
             if (interactive == true && eventData.button == PointerEventData.InputButton.Left)
             {
-                if (cardStack.Count > 1)
+                //if not dragging whole stack yield one card
+                if (cardStack.stackDrag == false && cardStack.Count > 1)
                 {
                     var cardViz = cardStack.Pop();
                     if (cardViz != null)
@@ -57,7 +57,8 @@ namespace CultistLike
 
                 foreach(var tokenViz in GameManager.Instance.tokens)
                 {
-                    if (tokenViz.actWindow.AcceptsCard(this) != null)
+                    var slotViz = tokenViz.actWindow.AcceptsCard(this);
+                    if (slotViz != null && (slotViz.slottedCard == null || slotViz.cardLock == false))
                     {
                         tokenViz.SetHighlight(true);
                     }
@@ -84,9 +85,19 @@ namespace CultistLike
                     //TODO
                     if (GetComponentInParent<ArrayTable>() != null)
                     {
-                        if (card == droppedCard.card)
+                        if (CanStack(droppedCard))
                         {
-                            if (cardStack.Push(droppedCard) == true)
+                            bool stacked = false;
+                            if (droppedCard.cardStack.Count > 1)
+                            {
+                                stacked = cardStack.Merge(droppedCard.cardStack);
+                            }
+                            else
+                            {
+                                stacked = cardStack.Push(droppedCard);
+                            }
+
+                            if (stacked == true)
                             {
                                 droppedCard.OnEndDrag(eventData);
                             }
@@ -96,7 +107,7 @@ namespace CultistLike
 
                     //handles dropping card on a slotted card
                     var slot = GetComponentInParent<SlotViz>();
-                    if (slot != null && slot.autoClose == false)
+                    if (slot != null)
                     {
                         slot.OnCardDock(droppedCard.gameObject);
                         return;
@@ -182,31 +193,6 @@ namespace CultistLike
 
         public virtual void OnCardUndock(GameObject go) {}
 
-        public void OnDecayComplete(Card card)
-        {
-            interactive = false;
-
-            if (card != null)
-            {
-                var yScale = transform.localScale.y;
-                var targetScale = new Vector3(transform.localScale.x, 0f, transform.localScale.z);
-                transform.DOScale(targetScale, GameManager.Instance.scaleSpeed).
-                    OnComplete(() =>
-                    {
-                        Transform(card);
-                        var targetScale2 = new Vector3(transform.localScale.x, yScale, transform.localScale.z);
-                        transform.DOScale(targetScale2, GameManager.Instance.scaleSpeed).
-                            OnComplete(() => { interactive = true; });
-                    });
-            }
-            else
-            {
-                var targetScale = new Vector3(transform.localScale.x, 0f, transform.localScale.z);
-                transform.DOScale(targetScale, GameManager.Instance.scaleSpeed).
-                    OnComplete(() => { Destroy(); });
-            }
-        }
-
         public void Decay(Card card, float time)
         {
             cardDecay.StartTimer(time, () => OnDecayComplete(card));
@@ -239,6 +225,21 @@ namespace CultistLike
 
             }
             faceDown = !faceDown;
+        }
+
+        public void Hide()
+        {
+            visualsGO.SetActive(false);
+            if (cardDecay.pauseOnHide == true)
+            {
+                cardDecay.Pause();
+            }
+        }
+
+        public void Show()
+        {
+            visualsGO.SetActive(true);
+            cardDecay.Unpause();
         }
 
         public void ShowFace()
@@ -290,7 +291,6 @@ namespace CultistLike
             {
                 LoadFragments();
             }
-
         }
 
         public void Transform(Card card)
@@ -333,8 +333,7 @@ namespace CultistLike
                 {
                     cardVizY.free = false;
                     cardVizY.transform.DOComplete(true);
-                    bool prevInteractive = cardVizY.interactive;
-                    cardVizY.interactive = false;
+
                     cardVizY.transform.parent?.GetComponentInParent<ICardDock>(true)?.
                         OnCardUndock(cardVizY.gameObject);
                     cardVizY.gameObject.SetActive(true);
@@ -347,19 +346,59 @@ namespace CultistLike
 
                     var pos = cardVizY.transform.position;
                     cardVizY.transform.position = new Vector3(pos.x, pos.y, GameManager.Instance.cardDragPlane.position.z);
-                    cardVizY.transform.DOMove(target, GameManager.Instance.normalSpeed).
-                        OnComplete(() =>
+
+                    cardVizY.DOMove(target, GameManager.Instance.normalSpeed, () =>
+                    {
+                        cardVizY.free = true;
+                        if (onComplete != null)
                         {
-                            cardVizY.interactive = prevInteractive;
-                            if (onComplete != null)
-                            {
-                                onComplete(cardVizY);
-                            }
-                        });
+                            onComplete(cardVizY);
+                        }
+                    });
+
                     return true;
                 }
             }
             return false;
+        }
+
+        private bool CanStack(CardViz cardViz)
+        {
+            if (card == cardViz.card &&
+                cardDecay.enabled == false &&
+                cardViz.cardDecay.enabled == false)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private void OnDecayComplete(Card card)
+        {
+            interactive = false;
+
+            if (card != null)
+            {
+                var yScale = transform.localScale.y;
+                var targetScale = new Vector3(transform.localScale.x, 0f, transform.localScale.z);
+                transform.DOScale(targetScale, GameManager.Instance.scaleSpeed).
+                    OnComplete(() =>
+                    {
+                        Transform(card);
+                        var targetScale2 = new Vector3(transform.localScale.x, yScale, transform.localScale.z);
+                        transform.DOScale(targetScale2, GameManager.Instance.scaleSpeed).
+                            OnComplete(() => { interactive = true; });
+                    });
+            }
+            else
+            {
+                var targetScale = new Vector3(transform.localScale.x, 0f, transform.localScale.z);
+                transform.DOScale(targetScale, GameManager.Instance.scaleSpeed).
+                    OnComplete(() => { Destroy(); });
+            }
         }
 
         private void LoadFragments()

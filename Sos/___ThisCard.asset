@@ -12,9 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d7ad74be29e3414894e2ccf6a7e39e6, type: 3}
   m_Name: ___ThisCard
   m_EditorClassIdentifier: 
-  label: ThisCard
+  label: ___ThisCard
   art: {fileID: 0}
   color: {r: 0, g: 0, b: 0, a: 0}
   description: 
   fragments: []
   rules: []
+  slots: []
+  decayTo: {fileID: 0}
+  lifetime: 0

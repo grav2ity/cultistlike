@@ -20,7 +20,6 @@ MonoBehaviour:
   description: 
   fragments: []
   rules: []
-  oneForAll: 0
   slots: []
   decayTo: {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
   lifetime: 30

@@ -30,9 +30,8 @@ namespace CultistLike
     [Serializable]
     public class Test
     {
-        [Tooltip("This Test can fail. Use this option to match Cards. You can reference matched Cards.")]
-        public bool canFail;
         public bool cardTest;
+        public bool canFail;
         public ReqLoc loc1;
         public Fragment fragment1;
         [Space(10)]
@@ -47,14 +46,16 @@ namespace CultistLike
         public bool Attempt(Context context)
         {
             int right;
+            Fragment fragment1r = context.ResolveFragment(fragment1);
+            Fragment fragment2r = context.ResolveFragment(fragment2);
 
-            if (fragment2 == null)
+            if (fragment2r == null)
             {
                 right = constant;
             }
             else
             {
-                right = constant * GetCount(context, loc2, fragment2);
+                right = constant * GetCount(context, loc2, fragment2r);
             }
 
             if (cardTest == true)
@@ -72,7 +73,7 @@ namespace CultistLike
                 }
 
                 bool passed = false;
-                if (fragment1 == null)
+                if (fragment1r == null)
                 {
                     if (right > 0 && right < context.matches.Count)
                     {
@@ -80,10 +81,10 @@ namespace CultistLike
                         // context.matches = context.matches.Slice(0, right);
                     }
                 }
-                else if (fragment1 is Aspect)
+                else if (fragment1r is Aspect)
                 {
                     List<CardViz> newMatches = new List<CardViz>();
-                    var aspect = (Aspect)fragment1;
+                    var aspect = (Aspect)fragment1r;
                     int left;
                     foreach (var card in cards)
                     {
@@ -107,7 +108,7 @@ namespace CultistLike
             }
             else
             {
-                int left = GetCount(context, loc1, fragment1);
+                int left = GetCount(context, loc1, fragment1r);
                 return Compare(op, constant, left, right);
             }
         }
@@ -164,7 +165,6 @@ namespace CultistLike
 
         public int GetCount(Context context, ReqLoc loc, Fragment fragment)
         {
-
             int total = 0;
 
             if (loc == ReqLoc.MatchedCards)
@@ -205,7 +205,8 @@ namespace CultistLike
             {
                 var scope = GetScope(context, loc);
 
-                total = fragment.CountInContainer(scope);
+                // total = fragment.CountInContainer(scope);
+                total = scope.Count(fragment);
             }
 
             return total;

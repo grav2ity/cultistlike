@@ -10,10 +10,11 @@ namespace CultistLike
     public class Rule : ScriptableObject
     {
         [Header("Tests")]
+        [Tooltip("All the tests must pass for this Rule to pass. Matched Cards from Card tests will be available in the Modifiers section.")]
         public List<Test> tests;
-        [Tooltip("All of the AND Rules must pass. Modifiers are not applied.")]
+        [Tooltip("All of the And Rules must pass for this Rule to pass. Modifiers are not applied. Matched Cards are not carried in nor out.")]
         public List<Rule> and;
-        [Tooltip("One of the OR Rules must pass. Modifiers are not applied.")]
+        [Tooltip("One of the Or Rules must pass for this Rules to pass. Modifiers are not applied. Matched Cards are not carried in nor out.")]
         public List<Rule> or;
         [Space(10)]
 
@@ -25,6 +26,7 @@ namespace CultistLike
         public List<DeckModifier> deckModifiers;
 
         [Header("Furthermore")]
+        [Tooltip("Additional Rules to be run if this Rule passed. Matched Cards are not carried in nor out.")]
         public List<Rule> furthermore;
 
 
@@ -45,8 +47,7 @@ namespace CultistLike
                 {
                     using (var context2 = new Context(context))
                     {
-                        var result = rule.Evaluate(context2);
-                        if (result == false)
+                        if (rule.Evaluate(context2) == false)
                         {
                             return false;
                         }
@@ -60,8 +61,7 @@ namespace CultistLike
                 {
                     using (var context2 = new Context(context))
                     {
-                        var result = rule.Evaluate(context2);
-                        if (result == true)
+                        if (rule.Evaluate(context2) == true)
                         {
                             return true;
                         }
@@ -100,14 +100,23 @@ namespace CultistLike
                     context.deckModifiers.Add(deckMod.Evaluate(context));
                 }
 
+                // foreach (var rule in furthermore)
+                // {
+                //     if (rule != null)
+                //     {
+                //         using (var context2 = new Context(context))
+                //         {
+                //             rule.Run(context2);
+                //         }
+                //     }
+                // }
+
                 foreach (var rule in furthermore)
                 {
                     if (rule != null)
                     {
-                        using (var context2 = new Context(context))
-                        {
-                            rule.Run(context2);
-                        }
+                        context.ResetMatches();
+                        rule.Run(context);
                     }
                 }
             }

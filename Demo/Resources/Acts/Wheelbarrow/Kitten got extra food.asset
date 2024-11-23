@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
   m_Name: Kitten got extra food
   m_EditorClassIdentifier: 
-  label: 
+  label: Nom nom nom
   token: {fileID: 0}
   initial: 0
   time: 10
   tests:
-  - canFail: 0
-    cardTest: 1
+  - cardTest: 1
+    canFail: 0
     loc1: 0
     fragment1: {fileID: 11400000, guid: a46ceb5ebda24c642835ccf7d042edef, type: 2}
     op: 0
@@ -51,4 +51,4 @@ MonoBehaviour:
   spawnedActs: []
   onSpawn: {fileID: 0}
   text: Nom nom nom
-  endText: 
+  endText: Kitten worked extra hard after a hearty meal.

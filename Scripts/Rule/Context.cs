@@ -6,7 +6,10 @@ using UnityEngine;
 
 namespace CultistLike
 {
-    [Serializable]
+    /// <summary>
+    /// Accumulates modifiers and applies them on Dispose.
+    /// Keeps track of scope and matched cards.
+    /// </summary>
     public class Context : IDisposable
     {
         public ActLogic actLogic;
@@ -15,7 +18,8 @@ namespace CultistLike
         public FragContainer scope;
         public FragContainer parentScope;
 
-        public CardViz card;
+        public Fragment thisAspect;
+        public CardViz thisCard;
         public List<CardViz> matches;
 
         public List<ActModifierC> actModifiers = new List<ActModifierC>();
@@ -64,7 +68,7 @@ namespace CultistLike
         {
             if (cardViz != null)
             {
-                card = cardViz;
+                thisCard = cardViz;
             }
         }
 
@@ -97,24 +101,11 @@ namespace CultistLike
             }
         }
 
-        public void Destroy(HeldFragment frag) => Destroy(frag?.cardViz);
-
         public void Destroy(CardViz cardViz)
         {
             if (cardViz != null)
             {
                 toDestroy.Add(cardViz);
-            }
-        }
-
-        public void Destroy(Target target)
-        {
-            if (target?.cards != null)
-            {
-                foreach (var cardViz in target.cards)
-                {
-                    toDestroy.Add(cardViz);
-                }
             }
         }
 
@@ -128,28 +119,44 @@ namespace CultistLike
             scope.matches = matches;
         }
 
-        public HeldFragment Resolve(Fragment frag)
+        public int Count(Fragment frag, int level)
         {
             if (frag != null)
             {
-                if (frag == GameManager.Instance.thisCard)
+                if (frag == GameManager.Instance.thisAspect)
                 {
-                    return new HeldFragment(card);
+                    return level * scope.Count(thisAspect);
                 }
-                if (frag == GameManager.Instance.matchedCard)
+                else if (frag == GameManager.Instance.thisCard)
                 {
-                    if (matches.Count > 0)
-                    {
-                        return new HeldFragment(matches[0]);
-                    }
-                    else
-                    {
-                        return null;
-                    }
+                    return level * scope.Count(thisCard.card);
                 }
                 else
                 {
-                    return new HeldFragment(frag);
+                    return level * scope.Count(frag);
+                }
+            }
+            else
+            {
+                return level;
+            }
+        }
+
+        public Fragment ResolveFragment(Fragment frag)
+        {
+            if (frag != null)
+            {
+                if (frag == GameManager.Instance.thisAspect)
+                {
+                    return thisAspect; 
+                }
+                else if (frag == GameManager.Instance.thisCard)
+                {
+                    return thisCard.card;
+                }
+                else
+                {
+                    return frag;
                 }
             }
             else
@@ -162,11 +169,15 @@ namespace CultistLike
         {
             if (frag != null)
             {
-                if (frag == GameManager.Instance.thisCard)
+                if (frag == GameManager.Instance.thisAspect)
                 {
-                    return new Target(card);
+                    return new Target(thisAspect);
                 }
-                if (frag == GameManager.Instance.matchedCard)
+                else if (frag == GameManager.Instance.thisCard)
+                {
+                    return new Target(thisCard);
+                }
+                else if (frag == GameManager.Instance.matchedCards)
                 {
                     return new Target(matches);
                 }
@@ -179,28 +190,6 @@ namespace CultistLike
             {
                 return null;
             }
-        }
-
-        public List<CardViz> ResolveTargetCards(HeldFragment fragment, FragContainer scope)
-        {
-            List<CardViz> targetCards = null;
-            if (fragment != null)
-            {
-                if (fragment.cardViz != null)
-                {
-                    targetCards = new List<CardViz>();
-                    targetCards.Add(fragment.cardViz);
-                }
-                else if (fragment.fragment is Card)
-                {
-                    targetCards = scope.FindAll((Card)fragment.fragment);
-                }
-                else if (fragment.fragment is Aspect)
-                {
-                    targetCards = scope.FindAll((Aspect)fragment.fragment);
-                }
-            }
-            return targetCards;
         }
 
         public List<CardViz> ResolveTargetCards(Target target, FragContainer scope)

@@ -24,7 +24,6 @@ MonoBehaviour:
   required:
   - fragment: {fileID: 11400000, guid: 0b492a19e517d754ebc4c3ae8ef37742, type: 2}
     count: 1
-    cardViz: {fileID: 0}
   essential: []
   forbidden: []
   cardTests: []

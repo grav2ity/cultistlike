@@ -10,21 +10,24 @@ namespace CultistLike
     public class Act : ScriptableObject
     {
         public string label;
-        [Tooltip("Limits execution to this Token. Mandatory for initial Acts or Acts that will be spawned.")]
+        [Space(10)]
+        [Tooltip("Limits execution to this Token. Mandatory for initial and spawned Acts.")]
         public Token token;
+        [Tooltip("First in the Act chain. Can be started by player pressing button.")]
         public bool initial;
         [Space(10)]
         public float time;
 
         [Header("Entry Tests")]
-        [Tooltip("All Tests must pass to enter this Act.")]
+        [Tooltip("All the tests must pass to enter this Act. Matched Cards from Card tests will be available in the On Complete modifiers.")]
         public List<Test> tests;
-        [Tooltip("All of the AND Rules must pass. Modifiers are not applied.")]
+        [Tooltip("All of the And Rules must pass to enter this Act. Modifiers are not applied. Matched Cards are not carried in nor out.")]
         public List<Rule> and;
-        [Tooltip("One of the OR Rules must pass. Modifiers are not applied.")]
+        [Tooltip("One of the Or Rules must pass to enter this Act. Modifiers are not applied. Matched Cards are not carried in nor out.")]
         public List<Rule> or;
 
         [Header("Fragments")]
+        [Tooltip("Fragments are added upon completing Act.")]
         public List<Fragment> fragments;
 
         [Header("On Complete")]
@@ -35,10 +38,13 @@ namespace CultistLike
         public List<DeckModifier> deckModifiers;
 
         [Header("Furthermore")]
+        [Tooltip("Rules run upon completing Act. Matched Cards are not carried in nor out.")]
         public List<Rule> furthermore;
 
         [Header("Slots")]
+        [Tooltip("Only Slots from the list below will attempt to open while Act is running.")]
         public bool ignoreGlobalSlots;
+        [Tooltip("Additional Slots that will attempt to open while Act is running.")]
         public List<Slot> slots;
 
         [Header("Alt Acts")]
@@ -51,6 +57,7 @@ namespace CultistLike
         public List<ActLink> spawnedActs;
 
         [Header("On Spawn")]
+        [Tooltip("Rule that will be run on spawning this Act in a new Token.")]
         public Rule onSpawn;
 
         [Space(10)]

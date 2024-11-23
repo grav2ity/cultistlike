@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
   m_Name: Trashcan Leftovers
   m_EditorClassIdentifier: 
-  label: 
+  label: Garbagio
   token: {fileID: 11400000, guid: 3cab6ca1ed0cd3e46a74957835403c96, type: 2}
   initial: 1
-  time: 10
+  time: 0
   tests:
-  - canFail: 0
-    cardTest: 0
+  - cardTest: 0
+    canFail: 0
     loc1: 0
     fragment1: {fileID: 11400000, guid: 81fd3c01bb1bc104aa7ee20bf354b578, type: 2}
     op: 0
@@ -28,19 +28,7 @@ MonoBehaviour:
   and: []
   or: []
   fragments: []
-  actModifiers:
-  - op: 0
-    fragment: {fileID: 11400000, guid: 81fd3c01bb1bc104aa7ee20bf354b578, type: 2}
-    level: -1
-    reference: {fileID: 0}
-  - op: 0
-    fragment: {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
-    level: 1
-    reference: {fileID: 0}
-  - op: 0
-    fragment: {fileID: 11400000, guid: d10a489eb2498384e921ee099e5baef9, type: 2}
-    level: 4
-    reference: {fileID: 0}
+  actModifiers: []
   cardModifiers: []
   tableModifiers: []
   pathModifiers: []
@@ -51,11 +39,11 @@ MonoBehaviour:
   randomAlt: 0
   altActs: []
   randomNext: 0
-  nextActs: []
-  spawnedActs:
+  nextActs:
   - chance: 0
-    act: {fileID: 11400000, guid: 7110755d538aa384bb94aa969db8c336, type: 2}
+    act: {fileID: 11400000, guid: 004b3c06ad5d656438a80c690527ca16, type: 2}
     actRule: {fileID: 0}
+  spawnedActs: []
   onSpawn: {fileID: 0}
-  text: Infernal noises! Hungry cats fighting for scraps.
+  text: 
   endText: 

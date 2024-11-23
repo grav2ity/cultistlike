@@ -10,21 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
-  m_Name: Kitten is loaded
+  m_Name: 00 Kitten is loaded
   m_EditorClassIdentifier: 
   label: 
-  token: {fileID: 0}
-  initial: 0
+  token: {fileID: 11400000, guid: 4df1ed6ef9f7ee24d848ce7de38a0070, type: 2}
+  initial: 1
   time: 10
-  aspects: []
   tests:
-  - canFail: 0
+  - cardTest: 0
+    canFail: 0
     loc1: 0
     fragment1: {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
     op: 0
     constant: 1
     loc2: 0
     fragment2: {fileID: 0}
+  and: []
+  or: []
+  fragments: []
   actModifiers:
   - op: 0
     fragment: {fileID: 11400000, guid: ffd73e677ec2c044e983ddd7811ef168, type: 2}
@@ -34,15 +37,22 @@ MonoBehaviour:
     fragment: {fileID: 11400000, guid: 2a6795affa3a5a84888ce76fb7490417, type: 2}
     level: 10
     reference: {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
+  - op: 0
+    fragment: {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
+    level: -1
+    reference: {fileID: 0}
   cardModifiers: []
   tableModifiers: []
   pathModifiers: []
-  rules: []
+  deckModifiers: []
+  furthermore: []
+  ignoreGlobalSlots: 0
   slots: []
-  spawnGlobalSlots: 0
-  randomAltAct: 0
+  randomAlt: 0
   altActs: []
-  randomNextAct: 0
+  randomNext: 0
   nextActs: []
+  spawnedActs: []
+  onSpawn: {fileID: 0}
   text: Well, there's no telling what can happen from this.
   endText: What are you going to do about all these cakes your cat ordered?

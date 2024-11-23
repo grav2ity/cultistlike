@@ -17,8 +17,9 @@ MonoBehaviour:
   initial: 1
   time: 10
   tests:
-  - canFail: 0
-    loc1: 0
+  - cardTest: 0
+    canFail: 0
+    loc1: 32
     fragment1: {fileID: 11400000, guid: 219db864b5c9cf84a9e11127db781ccb, type: 2}
     op: 0
     constant: 1
@@ -28,7 +29,7 @@ MonoBehaviour:
   or: []
   fragments: []
   actModifiers:
-  - op: 30
+  - op: 0
     fragment: {fileID: 11400000, guid: 219db864b5c9cf84a9e11127db781ccb, type: 2}
     level: -1
     reference: {fileID: 0}
@@ -50,7 +51,10 @@ MonoBehaviour:
   ignoreGlobalSlots: 0
   slots: []
   randomAlt: 0
-  altActs: []
+  altActs:
+  - chance: 0
+    act: {fileID: 0}
+    actRule: {fileID: 0}
   randomNext: 0
   nextActs: []
   spawnedActs: []

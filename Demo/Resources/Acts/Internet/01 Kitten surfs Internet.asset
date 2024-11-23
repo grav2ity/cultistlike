@@ -10,48 +10,44 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
-  m_Name: Kitten surfs Internet
+  m_Name: 01 Kitten surfs Internet
   m_EditorClassIdentifier: 
   label: 
   token: {fileID: 11400000, guid: 4df1ed6ef9f7ee24d848ce7de38a0070, type: 2}
   initial: 1
   time: 10
   tests:
-  - canFail: 0
+  - cardTest: 0
+    canFail: 0
     loc1: 0
     fragment1: {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
     op: 1
     constant: 1
     loc2: 0
     fragment2: {fileID: 0}
-  testRules: []
-  onEnterRules: []
+  and: []
+  or: []
   fragments: []
   actModifiers:
   - op: 0
     fragment: {fileID: 11400000, guid: f69d0cfbafb553242910b97267bae96e, type: 2}
     level: 1
     reference: {fileID: 0}
-  cardModifiers:
-  - op: 0
-    onto: {fileID: 0}
-    what: {fileID: 0}
-    level: 0
-    reference: {fileID: 0}
+  cardModifiers: []
   tableModifiers: []
   pathModifiers: []
   deckModifiers: []
-  modRules: []
+  furthermore: []
   ignoreGlobalSlots: 0
-  slots:
-  - {fileID: 11400000, guid: 55cc2d7b3415b3741b3f5fc7cd294bf8, type: 2}
-  randomAltAct: 0
+  slots: []
+  randomAlt: 0
   altActs:
-  - chance: 100
-    act: {fileID: 11400000, guid: aaeea83a99ff1c847a666927c0d164f4, type: 2}
   - chance: 5
     act: {fileID: 11400000, guid: b771920c03e36094fa409e13048755aa, type: 2}
-  randomNextAct: 0
+    actRule: {fileID: 0}
+  randomNext: 0
   nextActs: []
+  spawnedActs: []
+  onSpawn: {fileID: 0}
   text: Browsing for cat videos?
   endText: That went viral.

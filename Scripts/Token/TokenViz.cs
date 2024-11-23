@@ -22,6 +22,7 @@ namespace CultistLike
         [SerializeField] private TextMeshPro title;
         [SerializeField] private Timer _timer;
         [SerializeField] private TextMeshPro resultCounter;
+        [SerializeField] private GameObject resultCounterGO;
         [SerializeField] private Renderer artBack;
         [SerializeField] private Renderer highlight;
         [SerializeField] private SpriteRenderer art;
@@ -31,13 +32,14 @@ namespace CultistLike
         [SerializeField] private Vector2Int CellCount;
 
         [SerializeField, HideInInspector] private ActWindow _actWindow;
+        [SerializeField, HideInInspector] private int resultCount;
 
 
         public ActWindow actWindow { get => _actWindow; private set => _actWindow = value; }
         public Timer timer { get => _timer; private set => _timer = value; }
 
-
         public override Vector2Int GetCellSize() => CellCount;
+
 
         public void OnDrop(PointerEventData eventData)
         {
@@ -47,7 +49,6 @@ namespace CultistLike
                 if (droppedCard != null && droppedCard.isDragging == true)
                 {
                     actWindow.TrySlotAndBringUp(droppedCard);
-                    return;
                 }
             }
         }
@@ -81,15 +82,9 @@ namespace CultistLike
 
         public void SetResultCount(int count)
         {
-            if (count == 0)
-            {
-                resultCounter.gameObject.SetActive(false);
-            }
-            else
-            {
-                resultCounter.gameObject.SetActive(true);
-                resultCounter.text = count.ToString();
-            }
+            resultCount = count;
+            resultCounter.text = count.ToString();
+            resultCounterGO.SetActive(resultCount > 0);
         }
 
         public void SetHighlight(bool p)
@@ -102,9 +97,10 @@ namespace CultistLike
             timer.gameObject.SetActive(p);
         }
 
+        //used by modifiers. distinct from SlotViz grab
         public bool Grab(CardViz cardViz, bool bringUp = false)
         {
-            if (cardViz.gameObject.activeSelf == true)
+            if (cardViz.free == true)
             {
                 Vector3 target;
                 if (actWindow.gameObject.activeInHierarchy == true)
@@ -113,10 +109,9 @@ namespace CultistLike
                 }
                 else
                 {
-                    target = transform.position;
+                    target = targetPosition;
                 }
 
-                // Action<CardViz> onStart = x => SlotCardLogical(x);
                 Action<CardViz> onComplete = x =>
                 {
                     actWindow.ParentCardToWindow(x);

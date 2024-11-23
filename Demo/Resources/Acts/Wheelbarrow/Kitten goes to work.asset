@@ -12,11 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
   m_Name: Kitten goes to work
   m_EditorClassIdentifier: 
-  label: 
+  label: Kitten Labour
   token: {fileID: 11400000, guid: 5701f165dec7a2d4db96c726b68268f0, type: 2}
   initial: 1
-  time: 10
-  tests: []
+  time: 0
+  tests:
+  - cardTest: 0
+    canFail: 0
+    loc1: 0
+    fragment1: {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
+    op: 0
+    constant: 1
+    loc2: 0
+    fragment2: {fileID: 0}
   and: []
   or: []
   fragments: []
@@ -27,17 +35,13 @@ MonoBehaviour:
   deckModifiers: []
   furthermore: []
   ignoreGlobalSlots: 0
-  slots:
-  - {fileID: 11400000, guid: 2e8557dfbcd3fd64ca95c8e1daa29ade, type: 2}
+  slots: []
   randomAlt: 0
-  altActs:
-  - chance: 0
-    act: {fileID: 11400000, guid: 27891963cb71f014ca37a6b409f07b1b, type: 2}
-    actRule: {fileID: 0}
+  altActs: []
   randomNext: 0
   nextActs:
   - chance: 0
-    act: {fileID: 11400000, guid: f0abdd383ce6f6043a5e272a8c66a14e, type: 2}
+    act: {fileID: 11400000, guid: 340eab2a82a6cfa4683c2edde949c03c, type: 2}
     actRule: {fileID: 0}
   spawnedActs: []
   onSpawn: {fileID: 0}

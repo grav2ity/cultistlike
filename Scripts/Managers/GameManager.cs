@@ -34,28 +34,33 @@ namespace CultistLike
         public float scaleSpeed;
 
         [Header("Special fragments")]
+        public Fragment thisAspect;
         public Fragment thisCard;
-        public Fragment matchedCard;
+        public Fragment matchedCards;
 
-        [Header("Dev tools")]
+        [Header("Time control")]
+        public float timeScale;
         public float maxTime;
         public float allTime;
 
         [HideInInspector] public UnityEvent<CardViz> onCardInPlay;
-        [HideInInspector] public List<Slot> slotSOS;
 
         [SerializeField, HideInInspector] private List<TokenViz> _tokens;
-        [SerializeField, HideInInspector] private List<CardViz> _cards;
+        [SerializeField, HideInInspector] private FragContainer _fragments;
 
         [SerializeField, HideInInspector] private ActWindow _openWindow;
         [SerializeField, HideInInspector] private float elapsedTime;
 
-        private float timeScale;
-        private List<Act> initialActs;
+        private List<Act> _initialActs;
+        private List<Slot> _slotSOS;
 
 
-        public List<CardViz> cards { get => _cards; }
+        public FragContainer fragments { get => _fragments; }
+        public List<CardViz> cards { get => fragments.cards; }
         public List<TokenViz> tokens { get => _tokens; }
+
+        public List<Act> initialActs { get => _initialActs; private set => _initialActs = value; }
+        public List<Slot> slotSOS { get => _slotSOS; private set => _slotSOS = value; }
 
         public ActWindow openWindow { get => _openWindow; private set => _openWindow = value; }
         public float time { get => elapsedTime; }
@@ -91,13 +96,7 @@ namespace CultistLike
             }
         }
 
-        public void AddCard(CardViz cardViz)
-        {
-            if (cardViz != null && cards.Contains(cardViz) == false)
-            {
-                cards.Add(cardViz);
-            }
-        }
+        public void AddCard(CardViz cardViz) => fragments.Add(cardViz);
 
         public void CardInPlay(CardViz cardViz)
         {
@@ -116,7 +115,7 @@ namespace CultistLike
         {
             if (cardViz != null)
             {
-                cards.Remove(cardViz);
+                fragments.Remove(cardViz);
                 table.RemoveCard(cardViz);
                 cardViz.gameObject.SetActive(false);
                 Destroy(cardViz.gameObject, 1f);
@@ -199,8 +198,6 @@ namespace CultistLike
             maxTime = 0f;
         }
 
-        public List<Act> GetInitialActs() => initialActs;
-
         private void FindIninitalActs()
         {
             initialActs = new List<Act>();
@@ -227,6 +224,11 @@ namespace CultistLike
 
             FindSlotSOS();
             FindIninitalActs();
+
+            if (thisAspect == null || thisCard == null || matchedCards == null)
+            {
+                Debug.LogError("GameManager's Special fragments are missing!!");
+            }
         }
 
         private void Update()

@@ -35,6 +35,9 @@ namespace CultistLike
         public TokenViz tokenViz { get => actWindow.tokenViz; }
 
 
+        /// <summary>
+        /// Returns a list of Slots to open.
+        /// </summary>
         public List<Slot> CheckForSlots()
         {
             List<Slot> slotsToAttempt = new List<Slot>();
@@ -102,7 +105,6 @@ namespace CultistLike
             return slotsToOpen;
         }
 
-
         public void RunAct(Act act)
         {
             Debug.Log("Running act: " + act.name);
@@ -116,11 +118,6 @@ namespace CultistLike
                     forceRule.Run(context);
                 }
                 forceRule = null;
-            }
-
-            foreach (var frag in activeAct.fragments)
-            {
-                fragments.Add(frag);
             }
 
             actWindow.ParentCardsToWindow();
@@ -212,7 +209,12 @@ namespace CultistLike
                 activeAct = altAct;
             }
 
-            ApplyCardRules();
+            foreach (var frag in activeAct.fragments)
+            {
+                fragments.Add(frag);
+            }
+
+            ApplyTriggers();
 
             using (var context = new Context(this, true))
             {
@@ -225,6 +227,7 @@ namespace CultistLike
                 GameManager.Instance.SpawnAct(spawnedAct, this);
             }
 
+            actWindow.ParentCardsToWindow();
             actWindow.UpdateBars();
 
             if (forceAct != null)
@@ -303,32 +306,39 @@ namespace CultistLike
         public Act AttemptAltActs() => AttemptActs(altActs);
         private Act AttemptNextActs() => AttemptActs(nextActs);
 
-        private void ApplyCardRules()
+        private void ApplyTriggers()
         {
             using (var context = new Context(this))
             {
                 foreach (var cardViz in context.scope.cards)
                 {
-                    context.card = cardViz;
+                    context.thisCard = cardViz;
                     foreach (var rule in cardViz.card.rules)
                     {
                         rule?.Run(context);
                     }
 
-                    foreach (var frag in cardViz.fragments.fragments)
+                }
+                context.thisCard = null;
+                foreach (var frag in context.scope.fragments)
+                {
+                    if (frag.fragment != null)
                     {
-                        if (frag.fragment != null)
+                        context.thisAspect = frag.fragment;
+                        foreach (var rule in frag.fragment.rules)
                         {
-                            foreach (var rule in frag.fragment.rules)
-                            {
-                                rule?.Run(context);
-                            }
+                            rule?.Run(context);
                         }
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Adds CardViz to the scope.
+        /// </summary>
+        /// <param name="cardViz">CardViz to add.</param>
+        /// <param name="slot">Slot type if CardViz has been slotted.</param>
         public void HoldCard(CardViz cardViz, Slot slot = null)
         {
             if (cardViz != null)
@@ -346,6 +356,11 @@ namespace CultistLike
             }
         }
 
+        /// <summary>
+        /// Removes CardViz from the scope.
+        /// </summary>
+        /// <param name="cardViz">CardViz to remove.</param>
+        /// <param name="slot">Slot type if CardViz has been unslotted.</param>
         public CardViz UnholdCard(CardViz cardViz, Slot slot = null)
         {
             if (cardViz != null)
@@ -367,7 +382,9 @@ namespace CultistLike
 
         public void ParentCardToWindow(CardViz cardViz)
         {
-            cardViz.gameObject.SetActive(false);
+            // cardViz.gameObject.SetActive(false);
+            cardViz.Hide();
+            cardViz.free = false;
             cardViz.transform.SetParent(transform);
         }
 
@@ -384,7 +401,7 @@ namespace CultistLike
             this.parent = parent;
         }
 
-        public void AddChild(ActLogic child)
+        private void AddChild(ActLogic child)
         {
             if (child != null && children.Contains(child) == false)
             {
@@ -392,7 +409,7 @@ namespace CultistLike
             }
         }
 
-        public void RemoveChild(ActLogic child)
+        private void RemoveChild(ActLogic child)
         {
             if (child != null)
             {

@@ -12,8 +12,14 @@ namespace CultistLike
         [Space(10)]
         [TextArea(3, 10)] public string text;
         [Space(10)]
+        [Tooltip("Deck content.")]
         public List<Fragment> fragments;
+        [Tooltip("Fragment to draw when Deck is empty.")]
+        public Fragment defaultFragment;
+        [Tooltip("Randomize deck order.")]
         public bool shuffle;
+        [Tooltip("Replenish fragments on exhaustion.")]
+        public bool replenish;
         public bool infinite;
 
         public Fragment Draw() => DeckManager.Instance.GetDeckInst(this).Draw();

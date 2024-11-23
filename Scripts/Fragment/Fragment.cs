@@ -10,6 +10,7 @@ namespace CultistLike
     {
         [Multiline] public string label;
         public Sprite art;
+        [Tooltip("Solid color used when art is not set.")]
         public Color color;
         [TextArea(3, 10)] public string description;
 
@@ -17,12 +18,12 @@ namespace CultistLike
         public List<Fragment> fragments;
 
         [Header("Triggers")]
-        [Tooltip("Every time an Act completes, Rules will be run if this Fragment is present.")]
+        [Tooltip("Rules will be run on Act completion if Fragment is present.")]
         public List<Rule> rules;
-        public bool oneForAll;
+        // public bool oneForAll;
 
         [Header("Slots")]
-        [Tooltip("Slots that will attempt to open if this Fragment is present.")]
+        [Tooltip("Slots that will attempt to open if Fragment is present.")]
         public List<Slot> slots;
 
 
@@ -41,18 +42,11 @@ namespace CultistLike
         public Fragment fragment;
         public int count;
 
-        [HideInInspector] public CardViz cardViz;
-
 
         public HeldFragment(Fragment fragment, int count)
         {
             this.fragment = fragment;
             this.count = count;
-        }
-
-        public HeldFragment(CardViz cardViz)
-        {
-            this.cardViz = cardViz;
         }
 
         public HeldFragment(Fragment fragment) : this(fragment, 1) {}

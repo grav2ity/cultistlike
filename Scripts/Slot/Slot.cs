@@ -13,42 +13,43 @@ namespace CultistLike
         [Space(10)]
         [TextArea(3, 10)] public string description;
         [Space(10)]
+        [Tooltip("Fragments will be added to the Act window whenever Card is slotted.")]
         public List<Fragment> fragments;
-        [Tooltip("Token in which Slot should attempt to spawn.")]
 
         [Header("Spawn")]
+        [Tooltip("Token in which Slot will attempt to spawn.")]
         public Token token;
-        [Tooltip("Only one instance of this Slot can be opened per Window.")]
+        [Tooltip("Only one instance of this Slot can be opened per window.")]
         public bool unique;
         [Tooltip("Attempt to spawn in all Tokens.")]
         public bool allTokens;
         [Tooltip("Attempt to spawn in all running Acts.")]
         public bool allActs;
 
-        [Header("Spawn")]
+        [Header("Spawn Tests")]
         [Tooltip("All the Tests must pass for this Slot to spawn.")]
         public List<Test> spawnTests;
+        [Tooltip("Rule must pass for this Slot to spawn.")]
         public Rule spawnRule;
 
         [Header("Accepted Fragments")]
-        [Tooltip("Card must have one of these to be accepted.")]
+        [Tooltip("Card must have at least one of the Required Fragments to be accepted in this Slot.")]
         public List<HeldFragment> required;
-        [Tooltip("Card must have all of these to be accepted.")]
+        [Tooltip("Card must have all the Essential Fragments to be accepted in this Slot.")]
         public List<HeldFragment> essential;
-        [Tooltip("Card must have none of these to be accepted.")]
+        [Tooltip("Card can't have any of the Forbidden Fragments to be accepted in this Slot.")]
         public List<HeldFragment> forbidden;
 
-        [Header("Additional Card Tests")]
-        [Tooltip("All the Tests must pass to accept Card. This will not show in the tooltip.")]
-        public List<Test> cardTests;
+        [Header("Card Rule")]
+        [Tooltip("Additional Rule that must pass for a Card to be accepted. This will not show in the tooltip.")]
         public Rule cardRule;
 
         [Header("Options")]
-        [Tooltip("Accept all Cards.")]
+        [Tooltip("Allows to place all Cards in the Slot.")]
         public bool acceptAll;
-        [Tooltip("Grabs Cards for itself.")]
+        [Tooltip("Slot will automatically grab Cards for itself.")]
         public bool grab;
-        [Tooltip("Cannot remove Card from the slot.")]
+        [Tooltip("Cannot remove Card from the Slot.")]
         public bool cardLock;
 
 
@@ -112,31 +113,14 @@ namespace CultistLike
         {
             if (cardViz != null && CheckFragRules(cardViz) == true)
             {
-                if (cardTests.Count == 0 && cardRule == null)
+                if (cardRule == null)
                 {
                     return true;
                 }
                 else
                 {
                     var context = new Context(cardViz);
-                    foreach (var test in cardTests)
-                    {
-                        var r = test.Attempt(context);
-                        if (test.canFail == false && r == false)
-                        {
-                            return false;
-                        }
-                    }
-
-                    if (cardRule == null)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        context.ResetMatches();
-                        return cardRule.Evaluate(context);
-                    }
+                    return cardRule.Evaluate(context);
                 }
             }
             return false;

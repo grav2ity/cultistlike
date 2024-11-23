@@ -18,24 +18,29 @@ namespace CultistLike
         {
             this.deck = deck;
 
-            // index = 0;
+            fragments = new List<Fragment>();
+            Reshuffle();
+        }
 
-            if (deck.shuffle == true)
+        public Fragment Draw()
+        {
+            if (fragments.Count > 0)
             {
-                fragments = new List<Fragment>();
-                for (int i=0; i<deck.fragments.Count; i++)
-                {
-                    int r = Random.Range(0, fragments.Count);
-                    fragments.Insert(r, deck.fragments[i]); 
-                }
+                return Draw(0);
             }
             else
             {
-                fragments = new List<Fragment>(deck.fragments);
+                if (deck.replenish == true)
+                {
+                    Reshuffle();
+                    return Draw(0);
+                }
+                else
+                {
+                    return deck.defaultFragment;
+                }
             }
         }
-
-        public Fragment Draw() => Draw(0);
 
         public Fragment Draw(int i)
         {
@@ -71,6 +76,22 @@ namespace CultistLike
             else
             {
                 return null;
+            }
+        }
+
+        private void Reshuffle()
+        {
+            if (deck.shuffle == true)
+            {
+                for (int i=0; i<deck.fragments.Count; i++)
+                {
+                    int r = Random.Range(0, fragments.Count);
+                    fragments.Insert(r, deck.fragments[i]);
+                }
+            }
+            else
+            {
+                fragments = deck.fragments.GetRange(0, deck.fragments.Count);
             }
         }
     }

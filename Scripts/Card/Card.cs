@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-using UnityEngine;
+﻿using UnityEngine;
 
 
 namespace CultistLike
@@ -9,7 +7,9 @@ namespace CultistLike
     public class Card : Fragment
     {
         [Header("Decay")]
+        [Tooltip("Whenever Card is created it will automatically Decay to / turn into the specified Card.")]
         public Card decayTo;
+        [Tooltip("How long will it take for the Decay to complete.")]
         public float lifetime;
 
         public override void AddToContainer(FragContainer fg) => fg.Add(this);

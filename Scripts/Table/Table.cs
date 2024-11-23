@@ -91,7 +91,6 @@ namespace CultistLike
             var cardViz = go.GetComponent<CardViz>();
             if (cardViz != null)
             {
-                // cards.Remove(cardViz);
                 fragments.Remove(cardViz);
             }
         }
@@ -204,11 +203,8 @@ namespace CultistLike
 
         protected void DOMove(Viz viz, T t, float speed)
         {
-            bool prevInteractive = viz.interactive;
-            viz.interactive = false;
             Vector3 targetPosition = ToLocalPosition(t) + transform.position;
-            viz.transform.DOMove(targetPosition, speed).
-                OnComplete(() => { viz.interactive = prevInteractive; PutOn(viz.gameObject); });
+            viz.DOMove(targetPosition, speed, () => PutOn(viz.gameObject));
         }
 
         protected IEnumerator HighlightCardsE(List<CardViz> cards)

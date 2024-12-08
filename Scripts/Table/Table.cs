@@ -42,6 +42,10 @@ namespace CultistLike
 
         public abstract void Remove(Viz viz);
 
+        public abstract string Save();
+
+        public abstract void Load(string json);
+
 
         public virtual void OnDrop(PointerEventData eventData)
         {

@@ -47,6 +47,7 @@ namespace CultistLike
 
         [SerializeField, HideInInspector] private List<TokenViz> _tokens;
         [SerializeField, HideInInspector] private FragContainer _fragments;
+        [SerializeField, HideInInspector] private List<ActWindow> _windows;
 
         [SerializeField, HideInInspector] private ActWindow _openWindow;
         [SerializeField, HideInInspector] private float elapsedTime;
@@ -56,8 +57,9 @@ namespace CultistLike
 
 
         public FragContainer fragments { get => _fragments; }
-        public List<CardViz> cards { get => fragments.cards; }
+        public List<CardViz> cards { get => _fragments.cards; }
         public List<TokenViz> tokens { get => _tokens; }
+        public List<ActWindow> windows { get => _windows; }
 
         public List<Act> initialActs { get => _initialActs; private set => _initialActs = value; }
         public List<Slot> slotSOS { get => _slotSOS; private set => _slotSOS = value; }
@@ -103,11 +105,17 @@ namespace CultistLike
             onCardInPlay.Invoke(cardViz);
         }
 
-        public CardViz CreateCard(Card card)
+        public CardViz CreateCard()
         {
             var cardViz = UnityEngine.Object.Instantiate(cardPrefab);
-            cardViz.LoadCard(card);
             AddCard(cardViz);
+            return cardViz;
+        }
+
+        public CardViz CreateCard(Card card)
+        {
+            var cardViz = CreateCard();
+            cardViz.LoadCard(card);
             return cardViz;
         }
 
@@ -130,6 +138,20 @@ namespace CultistLike
             }
         }
 
+        public TokenViz CreateToken()
+        {
+            var tokenViz = UnityEngine.Object.Instantiate(tokenPrefab);
+            AddToken(tokenViz);
+            return tokenViz;
+        }
+
+        public TokenViz CreateToken(Token token)
+        {
+            var tokenViz = CreateToken();
+            tokenViz.LoadToken(token);
+            return tokenViz;
+        }
+
         public void DestroyToken(TokenViz tokenViz)
         {
             if (tokenViz != null)
@@ -138,6 +160,31 @@ namespace CultistLike
                 table.Remove(tokenViz);
                 tokenViz.gameObject.SetActive(false);
                 Destroy(tokenViz.gameObject, 1f);
+            }
+        }
+
+        public void AddWindow(ActWindow actWindow)
+        {
+            if (actWindow != null && windows.Contains(actWindow) == false)
+            {
+                windows.Add(actWindow);
+            }
+        }
+
+        public ActWindow CreateWindow()
+        {
+            var actWindow = UnityEngine.Object.Instantiate(actWindowPrefab, windowPlane);
+            AddWindow(actWindow);
+            return actWindow;
+        }
+
+        public void DestroyWindow(ActWindow actWindow)
+        {
+            if (actWindow != null)
+            {
+                windows.Remove(actWindow);
+                actWindow.gameObject.SetActive(false);
+                Destroy(actWindow.gameObject, 1f);
             }
         }
 
@@ -163,7 +210,7 @@ namespace CultistLike
             {
                 if (token.unique == false || tokens.Find(x => x.token == token) == null)
                 {
-                    var newTokenViz = UnityEngine.Object.Instantiate(GameManager.Instance.tokenPrefab,
+                    var newTokenViz = UnityEngine.Object.Instantiate(tokenPrefab,
                                                                      viz.transform.position, Quaternion.identity);
                     newTokenViz.LoadToken(token);
 
@@ -196,6 +243,96 @@ namespace CultistLike
         {
             allTime = time;
             maxTime = 0f;
+        }
+
+        public void Save()
+        {
+            var save = new GameManagerSave();
+            DOTween.CompleteAll(true);
+
+            foreach (var cardViz in cards)
+            {
+                save.cards.Add(cardViz.Save());
+            }
+
+            foreach (var tokenViz in tokens)
+            {
+                save.tokens.Add(tokenViz.Save());
+            }
+
+            save.decks = DeckManager.Instance.deckInsts;
+
+            save.table = table.Save();
+
+            var jsonSave = JsonUtility.ToJson(save);
+            SaveManager.Instance.Save(jsonSave);
+        }
+
+        public void Load()
+        {
+            Reset();
+
+            var jsonSave = SaveManager.Instance.Load();
+
+            GameManagerSave save = new GameManagerSave(jsonSave);
+
+            foreach (var cardSave in save.cards)
+            {
+                var cardViz = GameManager.Instance.CreateCard();
+                SaveManager.Instance.RegisterCard(cardSave.ID, cardViz);
+            }
+
+            foreach (var cardSave in save.cards)
+            {
+                SaveManager.Instance.CardFromID(cardSave.ID).Load(cardSave);
+            }
+
+            foreach (var tokenSave in save.tokens)
+            {
+                var tokenViz = GameManager.Instance.CreateToken();
+                tokenViz.Load(tokenSave);
+                tokenViz.transform.SetParent(table.transform);
+            }
+
+            foreach (var cardViz in GameManager.Instance.cards)
+            {
+                if (cardViz.transform.parent == null)
+                {
+                    cardViz.transform.SetParent(table.transform);
+                }
+            }
+
+            DeckManager.Instance.Load(save.decks);
+
+            //load table last
+            table.Load(save.table);
+        }
+
+        public void Reset()
+        {
+            DOTween.CompleteAll(true);
+
+            for (int i=cards.Count-1; i>=0; i--)
+            {
+                DestroyCard(cards[i]);
+            }
+            cards.Clear();
+
+            for (int i=tokens.Count-1; i>=0; i--)
+            {
+                DestroyToken(tokens[i]);
+            }
+            tokens.Clear();
+
+            for (int i=windows.Count-1; i>=0; i--)
+            {
+                DestroyWindow(windows[i]);
+            }
+            windows.Clear();
+
+            openWindow = null;
+            UIManager.Instance?.cardInfo?.Unload();
+            UIManager.Instance?.aspectInfo?.Unload();
         }
 
         private void FindIninitalActs()
@@ -234,6 +371,26 @@ namespace CultistLike
         private void Update()
         {
             elapsedTime += Time.deltaTime * timeScale;
+        }
+    }
+
+    [Serializable]
+    public class GameManagerSave
+    {
+        public List<CardVizSave> cards;
+        public List<TokenVizSave> tokens;
+        public List<DeckInst> decks;
+        public string table;
+
+        public GameManagerSave()
+        {
+            cards = new List<CardVizSave>();
+            tokens = new List<TokenVizSave>();
+        }
+
+        public GameManagerSave(string json)
+        {
+            JsonUtility.FromJsonOverwrite(json, this);
         }
     }
 }

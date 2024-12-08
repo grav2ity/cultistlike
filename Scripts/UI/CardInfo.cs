@@ -12,7 +12,6 @@ namespace CultistLike
         [SerializeField] private Image art;
         [SerializeField] private TextMeshProUGUI description;
         [SerializeField] private TextMeshProUGUI cardName;
-        [SerializeField] private GameObject aspectsGO;
         [SerializeField] private FragmentBar fragmentBar;
 
 

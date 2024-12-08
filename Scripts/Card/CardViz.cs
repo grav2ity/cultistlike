@@ -195,7 +195,7 @@ namespace CultistLike
 
         public void Decay(Card card, float time)
         {
-            cardDecay.StartTimer(time, () => OnDecayComplete(card));
+            cardDecay.StartTimer(time, card);
         }
 
         public void Destroy()
@@ -362,6 +362,57 @@ namespace CultistLike
             return false;
         }
 
+        public CardVizSave Save()
+        {
+            var save = new CardVizSave();
+            save.ID = GetInstanceID();
+            save.card = card;
+            save.fragSave = fragments.Save();
+            save.free = free;
+            save.faceDown = faceDown;
+            save.position = transform.position;
+            if (cardDecay.timeLeft != 0f)
+            {
+                save.decaySave = cardDecay.Save();
+            }
+            if (cardStack.Count > 1)
+            {
+                List<CardViz> cards = new List<CardViz>();
+                cardStack.GetComponentsInChildren(true, cards);
+                save.stackedCards = new List<int>();
+                foreach (var cardViz in cards)
+                {
+                    save.stackedCards.Add(cardViz.GetInstanceID());
+                }
+            }
+            return save;
+        }
+
+        public void Load(CardVizSave save)
+        {
+            LoadCard(save.card, false);
+            fragments.Load(save.fragSave);
+            free = save.free;
+            faceDown = save.faceDown;
+            if (faceDown == true)
+            {
+                ShowBack();
+            }
+            transform.position = save.position;
+            if (save.decaySave != null)
+            {
+                cardDecay.Load(save.decaySave);
+            }
+            if (save.stackedCards != null)
+            {
+                foreach (var cardID in save.stackedCards)
+                {
+                    cardStack.Push(SaveManager.Instance.CardFromID(cardID));
+                }
+            }
+            draggingPlane = GameManager.Instance.cardDragPlane;
+        }
+
         private bool CanStack(CardViz cardViz)
         {
             if (card == cardViz.card &&
@@ -376,7 +427,7 @@ namespace CultistLike
             }
         }
 
-        private void OnDecayComplete(Card card)
+        public void OnDecayComplete(Card card)
         {
             interactive = false;
 
@@ -428,7 +479,7 @@ namespace CultistLike
                 Debug.LogError("Please set Card for " + this.name);
             }
 
-            if (card.lifetime > 0f)
+            if (cardDecay.timeLeft == 0f && card.lifetime > 0f)
             {
                 Decay(card.decayTo, card.lifetime);
             }
@@ -436,5 +487,18 @@ namespace CultistLike
             draggingPlane = GameManager.Instance.cardDragPlane;
             GameManager.Instance.AddCard(this);
         }
+    }
+
+    [Serializable]
+    public class CardVizSave
+    {
+        public int ID;
+        public Card card;
+        public FragContainerSave fragSave;
+        public bool free;
+        public bool faceDown;
+        public CardDecaySave decaySave;
+        public List<int> stackedCards;
+        public Vector3 position;
     }
 }

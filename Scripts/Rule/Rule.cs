@@ -100,17 +100,6 @@ namespace CultistLike
                     context.deckModifiers.Add(deckMod.Evaluate(context));
                 }
 
-                // foreach (var rule in furthermore)
-                // {
-                //     if (rule != null)
-                //     {
-                //         using (var context2 = new Context(context))
-                //         {
-                //             rule.Run(context2);
-                //         }
-                //     }
-                // }
-
                 foreach (var rule in furthermore)
                 {
                     if (rule != null)

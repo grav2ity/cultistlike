@@ -8,11 +8,11 @@ namespace CultistLike
 {
     public class CardStack : MonoBehaviour, IBeginDragHandler, IDragHandler
     {
+        [HideInInspector] public bool stackDrag;
+
         [Header("Layout")]
         [SerializeField] private TextMeshPro text;
         [SerializeField] private GameObject stackCounterGO;
-
-        public bool stackDrag;
 
         [SerializeField, HideInInspector] private int count;
 

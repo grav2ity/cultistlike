@@ -9,6 +9,13 @@ using TMPro;
 
 namespace CultistLike
 {
+    [Serializable]
+    public class SlotVizSave
+    {
+        public Slot slot;
+        public int cardID;
+    }
+
     public class SlotViz : MonoBehaviour, IDropHandler, ICardDock, IPointerClickHandler
     {
         public Slot slot;
@@ -278,6 +285,26 @@ namespace CultistLike
             else
             {
                 return false;
+            }
+        }
+
+        public SlotVizSave Save()
+        {
+            var save = new SlotVizSave();
+            save.slot = slot;
+            save.cardID = slottedCard != null ? slottedCard.GetInstanceID() : 0;
+            return save;
+        }
+
+        public void Load(SlotVizSave save)
+        {
+            LoadSlot(save.slot);
+
+            var cardViz = SaveManager.Instance.CardFromID(save.cardID);
+            if (cardViz != null)
+            {
+                slottedCard = cardViz;
+                SlotCardPhysical(cardViz);
             }
         }
 

@@ -7,6 +7,14 @@ using UnityEngine;
 namespace CultistLike
 {
     [Serializable]
+    public class FragContainerSave
+    {
+        public List<int> cards;
+        public List<HeldFragment> fragments;
+        public List<int> matches;
+    }
+
+    [Serializable]
     public class FragContainer
     {
         public List<CardViz> cards;
@@ -150,9 +158,6 @@ namespace CultistLike
                 if (level > 0)
                 {
                     int count = level;
-                    // Add(cardViz);
-                    // level--;
-
                     while (level-- > 0)
                     {
                         var newCardViz = cardViz.Duplicate();
@@ -168,7 +173,7 @@ namespace CultistLike
                 {
                     if (Remove(cardViz) != null)
                     {
-                        return 1;
+                        return -1;
                     }
                     else
                     {
@@ -237,5 +242,43 @@ namespace CultistLike
         public int Count(Card card) => cards.FindAll(x => x.card == card).Count;
 
         public int Count(HeldFragment frag) => frag != null ? Count(frag.fragment) : 0;
+
+        public FragContainerSave Save()
+        {
+            var save = new FragContainerSave();
+
+            save.cards = new List<int>();
+            foreach (var cardViz in cards)
+            {
+                save.cards.Add(cardViz.GetInstanceID());
+            }
+
+            save.matches = new List<int>();
+            foreach (var cardViz in matches)
+            {
+                save.matches.Add(cardViz.GetInstanceID());
+            }
+
+            save.fragments = fragments;
+
+            return save;
+        }
+
+        public void Load(FragContainerSave save)
+        {
+            cards.Clear();
+            foreach (var cardID in save.cards)
+            {
+                cards.Add(SaveManager.Instance.CardFromID(cardID));
+            }
+
+            matches.Clear();
+            foreach (var cardID in save.matches)
+            {
+                matches.Add(SaveManager.Instance.CardFromID(cardID));
+            }
+
+            fragments = save.fragments;
+        }
     }
 }

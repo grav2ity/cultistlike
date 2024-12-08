@@ -11,7 +11,7 @@ namespace CultistLike
     {
         public static DeckManager Instance { get; private set; }
 
-        public List<DeckInst> deckInsts;
+        [HideInInspector] public List<DeckInst> deckInsts;
 
         private Dictionary<Deck, DeckInst> decDict;
 
@@ -31,17 +31,13 @@ namespace CultistLike
             }
         }
 
-        private void PopulateDict()
+        public void Load(List<DeckInst> decks)
         {
-            var decks = new List<Deck>(Resources.LoadAll("", typeof(Deck)).Cast<Deck>().ToArray());
-
-            foreach (var deck in decks)
+            deckInsts = decks;
+            decDict.Clear();
+            foreach (var deckInst in deckInsts)
             {
-                var d = deckInsts.Find(x => x.deck == deck);
-                if (d != null)
-                {
-                    decDict[deck] = d;
-                }
+                decDict[deckInst.deck] = deckInst;
             }
         }
 
@@ -50,7 +46,6 @@ namespace CultistLike
             Instance = this;
 
             decDict = new Dictionary<Deck, DeckInst>();
-            PopulateDict();
         }
     }
 }

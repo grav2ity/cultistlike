@@ -38,8 +38,8 @@ namespace CultistLike
         public ActWindow actWindow { get => _actWindow; private set => _actWindow = value; }
         public Timer timer { get => _timer; private set => _timer = value; }
 
-        public override Vector2Int GetCellSize() => CellCount;
 
+        public override Vector2Int GetCellSize() => CellCount;
 
         public void OnDrop(PointerEventData eventData)
         {
@@ -123,6 +123,40 @@ namespace CultistLike
             return false;
         }
 
+        public TokenVizSave Save()
+        {
+            var save = new TokenVizSave();
+            save.token = token;
+            save.position = transform.position;
+
+            save.timerSave = timer.Save();
+            save.windowSave = actWindow.Save();
+            save.logicSave = actWindow.GetComponent<ActLogic>().Save();
+
+            return save;
+        }
+
+        public void Load(TokenVizSave save)
+        {
+            LoadToken(save.token);
+
+            transform.position = save.position;
+
+            actWindow = GameManager.Instance.CreateWindow();
+            actWindow.Load(save.windowSave, this);
+
+            var actLogic = actWindow.GetComponent<ActLogic>();
+            actLogic.Load(save.logicSave);
+
+            if (save.windowSave.actStatus == ActStatus.Finished)
+            {
+                actWindow.SetupResultCards(actLogic.fragments.cards);
+            }
+
+            timer.Load(save.timerSave, actLogic.OnTimeUp);
+            ShowTimer(save.timerSave.duration != 0f);
+        }
+
         private void Awake()
         {
             if (token != null)
@@ -140,16 +174,31 @@ namespace CultistLike
                 Debug.LogError("Please set Token for " + this.name);
             }
 
-            actWindow = Instantiate(GameManager.Instance.actWindowPrefab,
-                                    GameManager.Instance.windowPlane);
-            actWindow.LoadToken(this);
-            actWindow.GetComponent<ActLogic>().SetParent(parent);
-            actWindow.GetComponent<ActLogic>().ForceRule(initRule);
+            //actWindow will be null if object was not loaded
+            if (actWindow == null)
+            {
+                actWindow = GameManager.Instance.CreateWindow();
+                actWindow.LoadToken(this);
+                actWindow.GetComponent<ActLogic>().ForceRule(initRule);
+                actWindow.GetComponent<ActLogic>().SetParent(parent);
+                ShowTimer(false);
+            }
 
             actWindow.timer.SetFollowing(timer);
-            ShowTimer(false);
 
-            GameManager.Instance.tokens.Add(this);
+            GameManager.Instance.AddToken(this);
         }
+    }
+
+    [Serializable]
+    public class TokenVizSave
+    {
+        public Token token;
+        // public ActLogic parent;
+        public Vector3 position;
+
+        public TimerSave timerSave;
+        public ActWindowSave windowSave;
+        public ActLogicSave logicSave;
     }
 }

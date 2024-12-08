@@ -1303,6 +1303,7 @@ MonoBehaviour:
   undrag: 0
   draggingPlane: {fileID: 0}
   _interactive: 1
+  open: 0
   label: {fileID: 7942707299308039800}
   text: {fileID: 8990604413214538326}
   idleSlotsGO: {fileID: 8647200573428268445}
@@ -3070,6 +3071,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Aspect Bar
+      objectReference: {fileID: 0}
+    - target: {fileID: 3748529706204225228, guid: e85bab7d1a9c8f04ba3fd04dc098c14d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7013819266576955069, guid: e85bab7d1a9c8f04ba3fd04dc098c14d,
         type: 3}

@@ -163,12 +163,10 @@ namespace CultistLike
                 switch (op)
                 {
                     case ActOp.Adjust:
-                        Debug.Log("ADJUST");
                         if (target.cards != null)
                         {
                             foreach (var cardViz in target.cards)
                             {
-                                Debug.Log("CARD");
                                 var count = context.scope.Adjust(cardViz, level);
                                 if (level < 0 && count < 0)
                                 {
@@ -180,9 +178,13 @@ namespace CultistLike
                         {
                             var cards = context.scope.FindAll((Card)target.fragment);
                             var count = context.scope.Adjust(target.fragment, level);
-                            for (int i=0; i<count && i<cards.Count; i++)
+                            if (count < 0)
                             {
-                                context.Destroy(cards[i]);
+                                count = -count;
+                                for (int i=0; i<count && i<cards.Count; i++)
+                                {
+                                    context.Destroy(cards[i]);
+                                }
                             }
                         }
                         else
@@ -217,7 +219,7 @@ namespace CultistLike
 
     public enum PathOp
     {
-        NextAct = 0,
+        // NextAct = 0,
         ForceAct = 20,
     }
 
@@ -239,9 +241,9 @@ namespace CultistLike
             {
                 switch (op)
                 {
-                    case PathOp.NextAct:
-                        context.actLogic.AddNextAct(act);
-                        break;
+                    // case PathOp.NextAct:
+                    //     context.actLogic.AddNextAct(act);
+                    //     break;
                     case PathOp.ForceAct:
                         context.actLogic.ForceAct(act);
                         break;

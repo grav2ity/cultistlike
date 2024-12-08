@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -16,6 +17,8 @@ namespace CultistLike
         [SerializeField, HideInInspector] private List<Act> altActs;
         [SerializeField, HideInInspector] private List<Act> nextActs;
         [SerializeField, HideInInspector] private List<Act> spawnedActs;
+        // private List<Act> nextActs;
+        // private List<Act> spawnedActs;
 
         [SerializeField, HideInInspector] private Act forceAct;
         [SerializeField, HideInInspector] private Rule forceRule;
@@ -132,11 +135,7 @@ namespace CultistLike
 
             if (act.time > 0)
             {
-                tokenViz.timer.StartTimer(act.time, () =>
-                {
-                    tokenViz.ShowTimer(false);
-                    SetupActResults();
-                });
+                tokenViz.timer.StartTimer(act.time, OnTimeUp);
                 tokenViz.ShowTimer(true);
                 actWindow.ApplyStatus(ActStatus.Running);
             }
@@ -144,6 +143,12 @@ namespace CultistLike
             {
                 SetupActResults();
             }
+        }
+
+        public void OnTimeUp()
+        {
+            tokenViz.ShowTimer(false);
+            SetupActResults();
         }
 
         public void Reset()
@@ -201,7 +206,7 @@ namespace CultistLike
             }
         }
 
-        private void SetupActResults()
+        public void SetupActResults()
         {
             if (altAct != null)
             {
@@ -255,17 +260,16 @@ namespace CultistLike
             {
                 actWindow.SetupResultCards(fragments.cards);
             }
-
-            activeAct = null;
+            actWindow.ApplyStatus(ActStatus.Finished);
         }
 
-        public void AddNextAct(Act act)
-        {
-            if (nextActs.Contains(act) == false)
-            {
-                nextActs.Add(act);
-            }
-        }
+        // public void AddNextAct(Act act)
+        // {
+        //     if (nextActs.Contains(act) == false)
+        //     {
+        //         nextActs.Add(act);
+        //     }
+        // }
         public void ForceAct(Act act) => forceAct = act;
         public void ForceRule(Rule rule) => forceRule = rule;
 
@@ -382,7 +386,6 @@ namespace CultistLike
 
         public void ParentCardToWindow(CardViz cardViz)
         {
-            // cardViz.gameObject.SetActive(false);
             cardViz.Hide();
             cardViz.free = false;
             cardViz.transform.SetParent(transform);
@@ -400,6 +403,34 @@ namespace CultistLike
             }
             this.parent = parent;
         }
+
+        public ActLogicSave Save()
+        {
+            var save = new ActLogicSave();
+            save.fragSave = fragments.Save();
+            save.activeAct = activeAct;
+            save.altAct = altAct;
+            return save;
+        }
+
+        public void Load(ActLogicSave save)
+        {
+            fragments.Load(save.fragSave);
+            foreach (var cardViz in fragments.cards)
+            {
+                cardViz.fragments.parent = fragments;
+                if (actWindow.actStatus == ActStatus.Running)
+                {
+                    if (cardViz.transform.parent == null)
+                    {
+                        ParentCardToWindow(cardViz);
+                    }
+                }
+            }
+            activeAct = save.activeAct;
+            altAct = save.altAct;
+        }
+
 
         private void AddChild(ActLogic child)
         {
@@ -423,4 +454,15 @@ namespace CultistLike
             fragments.onCreateCard = actWindow.ParentCardToWindow;
         }
     }
+
+    [Serializable]
+    public class ActLogicSave
+    {
+        public FragContainerSave fragSave;
+        public Act activeAct;
+        //???
+        public Act altAct;
+        //parent children
+    }
+
 }

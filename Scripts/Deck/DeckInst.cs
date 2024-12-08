@@ -12,7 +12,6 @@ namespace CultistLike
     {
         [SerializeField] public Deck deck;
         [SerializeField] private List<Fragment> fragments;
-        [SerializeField] private int index;
 
         public DeckInst(Deck deck)
         {

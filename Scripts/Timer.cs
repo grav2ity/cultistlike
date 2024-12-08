@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
@@ -13,8 +15,8 @@ namespace CultistLike
         [SerializeField] private TextMeshProUGUI text;
         [SerializeField] private Image image;
 
-        [SerializeField, HideInInspector] private float startTime;
-        [SerializeField, HideInInspector] private float endTime;
+        [SerializeField, HideInInspector] private float _duration;
+        [SerializeField, HideInInspector] private float elapsedTime;
 
         [SerializeField, HideInInspector] private UnityEvent timeUpEvent;
 
@@ -23,12 +25,12 @@ namespace CultistLike
 
         public float timeLeft
         {
-            get => following != null ? following.timeLeft : endTime - GameManager.Instance.time;
+            get => following != null ? following.timeLeft : _duration - elapsedTime;
         }
 
         public float duration
         {
-            get => following != null ? following.duration : endTime - startTime;
+            get => following != null ? following.duration : _duration;
         }
 
         public void OnEnable()
@@ -38,15 +40,17 @@ namespace CultistLike
 
         public void StartTimer(float time, UnityAction action = null)
         {
-            startTime = GameManager.Instance.time;
-            endTime = startTime + time;
+            elapsedTime = 0f;
+            _duration = time;
         #if UNITY_EDITOR
-            endTime = startTime + GameManager.Instance.DevTime(time);
+            _duration = GameManager.Instance.DevTime(time);
         #endif
+
             enabled = true;
             timeUpEvent.RemoveAllListeners();
             timeUpEvent.AddListener(action);
-            UpdateDisplay(duration);
+
+            UpdateDisplay(time);
         }
 
         public void SetFollowing(Timer timer)
@@ -55,6 +59,26 @@ namespace CultistLike
             {
                 following = timer;
                 enabled = true;
+            }
+        }
+
+        public TimerSave Save()
+        {
+            var save = new TimerSave();
+            save.duration = duration;
+            save.elapsedTime = elapsedTime;
+            return save;
+        }
+
+        public void Load(TimerSave save, UnityAction action = null)
+        {
+            _duration = save.duration;
+            elapsedTime = save.elapsedTime;
+
+            if (duration != 0f)
+            {
+                enabled = true;
+                timeUpEvent.AddListener(action);
             }
         }
 
@@ -71,25 +95,34 @@ namespace CultistLike
         {
             GetComponentInChildren<Canvas>().worldCamera = Camera.main;
 
-            startTime = endTime = 0f;
             image.fillAmount = 0f;
             enabled = false;
         }
 
         private void Update()
         {
+            elapsedTime += Time.deltaTime * GameManager.Instance.timeScale;
+
             UpdateDisplay(timeLeft);
 
             if (timeLeft <= 0f)
             {
-                startTime = endTime = 0f;
                 image.fillAmount = 0.9f;
                 if (following == null)
                 {
+                    _duration = 0f;
+                    elapsedTime = 0f;
                     enabled = false;
                 }
                 timeUpEvent.Invoke();
             }
         }
+    }
+
+    [Serializable]
+    public class TimerSave
+    {
+        public float duration;
+        public float elapsedTime;
     }
 }

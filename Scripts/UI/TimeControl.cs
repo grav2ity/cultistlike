@@ -26,7 +26,10 @@ namespace CultistLike
         private void Awake()
         {
             buttons = GetComponentsInChildren<Button>();
-            SelectButton(selectedButton);
+            if (selectedButton != null)
+            {
+                SelectButton(selectedButton);
+            }
         }
     }
 }

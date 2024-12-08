@@ -27,20 +27,23 @@ namespace CultistLike
 
         public void LoadAspect(Fragment aspect)
         {
-            gameObject.SetActive(true);
-
-            AspectName = aspect.label;
-            Description = aspect.description;
-
-            if (aspect.art != null)
+            if (aspect != null)
             {
-                art.sprite = aspect.art;
-                art.color = Color.white;
-            }
-            else
-            {
-                art.sprite = null;
-                art.color = aspect.color;
+                gameObject.SetActive(true);
+
+                AspectName = aspect.label;
+                Description = aspect.description;
+
+                if (aspect.art != null)
+                {
+                    art.sprite = aspect.art;
+                    art.color = Color.white;
+                }
+                else
+                {
+                    art.sprite = null;
+                    art.color = aspect.color;
+                }
             }
         }
 

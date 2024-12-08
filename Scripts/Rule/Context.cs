@@ -148,7 +148,7 @@ namespace CultistLike
             {
                 if (frag == GameManager.Instance.thisAspect)
                 {
-                    return thisAspect; 
+                    return thisAspect;
                 }
                 else if (frag == GameManager.Instance.thisCard)
                 {

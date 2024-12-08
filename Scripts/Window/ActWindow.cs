@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,6 +11,8 @@ namespace CultistLike
 {
     public class ActWindow : Drag
     {
+        [HideInInspector] public bool open;
+
         [Header("Layout")]
         [SerializeField] private TextMeshPro label;
         [SerializeField] private TextMeshProUGUI text;
@@ -26,7 +29,7 @@ namespace CultistLike
         [SerializeField] private List<SlotViz> idleSlots;
         [SerializeField] private List<SlotViz> runSlots;
 
-        [SerializeField, HideInInspector] private ActStatus actStatus;
+        public ActStatus actStatus;
         [SerializeField, HideInInspector] private Act readyAct;
 
         private TokenViz _tokenViz;
@@ -73,6 +76,7 @@ namespace CultistLike
         public void BringUp()
         {
             gameObject.SetActive(true);
+            open = true;
             GameManager.Instance.OpenWindow(this);
         }
 
@@ -90,6 +94,7 @@ namespace CultistLike
             }
 
             gameObject.SetActive(false);
+            open = false;
             GameManager.Instance.CloseWindow();
         }
 
@@ -243,8 +248,6 @@ namespace CultistLike
         {
             resultLane.PlaceCards(cards);
             tokenViz.SetResultCount(cards.Count);
-
-            ApplyStatus(ActStatus.Finished);
         }
 
         /// <summary>
@@ -338,6 +341,7 @@ namespace CultistLike
                         okButton.interactable = true;
                         label.text = readyAct.label;
                         text.text = readyAct.text;
+                        tokenViz.SetResultCount(0);
                     }
                     break;
                 case ActStatus.Running:
@@ -345,6 +349,7 @@ namespace CultistLike
                     idleSlotsGO.SetActive(false);
                     runSlotsGO.SetActive(true);
                     okButton.interactable = false;
+                    tokenViz.SetResultCount(0);
                     label.text = runLabel;
                     text.text = runText;
                     break;
@@ -353,10 +358,50 @@ namespace CultistLike
                     runSlotsGO.SetActive(false);
                     resultLane.gameObject.SetActive(true);
                     collectButton.interactable = true;
+                    label.text = runLabel;
                     text.text = actLogic.activeAct.endText;
                     break;
                 default:
                     break;
+            }
+        }
+
+        public ActWindowSave Save()
+        {
+            var save = new ActWindowSave();
+            save.open = open;
+            save.actStatus = actStatus;
+            save.readyAct = readyAct;
+            save.position = transform.position;
+
+            save.slots = new List<SlotVizSave>();
+            foreach (var slotViz in slots)
+            {
+                if (slotViz.gameObject.activeSelf == true)
+                {
+                    save.slots.Add(slotViz.Save());
+                }
+            }
+
+            return save;
+        }
+
+        public void Load(ActWindowSave save, TokenViz tokenViz)
+        {
+            transform.position = save.position;
+            actStatus = save.actStatus;
+            readyAct = save.readyAct;
+            open = save.open;
+            LoadToken(tokenViz);
+
+            for (int i=0; i<save.slots.Count && i<slots.Count; i++)
+            {
+                slots[i].Load(save.slots[i]);
+            }
+
+            if (save.open == true)
+            {
+                BringUp();
             }
         }
 
@@ -446,9 +491,10 @@ namespace CultistLike
             GetComponent<Drag>().draggingPlane = GameManager.Instance.windowPlane;
 
             timer.gameObject.SetActive(false);
+            okButton.interactable = false;
             collectButton.interactable = false;
-            tokenViz.SetResultCount(0);
-            gameObject.SetActive(false);
+
+            gameObject.SetActive(open);
 
             CloseSlots(idleSlots);
             CloseSlots(runSlots);
@@ -465,9 +511,20 @@ namespace CultistLike
             }
             else
             {
-                StatusIdle();
+                UpdateSlots();
+                ApplyStatus(actStatus);
             }
         }
+    }
+
+    [Serializable]
+    public class ActWindowSave
+    {
+        public bool open;
+        public ActStatus actStatus;
+        public Act readyAct;
+        public List<SlotVizSave> slots;
+        public Vector3 position;
     }
 
     public enum ActStatus

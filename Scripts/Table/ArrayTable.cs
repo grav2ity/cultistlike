@@ -12,7 +12,7 @@ namespace CultistLike
     {
         [Tooltip("Size of a single grid cell")]
         [SerializeField] private Vector2 cellSize;
-        [Tooltip("Initial cell count")]
+        [Tooltip("Cell count")]
         [SerializeField] private Vector2Int cellCount;
         [Tooltip("How much to grow array when no free space is left")]
         [SerializeField] private int growStep;
@@ -143,6 +143,19 @@ namespace CultistLike
             array.ForV(v, viz.GetCellSize(), a => viz);
         }
 
+        public override string Save()
+        {
+            return JsonUtility.ToJson(this);
+        }
+
+        public override void Load(string json)
+        {
+            JsonUtility.FromJsonOverwrite(json, this);
+            //TODO
+            array = new SArray<Viz>(cellCount.x, cellCount.y);
+            Start();
+        }
+
         private Vector2Int NextCell(Vector2Int v, Vector2Int size)
         {
             v.x = v.x + size.x * 2 + 1;
@@ -243,7 +256,7 @@ namespace CultistLike
             {
                 var child = transform.GetChild(i);
 
-                if (child.GetComponent<CardViz>() != null || child.GetComponent<TokenViz>() != null)
+                if (child.gameObject.activeInHierarchy == true && child.GetComponent<Viz>() != null)
                 {
                     OnCardDock(child.gameObject);
                 }
@@ -279,8 +292,8 @@ namespace CultistLike
         [Serializable]
         private class SArray<T>
         {
-            public T[] array;
-            private int w, h;
+            [NonSerialized] public T[] array;
+            [SerializeField] private int w, h;
 
 
             public SArray(int w, int h)

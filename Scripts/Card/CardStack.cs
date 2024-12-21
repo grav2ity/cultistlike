@@ -16,6 +16,7 @@ namespace CultistLike
 
         [SerializeField, HideInInspector] private int count;
 
+        private CardViz parent;
         private const int maxCount = 99;
 
 
@@ -25,9 +26,8 @@ namespace CultistLike
         public void OnBeginDrag(PointerEventData eventData)
         {
             stackDrag = true;
-            var cardViz = GetComponentInParent<CardViz>();
-            eventData.pointerDrag = cardViz.gameObject;
-            cardViz.OnBeginDrag(eventData);
+            eventData.pointerDrag = parent.gameObject;
+            parent.OnBeginDrag(eventData);
             stackDrag = false;
         }
 
@@ -43,6 +43,11 @@ namespace CultistLike
                 //this would disable Decay timer which is fine since stacking Cards with Decay is not allowed
                 cardViz.gameObject.SetActive(false);
                 SetCount(count + 1);
+                if (parent.fragments.parent != null)
+                {
+                    parent.fragments.parent.Add(cardViz);
+                }
+                cardViz.stack = parent;
                 return true;
             }
             else
@@ -58,6 +63,11 @@ namespace CultistLike
             {
                 cardViz.gameObject.SetActive(true);
                 SetCount(count - 1);
+                if (parent.fragments.parent != null)
+                {
+                    parent.fragments.parent.Remove(cardViz);
+                }
+                cardViz.stack = null;
             }
 
             return cardViz;
@@ -74,7 +84,7 @@ namespace CultistLike
                     cardViz = stack.Pop();
                 }
 
-                Push(stack.GetComponentInParent<CardViz>());
+                Push(stack.parent);
                 return true;
             }
             else
@@ -88,6 +98,11 @@ namespace CultistLike
             this.count = count;
             text.text = count.ToString();
             stackCounterGO.SetActive(count > 1);
+        }
+
+        private void Awake()
+        {
+            parent = GetComponentInParent<CardViz>();
         }
 
         private void Start()

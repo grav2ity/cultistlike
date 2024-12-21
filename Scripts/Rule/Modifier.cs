@@ -91,6 +91,7 @@ namespace CultistLike
                                 foreach (var targetCard in targetCards)
                                 {
                                     targetCard.Transform((Card)what.fragment);
+                                    //TODO ??
                                     context.scope.Adjust(targetCard, level - 1);
                                 }
                             }
@@ -144,6 +145,8 @@ namespace CultistLike
                 result.op = op;
                 result.target = context.ResolveTarget(fragment);
                 result.level = context.Count(reference, level);
+                //only for Grab
+                result.all = level == 0;
             }
             return result;
         }
@@ -154,6 +157,7 @@ namespace CultistLike
         public ActOp op;
         public Target target;
         public int level;
+        public bool all;
 
 
         public void Execute(Context context)
@@ -165,6 +169,7 @@ namespace CultistLike
                     case ActOp.Adjust:
                         if (target.cards != null)
                         {
+                            //TODO
                             foreach (var cardViz in target.cards)
                             {
                                 var count = context.scope.Adjust(cardViz, level);
@@ -193,16 +198,24 @@ namespace CultistLike
                         }
                         break;
                     case ActOp.Grab:
-                        var targetCards = context.ResolveTargetCards(target, GameManager.Instance.fragments);
-                        if (targetCards != null)
+                        var targetCardsY = context.ResolveTargetCards(target, GameManager.Instance.fragments);
+                        if (targetCardsY != null)
                         {
+                            var targetCards = new List<CardViz>();
+                            foreach (var cardViz in targetCardsY)
+                            {
+                                var targetCard = cardViz.stack != null ? cardViz.stack : cardViz;
+                                if (targetCard.gameObject.activeSelf == true)
+                                {
+                                    targetCards.Add(targetCard);
+                                }
+                            }
+
+                            level = all == true ? targetCards.Count : level;
                             for (int i=0; i<level && i<targetCards.Count; i++)
                             {
-                                if (targetCards[i].gameObject.activeSelf == true)
-                                {
-                                    context.scope.Add(targetCards[i]);
-                                    context.actLogic.tokenViz.Grab(targetCards[i]);
-                                }
+                                Action<CardViz> onStart = x => context.scope.Add(x);
+                                context.actLogic.tokenViz.Grab(targetCards[i], onStart);
                             }
                         }
                         break;
@@ -245,7 +258,7 @@ namespace CultistLike
                     //     context.actLogic.AddNextAct(act);
                     //     break;
                     case PathOp.ForceAct:
-                        context.actLogic.ForceAct(act);
+                        context.actLogic.SetForceAct(act);
                         break;
                     default:
                         break;

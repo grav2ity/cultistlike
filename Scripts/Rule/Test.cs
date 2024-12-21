@@ -23,8 +23,9 @@ namespace CultistLike
     {
         Scope          = 0,
         MatchedCards   = 1 << 5,
-        Parent         = 1 << 3,
+        // Parent         = 1 << 3,
         Table          = 1 << 4,
+        // Anywhere       = 1 << 6,
     }
 
     [Serializable]
@@ -55,6 +56,7 @@ namespace CultistLike
             }
             else
             {
+                //TODO make it possible fot regular test to modify MatchedCards list?
                 right = constant * GetCount(context, loc2, fragment2r);
             }
 
@@ -141,22 +143,27 @@ namespace CultistLike
 
         public FragContainer GetScope(Context context, ReqLoc loc)
         {
-            if (loc == ReqLoc.Parent)
-            {
-                if (context.parent != null)
-                {
-                    return context.parent.fragments;
-                }
-                else
-                {
-                    //ERROR
-                    return null;
-                }
-            }
-            else if (loc == ReqLoc.Table)
+            // if (loc == ReqLoc.Parent)
+            // {
+            //     if (context.parent != null)
+            //     {
+            //         return context.parent.fragments;
+            //     }
+            //     else
+            //     {
+            //         //ERROR
+            //         return null;
+            //     }
+            // }
+            // else if (loc == ReqLoc.Table)
+            if (loc == ReqLoc.Table)
             {
                 return GameManager.Instance.table.fragments;
             }
+            // else if (loc == ReqLoc.Anywhere)
+            // {
+            //     return GameManager.Instance.fragments;
+            // }
             else
             {
                 return context.scope;

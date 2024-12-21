@@ -30,15 +30,21 @@ namespace CultistLike
         public List<Rule> furthermore;
 
 
-        public static bool Evaluate(Context context, List<Test> tests, List<Rule> and, List<Rule> or)
+        public static bool Evaluate(Context context, List<Test> tests, List<Rule> and, List<Rule> or, bool force = false)
         {
             foreach (var test in tests)
             {
                 var r = test.Attempt(context);
-                if (test.canFail == false && r == false)
+                if (force == false && test.canFail == false && r == false)
                 {
                     return false;
                 }
+            }
+
+            //force is used only to save CardMatches for forced and spawned Acts
+            if (force == true)
+            {
+                return true;
             }
 
             foreach (var rule in and)

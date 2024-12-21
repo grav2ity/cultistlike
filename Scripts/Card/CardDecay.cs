@@ -34,7 +34,6 @@ namespace CultistLike
             get => decayTime - elapsedTime;
         }
 
-
         public void StartTimer(float time, Card decayTo)
         {
             elapsedTime = 0f;
@@ -47,6 +46,16 @@ namespace CultistLike
             originalColor = art.color;
 
             UpdateDisplay(time);
+        }
+
+        public void StopTimer()
+        {
+            decayTime = 0f;
+            elapsedTime = 0f;
+            enabled = false;
+            paused = false;
+            art.color = originalColor;
+            HideTimer();
         }
 
         public void ShowTimer()
@@ -130,12 +139,8 @@ namespace CultistLike
 
             if (timeLeft <= 0f)
             {
-                decayTime = 0f;
-                elapsedTime = 0f;
-                enabled = false;
+                StopTimer();
                 GetComponent<CardViz>()?.OnDecayComplete(decayTo);
-                art.color = originalColor;
-                HideTimer();
             }
         }
     }

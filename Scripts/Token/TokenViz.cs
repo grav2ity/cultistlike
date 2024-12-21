@@ -98,7 +98,7 @@ namespace CultistLike
         }
 
         //used by modifiers. distinct from SlotViz grab
-        public bool Grab(CardViz cardViz, bool bringUp = false)
+        public bool Grab(CardViz cardViz, Action<CardViz> onStart = null, bool bringUp = false)
         {
             if (cardViz.free == true)
             {
@@ -112,12 +112,9 @@ namespace CultistLike
                     target = targetPosition;
                 }
 
-                Action<CardViz> onComplete = x =>
-                {
-                    actWindow.ParentCardToWindow(x);
-                };
+                Action<CardViz> onComplete = x => actWindow.ParentCardToWindow(x);
 
-                cardViz.Grab(target, null, onComplete);
+                cardViz.Grab(target, onStart, onComplete);
                 return true;
             }
             return false;

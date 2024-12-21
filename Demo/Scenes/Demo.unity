@@ -4100,7 +4100,7 @@ MonoBehaviour:
     fragments: []
     matches: []
   cellSize: {x: 0.3, y: 0.4}
-  cellCount: {x: 0, y: 0}
+  cellCount: {x: 38, y: 38}
   growStep: 3
   array:
     w: 0

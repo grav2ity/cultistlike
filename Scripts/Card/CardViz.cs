@@ -15,8 +15,9 @@ namespace CultistLike
         [Header("Card")]
         public Card card;
 
-        [HideInInspector] public FragContainer fragments;
         [HideInInspector] public bool free;
+        [HideInInspector] public CardViz stack;
+        [HideInInspector] public FragContainer fragments;
 
         [Header("Layout")]
         [SerializeField] private GameObject visualsGO;
@@ -297,6 +298,7 @@ namespace CultistLike
         {
             LoadCard(card, false);
 
+            cardDecay.StopTimer();
             if (card.lifetime > 0f)
             {
                 Decay(card.decayTo, card.lifetime);
@@ -325,7 +327,7 @@ namespace CultistLike
 
         public bool Grab(Vector3 target, Action<CardViz> onStart, Action<CardViz> onComplete)
         {
-            if (gameObject.activeSelf == true)
+            if (gameObject.activeSelf == true && free == true)
             {
                 var cardVizY = this.Yield();
 

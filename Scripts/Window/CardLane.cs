@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+using DG.Tweening;
+
 
 namespace CultistLike
 {
@@ -25,17 +27,19 @@ namespace CultistLike
             CardViz cardViz = go.GetComponent<CardViz>();
             if (cardViz != null)
             {
-                if (gameObject.activeInHierarchy)
+                if (gameObject.activeInHierarchy == true)
                 {
                     cards.Add(cardViz);
                     cardViz.transform.SetParent(transform);
+
+                    actWindow.HoldCard(cardViz);
+                    actWindow.UpdateBars();
+                    actWindow.Check();
                 }
                 else
                 {
                     GameManager.Instance.table.ReturnToTable(cardViz);
                 }
-                actWindow.HoldCard(cardViz);
-                actWindow.UpdateBars();
             }
         }
 
@@ -47,6 +51,7 @@ namespace CultistLike
                 cards.Remove(cardViz);
                 cardViz.ShowFace();
 
+                //TODO ??
                 if (actWindow.gameObject.activeInHierarchy == false)
                 {
                     cardViz.transform.SetParent(actWindow.tokenViz.transform);
@@ -76,8 +81,10 @@ namespace CultistLike
 
             foreach (var cardViz in cards)
             {
+                cardViz.transform.DOComplete(true);
                 cardViz.Show();
                 cardViz.free = true;
+                cardViz.interactive = true;
                 cardViz.transform.SetParent(transform);
                 cardViz.transform.localPosition = o;
                 o += spacing;

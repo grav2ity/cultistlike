@@ -124,7 +124,7 @@ namespace CultistLike
             cardViz.transform.SetParent(transform);
         }
 
-        public void ParentCardsToWindow()
+        public void ParentSlotCardsToWindow()
         {
             foreach (var slot in slots)
             {
@@ -188,7 +188,8 @@ namespace CultistLike
         // reUpdate needs to be done
         public void UpdateSlots()
         {
-            if (suspendUpdates == false)
+            //TODO
+            if (suspendUpdates == false && actStatus != ActStatus.Finished)
             {
                 suspendUpdates = true;
 
@@ -409,17 +410,7 @@ namespace CultistLike
         {
             if (tokenViz.token != null)
             {
-                foreach (var act in GameManager.Instance.initialActs)
-                {
-                    if (act.token == tokenViz.token)
-                    {
-                        readyAct = actLogic.AttemptAct(act);
-                        if (readyAct != null)
-                        {
-                            break;
-                        }
-                    }
-                }
+                readyAct = actLogic.AttemptInitialActs();
 
                 if (readyAct != null)
                 {
@@ -440,9 +431,8 @@ namespace CultistLike
         private void StatusIdle()
         {
             actLogic.Reset();
-            UpdateSlots();
-
             ApplyStatus(ActStatus.Idle);
+            UpdateSlots();
         }
 
         private void ReturnCardsToTable()
@@ -507,7 +497,7 @@ namespace CultistLike
             if (tokenViz.autoPlay != null)
             {
                 readyAct = tokenViz.autoPlay;
-                GoForIt();
+                actLogic.ForceAct(readyAct);
             }
             else
             {

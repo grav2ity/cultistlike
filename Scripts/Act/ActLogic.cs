@@ -17,8 +17,6 @@ namespace CultistLike
         [SerializeField, HideInInspector] private List<Act> altActs;
         [SerializeField, HideInInspector] private List<Act> nextActs;
         [SerializeField, HideInInspector] private List<Act> spawnedActs;
-        // private List<Act> nextActs;
-        // private List<Act> spawnedActs;
 
         [SerializeField, HideInInspector] private Act forceAct;
         [SerializeField, HideInInspector] private Rule forceRule;
@@ -123,7 +121,7 @@ namespace CultistLike
                 forceRule = null;
             }
 
-            actWindow.ParentCardsToWindow();
+            actWindow.ParentSlotCardsToWindow();
             actWindow.UpdateBars();
             //need this for correct slots
             actWindow.ApplyStatus(ActStatus.Running);
@@ -232,12 +230,12 @@ namespace CultistLike
                 GameManager.Instance.SpawnAct(spawnedAct, this);
             }
 
-            actWindow.ParentCardsToWindow();
+            actWindow.ParentSlotCardsToWindow();
             actWindow.UpdateBars();
 
             if (forceAct != null)
             {
-                RunAct(forceAct);
+                ForceAct(forceAct);
             }
             else
             {
@@ -270,45 +268,56 @@ namespace CultistLike
         //         nextActs.Add(act);
         //     }
         // }
-        public void ForceAct(Act act) => forceAct = act;
+
+        public void ForceAct(Act act)
+        {
+            Context context = new Context(this);
+            //just to save matches
+            AttemptAct(act, context, true);
+            RunAct(act);
+        }
+
+        public void SetForceAct(Act act) => forceAct = act;
         public void ForceRule(Rule rule) => forceRule = rule;
 
-        public Act AttemptAct(Act act)
+        public Act AttemptInitialActs() => AttemptActs(GameManager.Instance.initialActs, true);
+        private Act AttemptAltActs() => AttemptActs(altActs);
+        private Act AttemptNextActs() => AttemptActs(nextActs);
+
+        private bool AttemptAct(Act act, Context context, bool force = false)
         {
-            if (act != null)
+            context.ResetMatches();
+            if (act.Attempt(context, force) == true)
             {
-                if (act.token != null && act.token != tokenViz.token)
+                context.SaveMatches();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private Act AttemptActs(List<Act> acts, bool matchToken = false)
+        {
+            Context context = new Context(this);
+            foreach (var act in acts)
+            {
+                if (act != null)
                 {
-                    return null;
-                }
-                var context = new Context(this);
-                if (act.Attempt(context) == true)
-                {
-                    return act;
+                    if (matchToken == true && act.token != tokenViz.token)
+                    {
+                        continue;
+                    }
+
+                    if (AttemptAct(act, context) == true)
+                    {
+                        return act;
+                    }
                 }
             }
             return null;
         }
-
-        private Act AttemptActs(List<Act> acts)
-        {
-            Context context = new Context(this);
-            Act pAct = null;
-            foreach (var act in acts)
-            {
-                context.ResetMatches();
-                if (act != null && act.Attempt(context) == true)
-                {
-                    pAct = act;
-                    context.SaveMatches();
-                    break;
-                }
-            }
-            return pAct;
-        }
-
-        public Act AttemptAltActs() => AttemptActs(altActs);
-        private Act AttemptNextActs() => AttemptActs(nextActs);
 
         private void ApplyTriggers()
         {

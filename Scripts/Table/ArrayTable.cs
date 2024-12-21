@@ -151,6 +151,7 @@ namespace CultistLike
         public override void Load(string json)
         {
             JsonUtility.FromJsonOverwrite(json, this);
+            fragments.Clear();
             //TODO
             array = new SArray<Viz>(cellCount.x, cellCount.y);
             Start();

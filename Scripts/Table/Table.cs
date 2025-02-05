@@ -16,7 +16,7 @@ namespace CultistLike
     /// <typeparam name="T"></typeparam>
     public abstract class Table<T> : MonoBehaviour, ICardDock, IDropHandler, IPointerDownHandler
     {
-        public FragContainer fragments;
+        public FragTree fragTree;
 
         protected Dictionary<GameObject, T> lastLocations = new Dictionary<GameObject, T>();
 
@@ -90,14 +90,7 @@ namespace CultistLike
             }
         }
 
-        public virtual void OnCardUndock(GameObject go)
-        {
-            var cardViz = go.GetComponent<CardViz>();
-            if (cardViz != null)
-            {
-                fragments.Remove(cardViz);
-            }
-        }
+        public virtual void OnCardUndock(GameObject go) {}
 
         /// <summary>
         /// Place multiple objects on free locations on the table.
@@ -134,7 +127,6 @@ namespace CultistLike
             DOMove(viz, t, moveSpeed);
 
             lastLocations[viz.gameObject] = t;
-            AddCard(viz.GetComponent<CardViz>());
         }
 
         /// <summary>
@@ -165,17 +157,7 @@ namespace CultistLike
 
         public virtual List<CardViz> GetCards()
         {
-            return fragments.cards;
-        }
-
-        public virtual void AddCard(CardViz cardViz)
-        {
-            fragments.Add(cardViz);
-        }
-
-        public virtual void RemoveCard(CardViz cardViz)
-        {
-            fragments.Remove(cardViz);
+            return fragTree.cards;
         }
 
         public virtual void HighlightCards(List<CardViz> cards)
@@ -208,7 +190,7 @@ namespace CultistLike
         protected void DOMove(Viz viz, T t, float speed)
         {
             Vector3 targetPosition = ToLocalPosition(t) + transform.position;
-            viz.DOMove(targetPosition, speed, () => PutOn(viz.gameObject));
+            viz.DOMove(targetPosition, speed, x => PutOn(viz.gameObject));
         }
 
         protected IEnumerator HighlightCardsE(List<CardViz> cards)

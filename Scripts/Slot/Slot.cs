@@ -87,21 +87,21 @@ namespace CultistLike
         {
             foreach (var fragL in essential)
             {
-                if (cardViz.fragments.Count(fragL) < fragL.count)
+                if (cardViz.fragTree.Count(fragL) < fragL.count)
                 {
                     return false;
                 }
             }
             foreach (var fragL in forbidden)
             {
-                if (cardViz.fragments.Count(fragL) >= fragL.count)
+                if (cardViz.fragTree.Count(fragL) >= fragL.count)
                 {
                     return false;
                 }
             }
             foreach (var fragL in required)
             {
-                if (cardViz.fragments.Count(fragL) >= fragL.count)
+                if (cardViz.fragTree.Count(fragL) >= fragL.count)
                 {
                     return true;
                 }

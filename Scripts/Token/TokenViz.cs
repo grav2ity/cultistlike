@@ -98,12 +98,12 @@ namespace CultistLike
         }
 
         //used by modifiers. distinct from SlotViz grab
-        public bool Grab(CardViz cardViz, Action<CardViz> onStart = null, bool bringUp = false)
+        public bool Grab(CardViz cardViz)
         {
             if (cardViz.free == true)
             {
                 Vector3 target;
-                if (actWindow.gameObject.activeInHierarchy == true)
+                if (actWindow.open == true)
                 {
                     target = actWindow.transform.position;
                 }
@@ -112,7 +112,8 @@ namespace CultistLike
                     target = targetPosition;
                 }
 
-                Action<CardViz> onComplete = x => actWindow.ParentCardToWindow(x);
+                Action<CardViz> onStart = x => x.ParentToWindow(actWindow.transform);
+                Action<CardViz> onComplete = x => x.Hide();
 
                 cardViz.Grab(target, onStart, onComplete);
                 return true;
@@ -147,7 +148,7 @@ namespace CultistLike
 
             if (save.windowSave.actStatus == ActStatus.Finished)
             {
-                actWindow.SetupResultCards(actLogic.fragments.cards);
+                actWindow.SetupResultCards(actLogic.fragTree.cards);
             }
 
             timer.Load(save.timerSave, actLogic.OnTimeUp);

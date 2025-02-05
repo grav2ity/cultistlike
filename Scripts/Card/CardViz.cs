@@ -15,11 +15,10 @@ namespace CultistLike
         [Header("Card")]
         public Card card;
 
-        [HideInInspector] public bool free;
         [HideInInspector] public CardViz stack;
-        [HideInInspector] public FragContainer fragments;
 
         [Header("Layout")]
+        public FragTree fragTree;
         [SerializeField] private GameObject visualsGO;
         [SerializeField] private TextMeshPro title;
         [SerializeField] private Renderer artBack;
@@ -36,6 +35,8 @@ namespace CultistLike
 
 
         public override Vector2Int GetCellSize() => CellCount;
+
+        public bool free { get => fragTree.free; set => fragTree.free = value; }
 
 
         public override void OnBeginDrag(PointerEventData eventData)
@@ -201,10 +202,6 @@ namespace CultistLike
 
         public void Destroy()
         {
-            if (fragments.parent != null)
-            {
-                fragments.parent.Remove(this);
-            }
             GameManager.Instance.DestroyCard(this);
         }
 
@@ -307,22 +304,24 @@ namespace CultistLike
 
         public CardViz Duplicate()
         {
+            //TODO clone whole object?
             var newCardViz = GameManager.Instance.CreateCard(card);
-            newCardViz.fragments.fragments.Clear();
-            foreach (var frag in fragments.fragments)
+            foreach (var frag in fragTree.localFragments)
             {
-                newCardViz.fragments.Add(frag);
+                newCardViz.fragTree.Add(frag);
             }
-            foreach (var cardViz in fragments.cards)
-            {
-                if (cardViz != this)
-                {
-                    newCardViz.fragments.cards.Add(cardViz);
-                }
-            }
-            newCardViz.fragments.parent = fragments.parent;
 
             return newCardViz;
+        }
+
+        public void ParentToWindow(Transform trans, bool hide = false)
+        {
+            if (hide == true)
+            {
+                Hide();
+            }
+            free = false;
+            transform.SetParent(trans);
         }
 
         public bool Grab(Vector3 target, Action<CardViz> onStart, Action<CardViz> onComplete)
@@ -333,12 +332,14 @@ namespace CultistLike
 
                 if (cardVizY.free == true)
                 {
-                    cardVizY.free = false;
                     cardVizY.transform.DOComplete(true);
+                    // cardVizY.free = false;
+                    cardVizY.isDragging = false;
 
                     cardVizY.transform.parent?.GetComponentInParent<ICardDock>(true)?.
                         OnCardUndock(cardVizY.gameObject);
                     cardVizY.gameObject.SetActive(true);
+
                     cardVizY.transform.SetParent(null);
 
                     if (onStart != null)
@@ -346,17 +347,16 @@ namespace CultistLike
                         onStart(cardVizY);
                     }
 
-                    var pos = cardVizY.transform.position;
-                    cardVizY.transform.position = new Vector3(pos.x, pos.y, GameManager.Instance.cardDragPlane.position.z);
-
-                    cardVizY.DOMove(target, GameManager.Instance.normalSpeed, () =>
+                    Action<Drag> onMoveEnd = x =>
                     {
-                        cardVizY.free = true;
+                        // cardVizY.free = true;
                         if (onComplete != null)
                         {
                             onComplete(cardVizY);
                         }
-                    });
+                    };
+
+                    cardVizY.DOMove(target, GameManager.Instance.normalSpeed, null, onMoveEnd);
 
                     return true;
                 }
@@ -369,7 +369,7 @@ namespace CultistLike
             var save = new CardVizSave();
             save.ID = GetInstanceID();
             save.card = card;
-            save.fragSave = fragments.Save();
+            save.fragSave = fragTree.Save();
             save.free = free;
             save.faceDown = faceDown;
             save.position = transform.position;
@@ -393,7 +393,7 @@ namespace CultistLike
         public void Load(CardVizSave save)
         {
             LoadCard(save.card, false);
-            fragments.Load(save.fragSave);
+            fragTree.Load(save.fragSave);
             free = save.free;
             faceDown = save.faceDown;
             if (faceDown == true)
@@ -460,14 +460,14 @@ namespace CultistLike
             {
                 if (frag != null)
                 {
-                    fragments.Add(frag);
+                    fragTree.Add(frag);
                 }
             }
-            fragments.AddCardVizOnly(this);
         }
 
         private void Awake()
         {
+            fragTree = GetComponent<FragTree>();
             if (card != null)
             {
                 LoadCard(card);
@@ -487,7 +487,6 @@ namespace CultistLike
             }
 
             draggingPlane = GameManager.Instance.cardDragPlane;
-            GameManager.Instance.AddCard(this);
         }
     }
 
@@ -496,7 +495,7 @@ namespace CultistLike
     {
         public int ID;
         public Card card;
-        public FragContainerSave fragSave;
+        public FragTreeSave fragSave;
         public bool free;
         public bool faceDown;
         public CardDecaySave decaySave;

@@ -26,7 +26,7 @@ namespace CultistLike
         [SerializeField, HideInInspector] private int index;
 
 
-        public void Load(FragContainer fragments)
+        public void Load(FragTree fragments)
         {
             Unload();
             if (fragments != null)

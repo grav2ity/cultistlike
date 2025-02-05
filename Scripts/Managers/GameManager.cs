@@ -20,6 +20,9 @@ namespace CultistLike
         public ActWindow actWindowPrefab;
         public FragmentViz fragmentPrefab;
 
+        [Header("Root")]
+        public FragTree root;
+
         [Header("Table")]
         public Table<Vector2Int> table;
 
@@ -46,7 +49,6 @@ namespace CultistLike
         [HideInInspector] public UnityEvent<CardViz> onCardInPlay;
 
         [SerializeField, HideInInspector] private List<TokenViz> _tokens;
-        [SerializeField, HideInInspector] private FragContainer _fragments;
         [SerializeField, HideInInspector] private List<ActWindow> _windows;
 
         [SerializeField, HideInInspector] private ActWindow _openWindow;
@@ -55,9 +57,7 @@ namespace CultistLike
         private List<Act> _initialActs;
         private List<Slot> _slotSOS;
 
-
-        public FragContainer fragments { get => _fragments; }
-        public List<CardViz> cards { get => _fragments.cards; }
+        public List<CardViz> cards { get => root.cards; }
         public List<TokenViz> tokens { get => _tokens; }
         public List<ActWindow> windows { get => _windows; }
 
@@ -98,8 +98,6 @@ namespace CultistLike
             }
         }
 
-        public void AddCard(CardViz cardViz) => fragments.Add(cardViz);
-
         public void CardInPlay(CardViz cardViz)
         {
             onCardInPlay.Invoke(cardViz);
@@ -108,7 +106,6 @@ namespace CultistLike
         public CardViz CreateCard()
         {
             var cardViz = UnityEngine.Object.Instantiate(cardPrefab);
-            AddCard(cardViz);
             return cardViz;
         }
 
@@ -123,10 +120,9 @@ namespace CultistLike
         {
             if (cardViz != null)
             {
-                fragments.Remove(cardViz);
-                table.RemoveCard(cardViz);
+                cardViz.transform.SetParent(null);
                 cardViz.gameObject.SetActive(false);
-                Destroy(cardViz.gameObject, 1f);
+                Destroy(cardViz.gameObject, 0.1f);
             }
         }
 
@@ -159,7 +155,7 @@ namespace CultistLike
                 tokens.Remove(tokenViz);
                 table.Remove(tokenViz);
                 tokenViz.gameObject.SetActive(false);
-                Destroy(tokenViz.gameObject, 1f);
+                Destroy(tokenViz.gameObject, 0.1f);
             }
         }
 
@@ -184,15 +180,15 @@ namespace CultistLike
             {
                 windows.Remove(actWindow);
                 actWindow.gameObject.SetActive(false);
-                Destroy(actWindow.gameObject, 1f);
+                Destroy(actWindow.gameObject, 0.1f);
             }
         }
 
         public TokenViz SpawnAct(Act act, ActLogic parent)
         {
-            if (act != null && act.token != null && parent != null && parent.tokenViz != null)
+            if (act != null && act.token != null)
             {
-                var newTokenViz = SpawnToken(act.token, parent.tokenViz);
+                var newTokenViz = SpawnToken(act.token, parent?.tokenViz);
                 if (newTokenViz != null)
                 {
                     newTokenViz.autoPlay = act;
@@ -206,18 +202,25 @@ namespace CultistLike
 
         public TokenViz SpawnToken(Token token, Viz viz)
         {
-            if (token != null && viz != null)
+            if (token != null)
             {
                 if (token.unique == false || tokens.Find(x => x.token == token) == null)
                 {
-                    var newTokenViz = UnityEngine.Object.Instantiate(tokenPrefab,
-                                                                     viz.transform.position, Quaternion.identity);
+                    var newPosition = viz != null ? viz.transform.position : Vector3.zero;
+                    var newTokenViz = UnityEngine.Object.Instantiate(tokenPrefab, newPosition, Quaternion.identity);
                     newTokenViz.LoadToken(token);
 
                     var root = newTokenViz.transform;
                     var localScale = root.localScale;
 
-                    GameManager.Instance.table.Place(viz, new List<Viz> { newTokenViz });
+                    if (viz != null)
+                    {
+                        GameManager.Instance.table.Place(viz, new List<Viz> { newTokenViz });
+                    }
+                    else
+                    {
+                        GameManager.Instance.table.ReturnToTable(newTokenViz);
+                    }
 
                     root.localScale = new Vector3(0f, 0f, 0f);
                     root.DOScale(localScale, 1);
@@ -276,6 +279,7 @@ namespace CultistLike
 
             GameManagerSave save = new GameManagerSave(jsonSave);
 
+
             foreach (var cardSave in save.cards)
             {
                 var cardViz = GameManager.Instance.CreateCard();
@@ -294,8 +298,9 @@ namespace CultistLike
                 tokenViz.transform.SetParent(table.transform);
             }
 
-            foreach (var cardViz in GameManager.Instance.cards)
+            foreach (var cardSave in save.cards)
             {
+                var cardViz = SaveManager.Instance.CardFromID(cardSave.ID);
                 if (cardViz.transform.parent == null)
                 {
                     cardViz.transform.SetParent(table.transform);
@@ -316,7 +321,6 @@ namespace CultistLike
             {
                 DestroyCard(cards[i]);
             }
-            cards.Clear();
 
             for (int i=tokens.Count-1; i>=0; i--)
             {
@@ -366,6 +370,11 @@ namespace CultistLike
             {
                 Debug.LogError("GameManager's Special fragments are missing!!");
             }
+
+        #if UNITY_EDITOR
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = 60;
+        #endif
         }
 
         private void Update()

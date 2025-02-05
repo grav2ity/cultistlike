@@ -17,3 +17,7 @@ MonoBehaviour:
   color: {r: 0.62077117, g: 0.8553459, b: 0.024207756, a: 1}
   description: Some things last longer than you think they will
   fragments: []
+  rules: []
+  slots: []
+  decayTo: {fileID: 0}
+  lifetime: 0

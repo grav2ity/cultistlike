@@ -32,7 +32,6 @@ namespace CultistLike
                     cards.Add(cardViz);
                     cardViz.transform.SetParent(transform);
 
-                    actWindow.HoldCard(cardViz);
                     actWindow.UpdateBars();
                     actWindow.Check();
                 }
@@ -57,7 +56,6 @@ namespace CultistLike
                     cardViz.transform.SetParent(actWindow.tokenViz.transform);
                     cardViz.transform.localPosition = Vector3.zero;
                 }
-                actWindow.UnholdCard(cardViz);
                 actWindow.UpdateBars();
                 actWindow.Check();
             }
@@ -96,9 +94,44 @@ namespace CultistLike
             }
         }
 
+        public CardLaneSave Save()
+        {
+            var save = new CardLaneSave();
+            save.maxSpacingX = maxSpacingX;
+            save.spacingZ = spacingZ;
+
+            save.cards = new List<int>();
+            foreach (var cardViz in cards)
+            {
+                save.cards.Add(cardViz.GetInstanceID());
+            }
+            return save;
+        }
+
+        public void Load(CardLaneSave save)
+        {
+            maxSpacingX = save.maxSpacingX;
+            spacingZ = save.spacingZ;
+
+            var cards = new List<CardViz>();
+            foreach (var cardID in save.cards)
+            {
+                cards.Add(SaveManager.Instance.CardFromID(cardID));
+            }
+            PlaceCards(cards);
+        }
+
         private void Awake()
         {
             actWindow = GetComponentInParent<ActWindow>();
         }
+    }
+
+    [Serializable]
+    public class CardLaneSave
+    {
+        public float maxSpacingX;
+        public float spacingZ;
+        public List<int> cards;
     }
 }

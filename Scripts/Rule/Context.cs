@@ -13,10 +13,8 @@ namespace CultistLike
     public class Context : IDisposable
     {
         public ActLogic actLogic;
-        public ActLogic parent;
 
-        public FragContainer scope;
-        public FragContainer parentScope;
+        public FragTree scope;
 
         public Fragment thisAspect;
         public CardViz thisCard;
@@ -33,7 +31,7 @@ namespace CultistLike
 
         public Context(Context context, bool keepMatches = false) : this(context.actLogic, keepMatches) {}
 
-        public Context(FragContainer fragments, bool keepMatches = false)
+        public Context(FragTree fragments, bool keepMatches = false)
         {
             if (fragments != null)
             {
@@ -45,26 +43,20 @@ namespace CultistLike
                 }
                 else
                 {
-                    matches = scope.cards.GetRange(0, fragments.cards.Count);
+                    matches = scope.cards.GetRange(0, scope.cards.Count);
                 }
             }
         }
 
-        public Context(ActLogic actLogic, bool keepMatches = false) : this(actLogic.fragments, keepMatches)
+        public Context(ActLogic actLogic, bool keepMatches = false) : this(actLogic.fragTree, keepMatches)
         {
             if (actLogic != null)
             {
                 this.actLogic = actLogic;
-
-                if (actLogic.parent != null)
-                {
-                    this.parent = actLogic.parent;
-                    parentScope = actLogic.parent.fragments;
-                }
             }
         }
 
-        public Context(CardViz cardViz, bool keepMatches = false) : this(cardViz.fragments, keepMatches)
+        public Context(CardViz cardViz, bool keepMatches = false) : this(cardViz.fragTree, keepMatches)
         {
             if (cardViz != null)
             {
@@ -111,7 +103,7 @@ namespace CultistLike
 
         public void ResetMatches()
         {
-            matches = scope.cards.GetRange(0, actLogic.fragments.cards.Count);
+            matches = scope.cards.GetRange(0, actLogic.fragTree.cards.Count);
         }
 
         public void SaveMatches()
@@ -192,7 +184,7 @@ namespace CultistLike
             }
         }
 
-        public List<CardViz> ResolveTargetCards(Target target, FragContainer scope)
+        public List<CardViz> ResolveTargetCards(Target target, FragTree scope)
         {
             if (target != null)
             {

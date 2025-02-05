@@ -20,8 +20,8 @@ MonoBehaviour:
   allTokens: 0
   allActs: 0
   spawnTests:
-  - canFail: 0
-    cardTest: 0
+  - cardTest: 0
+    canFail: 0
     loc1: 0
     fragment1: {fileID: 11400000, guid: 4bfaca303fc2e3544a9a652171baa65e, type: 2}
     op: 0
@@ -34,7 +34,6 @@ MonoBehaviour:
     count: 1
   essential: []
   forbidden: []
-  cardTests: []
   cardRule: {fileID: 0}
   acceptAll: 0
   grab: 0

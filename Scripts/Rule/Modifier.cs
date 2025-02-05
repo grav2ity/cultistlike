@@ -80,7 +80,7 @@ namespace CultistLike
                     case CardOp.FragmentAdditive:
                         foreach (var targetCard in targetCards)
                         {
-                            targetCard.fragments.Adjust(what, level);
+                            targetCard.fragTree.Adjust(what, level);
                         }
                         break;
                     case CardOp.Transform:
@@ -169,7 +169,6 @@ namespace CultistLike
                     case ActOp.Adjust:
                         if (target.cards != null)
                         {
-                            //TODO
                             foreach (var cardViz in target.cards)
                             {
                                 var count = context.scope.Adjust(cardViz, level);
@@ -198,7 +197,7 @@ namespace CultistLike
                         }
                         break;
                     case ActOp.Grab:
-                        var targetCardsY = context.ResolveTargetCards(target, GameManager.Instance.fragments);
+                        var targetCardsY = context.ResolveTargetCards(target, GameManager.Instance.root);
                         if (targetCardsY != null)
                         {
                             var targetCards = new List<CardViz>();
@@ -214,8 +213,7 @@ namespace CultistLike
                             level = all == true ? targetCards.Count : level;
                             for (int i=0; i<level && i<targetCards.Count; i++)
                             {
-                                Action<CardViz> onStart = x => context.scope.Add(x);
-                                context.actLogic.tokenViz.Grab(targetCards[i], onStart);
+                                context.actLogic.tokenViz.Grab(targetCards[i]);
                             }
                         }
                         break;
@@ -234,6 +232,7 @@ namespace CultistLike
     {
         // NextAct = 0,
         ForceAct = 20,
+        GameOver = 80,
     }
 
     [Serializable]
@@ -259,6 +258,10 @@ namespace CultistLike
                     //     break;
                     case PathOp.ForceAct:
                         context.actLogic.SetForceAct(act);
+                        break;
+                    case PathOp.GameOver:
+                        GameManager.Instance.Reset();
+                        GameManager.Instance.SpawnAct(act, null);
                         break;
                     default:
                         break;

@@ -29,7 +29,7 @@ namespace CultistLike
         private Vector3 moveTarget;
 
 
-        public bool isDragging { get => _isDragging; private set => _isDragging = value; }
+        public bool isDragging { get => _isDragging; protected set => _isDragging = value; }
         public bool interactive { get => _interactive; set => _interactive = value; }
 
         public Vector3 targetPosition => isBeingMoved == true ? moveTarget : transform.position;
@@ -45,16 +45,16 @@ namespace CultistLike
             isDragging = true;
 
             dragOrigin = transform.position;
+
             dragOriginDock = transform.parent?.GetComponentInParent<ICardDock>();
+            // dragOriginDock?.OnCardUndock(gameObject);
+            transform.SetParent(draggingPlane.transform);
             dragOriginDock?.OnCardUndock(gameObject);
 
-            // foreach(var collider in gameObject.GetComponentsInChildren<Collider>(true))
             foreach(var collider in gameObject.GetComponentsInChildren<Collider>())
             {
                 collider.enabled = false;
             }
-
-            transform.SetParent(draggingPlane.transform);
 
             Vector3 globalMousePos;
             if (RectTransformUtility.ScreenPointToWorldPointInRectangle(draggingPlane,
@@ -90,7 +90,6 @@ namespace CultistLike
 
             isDragging = false;
 
-            // foreach(var collider in gameObject.GetComponentsInChildren<Collider>(true))
             foreach(var collider in gameObject.GetComponentsInChildren<Collider>())
             {
                 collider.enabled = true;
@@ -102,7 +101,7 @@ namespace CultistLike
             }
         }
 
-        public void DOMove(Vector3 target, float speed, Action onComplete)
+        public virtual void DOMove(Vector3 target, float speed, Action<Drag> onStart = null, Action<Drag> onComplete = null)
         {
             bool prevInteractive = interactive;
             interactive = false;
@@ -110,18 +109,26 @@ namespace CultistLike
             moveTarget = target;
             isBeingMoved = true;
 
+            if (onStart != null)
+            {
+                onStart(this);
+            }
+
             transform.DOMove(target, speed).
                 OnComplete(() =>
                 {
                     interactive = prevInteractive;
                     isBeingMoved = false;
-                    onComplete();
+                    if (onComplete != null)
+                    {
+                        onComplete(this);
+                    }
                 });
         }
 
         public void Undrag()
         {
-            DOMove(dragOrigin, GameManager.Instance.normalSpeed, () =>
+            DOMove(dragOrigin, GameManager.Instance.normalSpeed, null, x =>
                    dragOriginDock?.OnCardDock(gameObject));
         }
 

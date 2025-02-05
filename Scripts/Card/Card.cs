@@ -12,9 +12,10 @@ namespace CultistLike
         [Tooltip("How long will it take for the Decay to complete.")]
         public float lifetime;
 
-        public override void AddToContainer(FragContainer fg) => fg.Add(this);
-        public override int AdjustInContainer(FragContainer fg, int level) => fg.Adjust(this, level);
-        public override void RemoveFromContainer(FragContainer fg) => fg.Remove(this);
-        public override int CountInContainer(FragContainer fg) => fg.Count(this);
+        public override void AddToTree(FragTree fg) => fg.Add(this);
+        public override int AdjustInTree(FragTree fg, int level) => fg.Adjust(this, level);
+        public override void RemoveFromTree(FragTree fg) => fg.Remove(this);
+        public override int CountInTree(FragTree fg, bool onlyFree=false) => fg.Count(this, onlyFree);
+
     }
 }

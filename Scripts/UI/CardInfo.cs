@@ -46,7 +46,7 @@ namespace CultistLike
                     art.color = cardViz.card.color;
                 }
 
-                fragmentBar.Load(cardViz.fragments);
+                fragmentBar.Load(cardViz.fragTree);
             }
         }
 

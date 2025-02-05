@@ -145,14 +145,22 @@ namespace CultistLike
 
         public override string Save()
         {
-            return JsonUtility.ToJson(this);
+            var save = new ArrayTableSave();
+            save.fragSave = fragTree.Save();
+            save.cellSize = cellSize;
+            save.cellCount = cellCount;
+            save.growStep = growStep;
+            return JsonUtility.ToJson(save);
         }
 
         public override void Load(string json)
         {
-            JsonUtility.FromJsonOverwrite(json, this);
-            fragments.Clear();
-            //TODO
+            var save = new ArrayTableSave();
+            JsonUtility.FromJsonOverwrite(json, save);
+            fragTree.Load(save.fragSave);
+            cellSize = save.cellSize;
+            cellCount = save.cellCount;
+            growStep = save.growStep;
             array = new SArray<Viz>(cellCount.x, cellCount.y);
             Start();
         }
@@ -247,6 +255,7 @@ namespace CultistLike
         private void Awake()
         {
             array = new SArray<Viz>(cellCount.x, cellCount.y);
+            fragTree = GetComponent<FragTree>();
         }
 
         private void Start()
@@ -261,6 +270,7 @@ namespace CultistLike
                 {
                     OnCardDock(child.gameObject);
                 }
+
             }
         }
 
@@ -394,5 +404,13 @@ namespace CultistLike
                 }
             }
         }
+    }
+
+    public class ArrayTableSave
+    {
+        public FragTreeSave fragSave;
+        public Vector2 cellSize;
+        public Vector2Int cellCount;
+        public int growStep;
     }
 }

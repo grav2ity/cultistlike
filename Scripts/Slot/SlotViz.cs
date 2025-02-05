@@ -9,18 +9,12 @@ using TMPro;
 
 namespace CultistLike
 {
-    [Serializable]
-    public class SlotVizSave
-    {
-        public Slot slot;
-        public int cardID;
-    }
-
     public class SlotViz : MonoBehaviour, IDropHandler, ICardDock, IPointerClickHandler
     {
         public Slot slot;
 
         [Header("Layout")]
+        [SerializeField] private GameObject visualsGO;
         [SerializeField] private TextMeshPro label;
         [SerializeField] private Renderer art;
         [SerializeField] private Renderer highlight;
@@ -36,6 +30,8 @@ namespace CultistLike
         [Header("Options")]
         [Tooltip("Removing Card will cause all other Slots to close.")]
         public bool firstSlot;
+
+        public Action OnChange;
 
         [SerializeField, HideInInspector] private ActWindow actWindow;
         [SerializeField, HideInInspector] private CardViz _slottedCard;
@@ -129,6 +125,11 @@ namespace CultistLike
                 cardViz.transform.SetParent(transform);
                 cardViz.transform.localPosition = Vector3.zero;
 
+                if (visualsGO.activeInHierarchy == false)
+                {
+                    cardViz.Hide();
+                }
+
                 if (cardViz.isDragging == true)
                 {
                     cardViz.UnhighlightTargets();
@@ -144,43 +145,67 @@ namespace CultistLike
 
         public void SlotCardLogical(CardViz cardViz)
         {
-            if (slottedCard != null)
+            if (cardViz != null)
             {
-                actWindow.UnholdCard(slottedCard, slot);
-            }
-            slottedCard = cardViz;
-            if (slottedCard != null)
-            {
-                actWindow.HoldCard(slottedCard, slot);
+                slottedCard = cardViz;
+
+                //TODO slot frags
+                // foreach (var frag in slot.fragments)
+                // {
+                //     actWindow.actLogic.fragTree.Add(frag);
+                // }
+
+                slottedCard.transform.SetParent(transform);
+                if (OnChange != null)
+                {
+                    OnChange();
+                }
                 actWindow.Check();
             }
         }
 
         public CardViz UnslotCard()
         {
-            var sc = slottedCard;
             if (slottedCard != null)
             {
                 slottedCard.free = true;
                 slottedCard.interactive = true;
                 slottedCard.transform.SetParent(null);
-                SlotCardLogical(null);
-            }
-            if (firstSlot == true)
-            {
-                actWindow.FirstSlotEmpty();
-            }
 
-            return sc;
+                // SlotCardLogical(null);
+                //TODO slot frags
+                // foreach (var frag in slot.fragments)
+                // {
+                //     actWindow.actLogic.fragTree.Remove(frag);
+                // }
+
+                var sc = slottedCard;
+                slottedCard = null;
+
+                if (firstSlot == true)
+                {
+                    actWindow.FirstSlotEmpty();
+                }
+
+                if (OnChange != null)
+                {
+                    OnChange();
+                }
+
+                return sc;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public void ParentCardToWindow()
         {
             if (slottedCard != null)
             {
+                slottedCard.ParentToWindow(actWindow.transform);
                 slottedCard.Hide();
-                slottedCard.free = false;
-                slottedCard.transform.SetParent(actWindow.transform);
                 slottedCard = null;
             }
         }
@@ -222,15 +247,6 @@ namespace CultistLike
             }
         }
 
-        public void DestroyCard()
-        {
-            if (slottedCard != null)
-            {
-                slottedCard.Destroy();
-            }
-            SlotCardLogical(null);
-        }
-
         public void SetHighlight(bool p)
         {
             highlight.enabled = p;
@@ -261,7 +277,7 @@ namespace CultistLike
             if (cardViz != null && cardViz.free == true && AcceptsCard(cardViz) == true)
             {
                 Vector3 target;
-                if (gameObject.activeInHierarchy == true)
+                if (actWindow.open == true)
                 {
                     target = transform.position;
                 }
@@ -286,6 +302,18 @@ namespace CultistLike
             {
                 return false;
             }
+        }
+
+        public void Hide()
+        {
+            visualsGO.SetActive(false);
+            slottedCard?.Hide();
+        }
+
+        public void Show()
+        {
+            visualsGO.SetActive(true);
+            slottedCard?.Show();
         }
 
         public SlotVizSave Save()
@@ -313,4 +341,12 @@ namespace CultistLike
             actWindow = GetComponentInParent<ActWindow>();
         }
     }
+
+    [Serializable]
+    public class SlotVizSave
+    {
+        public Slot slot;
+        public int cardID;
+    }
+
 }

@@ -32,7 +32,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1.5, z: 0.001}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3707799410444567590}
+  m_Father: {fileID: 4100313711175509000}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &1758532075192752156
 MeshFilter:
@@ -105,6 +105,40 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &3133944100128606637
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4100313711175509000}
+  m_Layer: 0
+  m_Name: Visuals
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4100313711175509000
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3133944100128606637}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3694864181931799775}
+  - {fileID: 6620228819848198586}
+  - {fileID: 7810117994087993145}
+  m_Father: {fileID: 3707799410444567590}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5875277925063152557
 GameObject:
   m_ObjectHideFlags: 0
@@ -133,10 +167,10 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0.011}
-  m_LocalScale: {x: 1.1, y: 1.6, z: 0.010000001}
+  m_LocalScale: {x: 1.1, y: 1.6000001, z: 0.010000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3707799410444567590}
+  m_Father: {fileID: 4100313711175509000}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &819843577389648281
 MeshFilter:
@@ -218,9 +252,7 @@ Transform:
   m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 3694864181931799775}
-  - {fileID: 6620228819848198586}
-  - {fileID: 7810117994087993145}
+  - {fileID: 4100313711175509000}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4948182315103652455
@@ -236,13 +268,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slot: {fileID: 0}
+  visualsGO: {fileID: 3133944100128606637}
   label: {fileID: 5266998188540822850}
   art: {fileID: 8567668268619634666}
   highlight: {fileID: 2721004463860648226}
-  onlyMatching: 0
-  cardLock: 0
+  acceptAll: 0
   grab: 0
-  autoClose: 0
+  cardLock: 0
   firstSlot: 0
   actWindow: {fileID: 0}
   _slottedCard: {fileID: 0}
@@ -276,7 +308,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3707799410444567590}
+  m_Father: {fileID: 4100313711175509000}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}

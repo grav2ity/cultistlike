@@ -14,6 +14,7 @@ namespace CultistLike
         [HideInInspector] public bool open;
 
         [Header("Layout")]
+        [SerializeField] private GameObject visualsGO;
         [SerializeField] private TextMeshPro label;
         [SerializeField] private TextMeshProUGUI text;
         [SerializeField] private GameObject idleSlotsGO;
@@ -46,6 +47,8 @@ namespace CultistLike
         private string runLabel => actLogic.altAct ? actLogic.altAct.label : actLogic.activeAct.label;
 
 
+        private Vector3 spos;
+
         public bool TrySlotAndBringUp(CardViz cardViz)
         {
             if (actStatus != ActStatus.Finished)
@@ -75,7 +78,7 @@ namespace CultistLike
 
         public void BringUp()
         {
-            gameObject.SetActive(true);
+            Show();
             open = true;
             GameManager.Instance.OpenWindow(this);
         }
@@ -93,7 +96,7 @@ namespace CultistLike
                     break;
             }
 
-            gameObject.SetActive(false);
+            Hide();
             open = false;
             GameManager.Instance.CloseWindow();
         }
@@ -115,13 +118,6 @@ namespace CultistLike
                     StatusIdle();
                 }
             }
-        }
-
-        public void ParentCardToWindow(CardViz cardViz)
-        {
-            cardViz.Hide();
-            cardViz.free = false;
-            cardViz.transform.SetParent(transform);
         }
 
         public void ParentSlotCardsToWindow()
@@ -154,48 +150,20 @@ namespace CultistLike
             }
         }
 
-        public void HoldCard(CardViz cardViz, Slot slot = null)
-        {
-            if (cardViz != null)
-            {
-                actLogic.HoldCard(cardViz, slot);
-                UpdateSlots();
-                if (actStatus == ActStatus.Running)
-                {
-                    ApplyStatus(ActStatus.Running);
-                }
-            }
-        }
-
-        public CardViz UnholdCard(CardViz cardViz, Slot slot = null)
-        {
-            if (cardViz != null)
-            {
-                var r = actLogic.UnholdCard(cardViz, slot);
-                UpdateSlots();
-                if (actStatus == ActStatus.Running)
-                {
-                    ApplyStatus(ActStatus.Running);
-                }
-                return r;
-            }
-
-            return null;
-        }
-
         // closing a slot will remove a slotted card
         // since slotted cards influence which slots are open
         // reUpdate needs to be done
         public void UpdateSlots()
         {
-            //TODO
             if (suspendUpdates == false && actStatus != ActStatus.Finished)
             {
                 suspendUpdates = true;
 
-                CloseSlots(slots);
 
                 var slotsToOpen = actLogic.CheckForSlots();
+
+                CloseSlots(slots);
+
                 foreach (var slot in slotsToOpen)
                 {
                     OpenSlot(slot, slots);
@@ -272,7 +240,7 @@ namespace CultistLike
                         {
                             tokenViz.Dissolve();
                             Close();
-                            Destroy(this, 1f);
+                            Destroy(this, 0.1f);
                         }
                     }
                     else
@@ -313,8 +281,8 @@ namespace CultistLike
         {
             if (suspendUpdates == false)
             {
-                aspectBar?.Load(actLogic.fragments);
-                cardBar?.Load(actLogic.fragments);
+                aspectBar?.Load(actLogic.fragTree);
+                cardBar?.Load(actLogic.fragTree);
             }
         }
 
@@ -367,6 +335,32 @@ namespace CultistLike
             }
         }
 
+        public void Hide()
+        {
+            visualsGO.SetActive(false);
+            foreach (var slot in idleSlots)
+            {
+                slot.Hide();
+            }
+            foreach (var slot in runSlots)
+            {
+                slot.Hide();
+            }
+
+        }
+        public void Show()
+        {
+            visualsGO.SetActive(true);
+            foreach (var slot in idleSlots)
+            {
+                slot.Show();
+            }
+            foreach (var slot in runSlots)
+            {
+                slot.Show();
+            }
+        }
+
         public ActWindowSave Save()
         {
             var save = new ActWindowSave();
@@ -375,6 +369,17 @@ namespace CultistLike
             save.readyAct = readyAct;
             save.position = transform.position;
 
+            save.localCards = new List<int>();
+            for (int i=0; i<transform.childCount; i++)
+            {
+                var cardViz = transform.GetChild(i).gameObject.GetComponent<CardViz>();
+                if (cardViz != null)
+                {
+                    save.localCards.Add(cardViz.GetInstanceID());
+                }
+            }
+
+            save.cardLane = resultLane.Save();
             save.slots = new List<SlotVizSave>();
             foreach (var slotViz in slots)
             {
@@ -394,6 +399,13 @@ namespace CultistLike
             readyAct = save.readyAct;
             open = save.open;
             LoadToken(tokenViz);
+
+            foreach (var cardID in save.localCards)
+            {
+                SaveManager.Instance.CardFromID(cardID).ParentToWindow(transform, true);
+            }
+
+            resultLane.Load(save.cardLane);
 
             for (int i=0; i<save.slots.Count && i<slots.Count; i++)
             {
@@ -474,6 +486,30 @@ namespace CultistLike
         private void Awake()
         {
             actLogic = GetComponent<ActLogic>();
+
+            Action idleUpdate = () =>
+            {
+                UpdateSlots();
+                UpdateBars();
+            };
+
+            Action runUpdate = () =>
+            {
+                UpdateSlots();
+                UpdateBars();
+                actLogic.altAct = actLogic.AttemptAltActs();
+                ApplyStatus(ActStatus.Running);
+            };
+
+            foreach (var slotViz in idleSlots)
+            {
+                slotViz.OnChange += idleUpdate;
+            }
+
+            foreach (var slotViz in runSlots)
+            {
+                slotViz.OnChange += runUpdate;
+            }
         }
 
         private void Start()
@@ -484,7 +520,10 @@ namespace CultistLike
             okButton.interactable = false;
             collectButton.interactable = false;
 
-            gameObject.SetActive(open);
+            if (open == false)
+            {
+                Hide();
+            }
 
             CloseSlots(idleSlots);
             CloseSlots(runSlots);
@@ -513,6 +552,8 @@ namespace CultistLike
         public bool open;
         public ActStatus actStatus;
         public Act readyAct;
+        public List<int> localCards;
+        public CardLaneSave cardLane;
         public List<SlotVizSave> slots;
         public Vector3 position;
     }

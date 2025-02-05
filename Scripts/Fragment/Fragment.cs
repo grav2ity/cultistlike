@@ -27,10 +27,10 @@ namespace CultistLike
         public List<Slot> slots;
 
 
-        public virtual void AddToContainer(FragContainer fg) {}
-        public virtual void RemoveFromContainer(FragContainer fg) {}
-        public virtual int AdjustInContainer(FragContainer fg, int level) { return 0; }
-        public virtual int CountInContainer(FragContainer fg) { return 0; }
+        public virtual void AddToTree(FragTree fg) {}
+        public virtual void RemoveFromTree(FragTree fg) {}
+        public virtual int AdjustInTree(FragTree fg, int level) { return 0; }
+        public virtual int CountInTree(FragTree fg, bool onlyFree=false) { return 0; }
 
         public virtual Fragment ToFragment() => this;
         public virtual int Count() => 1;

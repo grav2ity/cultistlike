@@ -510,6 +510,53 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 4193257133359007840}
   m_maskType: 0
+--- !u!1 &1150662756701060893
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8181647728646021984}
+  - component: {fileID: 8075889189413410941}
+  m_Layer: 0
+  m_Name: CardRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8181647728646021984
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1150662756701060893}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3707799410444567590}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8075889189413410941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1150662756701060893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82ae1eded985fed40acba304402545b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localFragments: []
+  matches: []
+  free: 1
 --- !u!1 &1560137554015283909
 GameObject:
   m_ObjectHideFlags: 0
@@ -690,8 +737,7 @@ Transform:
   m_LocalPosition: {x: 0.45, y: -0.7, z: -0.020000001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 3486939232332599054}
+  m_Children: []
   m_Father: {fileID: 3707799410444567590}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3757678567134121052
@@ -706,9 +752,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 496a886e186203a47bda38189e8e89a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stackDrag: 0
   text: {fileID: 8154843806976885310}
   stackCounterGO: {fileID: 5995941787822434261}
-  stackDrag: 0
   count: 1
 --- !u!135 &3581411913426031042
 SphereCollider:
@@ -954,14 +1000,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5995941787822434261}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.45, y: -0.7, z: -0.020000001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6741061816069409223}
   - {fileID: 6835914045465584173}
-  m_Father: {fileID: 3167483877078672950}
+  m_Father: {fileID: 5339063405377240610}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6062753440016442787
 GameObject:
@@ -973,6 +1019,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3707799410444567590}
   - component: {fileID: 2231594063718650465}
+  - component: {fileID: 2249686336847695893}
   - component: {fileID: 2129266061847676189}
   m_Layer: 0
   m_Name: Card
@@ -994,6 +1041,7 @@ Transform:
   m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 1
   m_Children:
+  - {fileID: 8181647728646021984}
   - {fileID: 3167483877078672950}
   - {fileID: 5339063405377240610}
   m_Father: {fileID: 0}
@@ -1015,11 +1063,8 @@ MonoBehaviour:
   draggingPlane: {fileID: 0}
   _interactive: 1
   card: {fileID: 0}
-  fragments:
-    cards: []
-    fragments: []
-    matches: []
-  free: 1
+  stack: {fileID: 0}
+  fragTree: {fileID: 8075889189413410941}
   visualsGO: {fileID: 6351843846993097422}
   title: {fileID: 1629566531204144440}
   artBack: {fileID: 8567668268619634666}
@@ -1029,6 +1074,21 @@ MonoBehaviour:
   cardDecay: {fileID: 2129266061847676189}
   CellCount: {x: 1, y: 1}
   faceDown: 0
+--- !u!114 &2249686336847695893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6062753440016442787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82ae1eded985fed40acba304402545b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localFragments: []
+  matches: []
+  free: 1
 --- !u!114 &2129266061847676189
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1044,12 +1104,10 @@ MonoBehaviour:
   text: {fileID: 135878409765785190}
   art: {fileID: 6939245965619256764}
   pauseOnHide: 1
+  decayTo: {fileID: 0}
   paused: 0
   decayTime: 0
   elapsedTime: 0
-  timeUpEvent:
-    m_PersistentCalls:
-      m_Calls: []
   originalColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &6351843846993097422
 GameObject:
@@ -1085,6 +1143,7 @@ Transform:
   - {fileID: 8489804189808850022}
   - {fileID: 6986708024462997754}
   - {fileID: 6099188223844859926}
+  - {fileID: 3486939232332599054}
   - {fileID: 4056867988049479970}
   m_Father: {fileID: 3707799410444567590}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

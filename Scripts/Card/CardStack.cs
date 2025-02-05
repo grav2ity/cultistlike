@@ -43,10 +43,6 @@ namespace CultistLike
                 //this would disable Decay timer which is fine since stacking Cards with Decay is not allowed
                 cardViz.gameObject.SetActive(false);
                 SetCount(count + 1);
-                if (parent.fragments.parent != null)
-                {
-                    parent.fragments.parent.Add(cardViz);
-                }
                 cardViz.stack = parent;
                 return true;
             }
@@ -63,10 +59,6 @@ namespace CultistLike
             {
                 cardViz.gameObject.SetActive(true);
                 SetCount(count - 1);
-                if (parent.fragments.parent != null)
-                {
-                    parent.fragments.parent.Remove(cardViz);
-                }
                 cardViz.stack = null;
             }
 

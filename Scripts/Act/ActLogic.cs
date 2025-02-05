@@ -9,7 +9,7 @@ namespace CultistLike
 {
     public class ActLogic : MonoBehaviour
     {
-        [SerializeField] private FragContainer _fragments;
+        public FragTree fragTree;
 
         [SerializeField, HideInInspector] private Act _activeAct;
         [SerializeField, HideInInspector] private Act _altAct;
@@ -27,7 +27,6 @@ namespace CultistLike
         private ActWindow actWindow;
 
 
-        public FragContainer fragments { get => _fragments; private set => _fragments = value; }
         public Act activeAct { get => _activeAct; private set => _activeAct = value; }
         public Act altAct { get => _altAct; set => _altAct = value; }
 
@@ -69,14 +68,14 @@ namespace CultistLike
                     slotsToOpen.Add(tokenViz?.token?.slot);
                 }
 
-                foreach (var cardViz in fragments.cards)
+                foreach (var cardViz in fragTree.cards)
                 {
                     foreach (var slot in cardViz.card.slots)
                     {
                         slotsToAttempt.Add(slot);
                     }
                 }
-                foreach (var frag in fragments.fragments)
+                foreach (var frag in fragTree.fragments)
                 {
                     foreach (var slot in frag.fragment.slots)
                     {
@@ -154,7 +153,7 @@ namespace CultistLike
             activeAct = null;
             altAct = null;
 
-            fragments.Clear();
+            fragTree.Clear();
         }
 
         private void PopulateActList(List<ActLink> source, List<Act> target, bool randomOrder = false)
@@ -212,9 +211,11 @@ namespace CultistLike
                 activeAct = altAct;
             }
 
+            actWindow.ParentSlotCardsToWindow();
+
             foreach (var frag in activeAct.fragments)
             {
-                fragments.Add(frag);
+                fragTree.Add(frag);
             }
 
             ApplyTriggers();
@@ -254,20 +255,9 @@ namespace CultistLike
 
         private void SetupFinalResults(string endText)
         {
-            if (fragments.cards != null)
-            {
-                actWindow.SetupResultCards(fragments.cards);
-            }
+            actWindow.SetupResultCards(fragTree.cards);
             actWindow.ApplyStatus(ActStatus.Finished);
         }
-
-        // public void AddNextAct(Act act)
-        // {
-        //     if (nextActs.Contains(act) == false)
-        //     {
-        //         nextActs.Add(act);
-        //     }
-        // }
 
         public void ForceAct(Act act)
         {
@@ -281,7 +271,7 @@ namespace CultistLike
         public void ForceRule(Rule rule) => forceRule = rule;
 
         public Act AttemptInitialActs() => AttemptActs(GameManager.Instance.initialActs, true);
-        private Act AttemptAltActs() => AttemptActs(altActs);
+        public Act AttemptAltActs() => AttemptActs(altActs);
         private Act AttemptNextActs() => AttemptActs(nextActs);
 
         private bool AttemptAct(Act act, Context context, bool force = false)
@@ -347,59 +337,6 @@ namespace CultistLike
             }
         }
 
-        /// <summary>
-        /// Adds CardViz to the scope.
-        /// </summary>
-        /// <param name="cardViz">CardViz to add.</param>
-        /// <param name="slot">Slot type if CardViz has been slotted.</param>
-        public void HoldCard(CardViz cardViz, Slot slot = null)
-        {
-            if (cardViz != null)
-            {
-                fragments.Add(cardViz);
-                if (slot != null)
-                {
-                    foreach (var frag in slot.fragments)
-                    {
-                        fragments.Add(frag);
-                    }
-                }
-                actWindow.UpdateBars();
-                altAct = AttemptAltActs();
-            }
-        }
-
-        /// <summary>
-        /// Removes CardViz from the scope.
-        /// </summary>
-        /// <param name="cardViz">CardViz to remove.</param>
-        /// <param name="slot">Slot type if CardViz has been unslotted.</param>
-        public CardViz UnholdCard(CardViz cardViz, Slot slot = null)
-        {
-            if (cardViz != null)
-            {
-                fragments.Remove(cardViz);
-                if (slot != null)
-                {
-                    foreach (var frag in slot.fragments)
-                    {
-                        fragments.Remove(frag);
-                    }
-                }
-
-                actWindow.UpdateBars();
-                altAct = AttemptAltActs();
-            }
-            return cardViz;
-        }
-
-        public void ParentCardToWindow(CardViz cardViz)
-        {
-            cardViz.Hide();
-            cardViz.free = false;
-            cardViz.transform.SetParent(transform);
-        }
-
         public void SetParent(ActLogic parent)
         {
             if (this.parent != null)
@@ -416,7 +353,8 @@ namespace CultistLike
         public ActLogicSave Save()
         {
             var save = new ActLogicSave();
-            save.fragSave = fragments.Save();
+            save.fragSave = fragTree.Save();
+
             save.activeAct = activeAct;
             save.altAct = altAct;
             return save;
@@ -424,20 +362,10 @@ namespace CultistLike
 
         public void Load(ActLogicSave save)
         {
-            fragments.Load(save.fragSave);
-            foreach (var cardViz in fragments.cards)
-            {
-                cardViz.fragments.parent = fragments;
-                if (actWindow.actStatus == ActStatus.Running)
-                {
-                    if (cardViz.transform.parent == null)
-                    {
-                        ParentCardToWindow(cardViz);
-                    }
-                }
-            }
+            fragTree.Load(save.fragSave);
             activeAct = save.activeAct;
             altAct = save.altAct;
+            actWindow.UpdateBars();
         }
 
 
@@ -460,14 +388,15 @@ namespace CultistLike
         private void Awake()
         {
             actWindow = GetComponent<ActWindow>();
-            fragments.onCreateCard = actWindow.ParentCardToWindow;
+            fragTree = GetComponent<FragTree>();
+            fragTree.onCreateCard = x => x.ParentToWindow(actWindow.transform);
         }
     }
 
     [Serializable]
     public class ActLogicSave
     {
-        public FragContainerSave fragSave;
+        public FragTreeSave fragSave;
         public Act activeAct;
         //???
         public Act altAct;

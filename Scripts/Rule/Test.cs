@@ -25,7 +25,8 @@ namespace CultistLike
         MatchedCards   = 1 << 5,
         // Parent         = 1 << 3,
         Table          = 1 << 4,
-        // Anywhere       = 1 << 6,
+        Free          = 1 << 7,
+        Anywhere       = 1 << 6,
     }
 
     [Serializable]
@@ -65,7 +66,7 @@ namespace CultistLike
                 var scope = GetScope(context, loc1);
 
                 List<CardViz> cards;
-                if ((loc1 & ReqLoc.MatchedCards) != 0)
+                if (loc1 == ReqLoc.MatchedCards)
                 {
                     cards = context.matches;
                 }
@@ -79,8 +80,7 @@ namespace CultistLike
                 {
                     if (right > 0 && right < context.matches.Count)
                     {
-                        //TODO
-                        // context.matches = context.matches.Slice(0, right);
+                        context.matches = context.matches.GetRange(0, right);
                     }
                 }
                 else if (fragment1r is Aspect)
@@ -91,10 +91,10 @@ namespace CultistLike
                     foreach (var card in cards)
                     {
                         bool result = false;
-                        left = card.fragments.Count(aspect);
+                        left = card.fragTree.Count(aspect);
 
                         result = Compare(op, constant, left, right);
-                        if (result == true)
+                        if (result == true && (loc1 != ReqLoc.Free || card.free == true))
                         {
                             newMatches.Add(card);
                             passed = true;
@@ -141,29 +141,16 @@ namespace CultistLike
             }
         }
 
-        public FragContainer GetScope(Context context, ReqLoc loc)
+        public FragTree GetScope(Context context, ReqLoc loc)
         {
-            // if (loc == ReqLoc.Parent)
-            // {
-            //     if (context.parent != null)
-            //     {
-            //         return context.parent.fragments;
-            //     }
-            //     else
-            //     {
-            //         //ERROR
-            //         return null;
-            //     }
-            // }
-            // else if (loc == ReqLoc.Table)
             if (loc == ReqLoc.Table)
             {
-                return GameManager.Instance.table.fragments;
+                return GameManager.Instance.table.fragTree;
             }
-            // else if (loc == ReqLoc.Anywhere)
-            // {
-            //     return GameManager.Instance.fragments;
-            // }
+            else if (loc == ReqLoc.Free || loc == ReqLoc.Anywhere )
+            {
+                return GameManager.Instance.root;
+            }
             else
             {
                 return context.scope;
@@ -188,7 +175,8 @@ namespace CultistLike
                     HeldFragment ha = null;
                     foreach (var card in cards)
                     {
-                        ha = card.fragments.Find(aspect);
+                        //TODO !!!!!!!
+                        ha = card.fragTree.Find(aspect);
                         if (ha != null)
                         {
                             total += ha.count;
@@ -212,8 +200,7 @@ namespace CultistLike
             {
                 var scope = GetScope(context, loc);
 
-                // total = fragment.CountInContainer(scope);
-                total = scope.Count(fragment);
+                total = scope.Count(fragment, loc == ReqLoc.Free);
             }
 
             return total;

@@ -134,8 +134,16 @@ namespace CultistLike
                 case ReqOp.RandomChallenge:
                     return constant * left > Random.Range(0, 100);
                 case ReqOp.RandomClash:
-                    float chance = ((float)left / (float)(left + right));
-                    return chance > Random.Range(0f, 1f);
+                    float div = (float)(left + right);
+                    if (div > 0f)
+                    {
+                        float chance = ((float)left / div);
+                        return chance > Random.Range(0f, 1f);
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 default:
                     return false;
             }

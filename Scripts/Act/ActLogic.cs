@@ -121,7 +121,6 @@ namespace CultistLike
             }
 
             actWindow.ParentSlotCardsToWindow();
-            actWindow.UpdateBars();
             //need this for correct slots
             actWindow.ApplyStatus(ActStatus.Running);
             actWindow.UpdateSlots();
@@ -232,7 +231,6 @@ namespace CultistLike
             }
 
             actWindow.ParentSlotCardsToWindow();
-            actWindow.UpdateBars();
 
             if (forceAct != null)
             {
@@ -365,7 +363,6 @@ namespace CultistLike
             fragTree.Load(save.fragSave);
             activeAct = save.activeAct;
             altAct = save.altAct;
-            actWindow.UpdateBars();
         }
 
 
@@ -389,7 +386,7 @@ namespace CultistLike
         {
             actWindow = GetComponent<ActWindow>();
             fragTree = GetComponent<FragTree>();
-            fragTree.onCreateCard = x => x.ParentToWindow(actWindow.transform);
+            fragTree.onCreateCard = x => x.ParentToWindow(actWindow.transform, true);
         }
     }
 

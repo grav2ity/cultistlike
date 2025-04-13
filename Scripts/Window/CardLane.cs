@@ -12,6 +12,7 @@ namespace CultistLike
     [RequireComponent(typeof(RectTransform))]
     public class CardLane : MonoBehaviour, ICardDock
     {
+        public bool stackMatching;
         public float maxSpacingX;
         public float spacingZ;
         [HideInInspector] public List<CardViz> cards;
@@ -30,10 +31,7 @@ namespace CultistLike
                 if (gameObject.activeInHierarchy == true)
                 {
                     cards.Add(cardViz);
-                    cardViz.transform.SetParent(transform);
-
-                    actWindow.UpdateBars();
-                    actWindow.Check();
+                    cardViz.Parent(transform);
                 }
                 else
                 {
@@ -53,39 +51,70 @@ namespace CultistLike
                 //TODO ??
                 if (actWindow.gameObject.activeInHierarchy == false)
                 {
-                    cardViz.transform.SetParent(actWindow.tokenViz.transform);
+                    cardViz.Parent(actWindow.tokenViz.transform);
                     cardViz.transform.localPosition = Vector3.zero;
                 }
-                actWindow.UpdateBars();
-                actWindow.Check();
             }
         }
 
         public void PlaceCards(List<CardViz> cards)
         {
-            this.cards = cards.GetRange(0, cards.Count);
-
-            Vector3 spacing = new Vector3(
-                Math.Min(rect.width / cards.Count, maxSpacingX),
-                0f,
-                -spacingZ
-            );
-
-            Vector3 o = new Vector3(
-                -0.5f * spacing.x * (cards.Count - 1),
-                0,
-                0
-            );
-
             foreach (var cardViz in cards)
             {
                 cardViz.transform.DOComplete(true);
                 cardViz.Show();
                 cardViz.free = true;
                 cardViz.interactive = true;
-                cardViz.transform.SetParent(transform);
-                cardViz.transform.localPosition = o;
-                o += spacing;
+            }
+
+            if (stackMatching == true)
+            {
+                List<CardViz> cardsStacked = new List<CardViz>();
+                foreach (var cardViz in cards)
+                {
+                    bool stacked = false;
+                    foreach (var cardS in cardsStacked)
+                    {
+                        if (cardViz.CanStack(cardS))
+                        {
+                            cardS.Stack(cardViz);
+                            stacked = true;
+                            break;
+                        }
+                    }
+                    if (stacked == false)
+                    {
+                        cardsStacked.Add(cardViz);
+                    }
+                }
+                this.cards = cardsStacked;
+            }
+            else
+            {
+                this.cards = cards.GetRange(0, cards.Count);
+            }
+
+            if (this.cards.Count > 0)
+            {
+                Vector3 spacing = new Vector3(
+                    Math.Min(rect.width / this.cards.Count, maxSpacingX),
+                    0f,
+                    // -spacingZ
+                    spacingZ
+                );
+
+                Vector3 o = new Vector3(
+                    -0.5f * spacing.x * (this.cards.Count - 1),
+                    0,
+                    -spacingZ * (this.cards.Count)
+                );
+
+                foreach (var cardViz in this.cards)
+                {
+                    cardViz.transform.SetParent(transform);
+                    cardViz.transform.localPosition = o;
+                    o += spacing;
+                }
             }
 
             for (int i = cards.Count - 1; i >= 0; i--)

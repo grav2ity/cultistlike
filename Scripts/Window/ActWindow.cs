@@ -37,6 +37,9 @@ namespace CultistLike
         private ActLogic actLogic;
 
         private bool suspendUpdates;
+        private bool updateSlots;
+
+        private bool pendingUpdate;
 
 
         public TokenViz tokenViz { get => _tokenViz; private set => _tokenViz = value; }
@@ -46,8 +49,6 @@ namespace CultistLike
         private string runText => actLogic.altAct ? actLogic.altAct.text : actLogic.activeAct.text;
         private string runLabel => actLogic.altAct ? actLogic.altAct.label : actLogic.activeAct.label;
 
-
-        private Vector3 spos;
 
         public bool TrySlotAndBringUp(CardViz cardViz)
         {
@@ -62,7 +63,6 @@ namespace CultistLike
             }
             return false;
         }
-
 
         public SlotViz AcceptsCard(CardViz cardViz, bool onlyEmpty = false)
         {
@@ -188,7 +188,6 @@ namespace CultistLike
                 {
                     UpdateSlots();
                 }
-                UpdateBars();
             }
         }
 
@@ -230,12 +229,15 @@ namespace CultistLike
                 case ActStatus.Ready:
                     AttemptReadyAct();
                     break;
+                case ActStatus.Running:
+                    actLogic.altAct = actLogic.AttemptAltActs();
+                    ApplyStatus(ActStatus.Running);
+                    break;
                 case ActStatus.Finished:
-                    var count = GetResultCards().Count;
+                    var count = actLogic.fragTree.cards.Count;
                     if (count == 0)
                     {
                         StatusIdle();
-                        UpdateBars();
                         if (tokenViz.token.dissolve == true)
                         {
                             tokenViz.Dissolve();
@@ -258,15 +260,19 @@ namespace CultistLike
             List<Viz> l = new List<Viz>();
             foreach (var cardViz in resultLane.cards)
             {
-                l.Add(cardViz);
                 cardViz.ShowFace();
+                if (GameManager.Instance.table.LastLocation(cardViz) == true)
+                {
+                    GameManager.Instance.table.ReturnToTable(cardViz);
+                }
+                else
+                {
+                    l.Add(cardViz);
+                }
             }
 
             GameManager.Instance.table.Place(tokenViz, l);
             resultLane.cards.Clear();
-
-            Check();
-            UpdateBars();
         }
 
         public void LoadToken(TokenViz tokenViz)
@@ -274,15 +280,6 @@ namespace CultistLike
             if (tokenViz != null)
             {
                 this.tokenViz = tokenViz;
-            }
-        }
-
-        public void UpdateBars()
-        {
-            if (suspendUpdates == false)
-            {
-                aspectBar?.Load(actLogic.fragTree);
-                cardBar?.Load(actLogic.fragTree);
             }
         }
 
@@ -407,6 +404,9 @@ namespace CultistLike
 
             resultLane.Load(save.cardLane);
 
+            var count = actLogic.fragTree.cards.Count;
+            tokenViz.SetResultCount(count);
+
             for (int i=0; i<save.slots.Count && i<slots.Count; i++)
             {
                 slots[i].Load(save.slots[i]);
@@ -487,29 +487,11 @@ namespace CultistLike
         {
             actLogic = GetComponent<ActLogic>();
 
-            Action idleUpdate = () =>
+            var fragTree = GetComponent<FragTree>();
+            fragTree.ChangeEvent += () =>
             {
-                UpdateSlots();
-                UpdateBars();
+                pendingUpdate = true;
             };
-
-            Action runUpdate = () =>
-            {
-                UpdateSlots();
-                UpdateBars();
-                actLogic.altAct = actLogic.AttemptAltActs();
-                ApplyStatus(ActStatus.Running);
-            };
-
-            foreach (var slotViz in idleSlots)
-            {
-                slotViz.OnChange += idleUpdate;
-            }
-
-            foreach (var slotViz in runSlots)
-            {
-                slotViz.OnChange += runUpdate;
-            }
         }
 
         private void Start()
@@ -542,6 +524,17 @@ namespace CultistLike
             {
                 UpdateSlots();
                 ApplyStatus(actStatus);
+            }
+        }
+
+        private void Update()
+        {
+            if (pendingUpdate == true)
+            {
+                UpdateSlots();
+                Check();
+
+                pendingUpdate = false;
             }
         }
     }

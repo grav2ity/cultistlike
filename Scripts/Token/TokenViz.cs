@@ -146,11 +146,6 @@ namespace CultistLike
             var actLogic = actWindow.GetComponent<ActLogic>();
             actLogic.Load(save.logicSave);
 
-            if (save.windowSave.actStatus == ActStatus.Finished)
-            {
-                actWindow.SetupResultCards(actLogic.fragTree.cards);
-            }
-
             timer.Load(save.timerSave, actLogic.OnTimeUp);
             ShowTimer(save.timerSave.duration != 0f);
         }

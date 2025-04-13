@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace CultistLike
 {
+    //TODO fragment bar displays stacked cards
     public class FragmentBar : MonoBehaviour
     {
         [Header("Layout")]
@@ -12,6 +13,8 @@ namespace CultistLike
         public GameObject verticalGO;
 
         [Header("Options")]
+        [Tooltip("Auto reflects content of the nearest FragTree (searching upwards in transform hierarchy).")]
+        public bool autoUpdate;
         public bool vertical;
         public bool showAspects;
         public bool showCards;
@@ -32,7 +35,6 @@ namespace CultistLike
             if (fragments != null)
             {
                 index = 0;
-                gameObject.SetActive(true);
 
                 if (showCards == true)
                 {
@@ -57,7 +59,6 @@ namespace CultistLike
             if (slot != null)
             {
                 index = 0;
-                gameObject.SetActive(true);
 
                 if (slot.required.Count > 0 && showSpecial == true)
                 {
@@ -86,7 +87,6 @@ namespace CultistLike
             }
 
             index = 0;
-            gameObject.SetActive(false);
         }
 
         private void Load<T>(T frag) where T : IFrag
@@ -125,7 +125,27 @@ namespace CultistLike
 
         private void Awake()
         {
-            gameObject.SetActive(false);
+            if (autoUpdate == true)
+            {
+                var fragTree = GetComponentInParent<FragTree>();
+                if (fragTree != null)
+                {
+                    fragTree.ChangeEvent += () => Load(fragTree);
+                }
+            }
+        }
+
+        //TODO
+        private void Start()
+        {
+            if (autoUpdate == true)
+            {
+                var fragTree = GetComponentInParent<FragTree>();
+                if (fragTree != null)
+                {
+                    Load(fragTree);
+                }
+            }
         }
     }
 }

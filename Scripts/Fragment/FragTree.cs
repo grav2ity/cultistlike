@@ -11,16 +11,26 @@ namespace CultistLike
     public class FragTree : MonoBehaviour
     {
         public List<HeldFragment> localFragments;
+        public CardViz localCard;
         public List<CardViz> matches;
 
         public bool free;
 
         public Action<CardViz> onCreateCard;
+        public Action ChangeEvent;
 
 
         public List<CardViz> cards
         {
-            get => new List<CardViz>(GetComponentsInChildren<CardViz>(true));
+            get
+            {
+                var list = new List<CardViz>(GetComponentsInChildren<CardViz>(true));
+                if (localCard != null)
+                {
+                    list.Add(localCard);
+                }
+                return list;
+            }
         }
 
         public List<CardViz> freeCards
@@ -45,11 +55,15 @@ namespace CultistLike
             var results = GetComponentsInChildren<FragTree>(true);
             foreach (var fragTree in results)
             {
-                if (onlyFree == false || fragTree.free == true)
+                //TODO
+                if (fragTree.enabled == true)
                 {
-                    foreach (var fragment in fragTree.localFragments)
+                    if (onlyFree == false || fragTree.free == true)
                     {
-                        HeldFragment.AdjustInList(list, fragment.fragment, fragment.count);
+                        foreach (var fragment in fragTree.localFragments)
+                        {
+                            HeldFragment.AdjustInList(list, fragment.fragment, fragment.count);
+                        }
                     }
                 }
             }
@@ -73,7 +87,9 @@ namespace CultistLike
         {
             if (aspect != null)
             {
-                return aspect.AdjustInList(localFragments, level);
+                int count = aspect.AdjustInList(localFragments, level);
+                OnChange();
+                return count;
             }
             else
             {
@@ -88,9 +104,15 @@ namespace CultistLike
         public void Add(MonoBehaviour mono)
         {
             mono?.transform.SetParent(transform);
+            OnChange();
         }
 
-        public void Add(Card card)
+        public void Add(Viz viz)
+        {
+            viz.Parent(transform);
+        }
+
+        public CardViz Add(Card card)
         {
             if (card != null)
             {
@@ -100,6 +122,11 @@ namespace CultistLike
                 {
                     onCreateCard(cardViz);
                 }
+                return cardViz;
+            }
+            else
+            {
+                return null;
             }
         }
 
@@ -109,6 +136,7 @@ namespace CultistLike
             {
                 cardViz.transform.SetParent(null);
                 matches.Remove(cardViz);
+                OnChange();
                 return cardViz;
             }
             else
@@ -149,12 +177,14 @@ namespace CultistLike
                             onCreateCard(newCardViz);
                         }
                     }
+                    OnChange();
                     return count;
                 }
                 else if (level < 0)
                 {
                     if (Remove(cardViz) != null)
                     {
+                        OnChange();
                         return -1;
                     }
                     else
@@ -225,8 +255,19 @@ namespace CultistLike
         public List<CardViz> FindAll(Aspect aspect) =>
             cards.FindAll(x => x.fragTree.Count(aspect) > 0);
 
-        public int Count(Aspect aspect, bool onlyFree=false) =>
-            onlyFree ? freeFragments.Count(x => x.fragment == aspect) : fragments.Count(x => x.fragment == aspect);
+        public int Count(Aspect aspect, bool onlyFree=false)
+        {
+            var frags = onlyFree ? freeFragments : fragments;
+            var hFrag = frags.Find(x => x.fragment == aspect);
+            if (hFrag != null)
+            {
+                return hFrag.count;
+            }
+            else
+            {
+                return 0;
+            }
+        }
         public int Count(Card card, bool onlyFree=false) =>
             onlyFree ? freeCards.Count(x => x.card == card) : cards.Count(x => x.card == card);
 
@@ -259,6 +300,18 @@ namespace CultistLike
 
             localFragments = save.localFragments;
             free = save.free;
+        }
+
+        public void OnChange()
+        {
+            if (ChangeEvent != null)
+            {
+                ChangeEvent();
+            }
+            if (transform.parent != null)
+            {
+                transform.parent.GetComponentInParent<FragTree>()?.OnChange();
+            }
         }
     }
 

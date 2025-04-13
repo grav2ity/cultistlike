@@ -321,7 +321,7 @@ namespace CultistLike
                 Hide();
             }
             free = false;
-            transform.SetParent(trans);
+            Parent(trans);
         }
 
         public bool Grab(Vector3 target, Action<CardViz> onStart, Action<CardViz> onComplete)
@@ -333,14 +333,13 @@ namespace CultistLike
                 if (cardVizY.free == true)
                 {
                     cardVizY.transform.DOComplete(true);
-                    // cardVizY.free = false;
                     cardVizY.isDragging = false;
 
                     cardVizY.transform.parent?.GetComponentInParent<ICardDock>(true)?.
                         OnCardUndock(cardVizY.gameObject);
                     cardVizY.gameObject.SetActive(true);
 
-                    cardVizY.transform.SetParent(null);
+                    cardVizY.Parent(null);
 
                     if (onStart != null)
                     {
@@ -349,7 +348,6 @@ namespace CultistLike
 
                     Action<Drag> onMoveEnd = x =>
                     {
-                        // cardVizY.free = true;
                         if (onComplete != null)
                         {
                             onComplete(cardVizY);
@@ -415,9 +413,11 @@ namespace CultistLike
             draggingPlane = GameManager.Instance.cardDragPlane;
         }
 
-        private bool CanStack(CardViz cardViz)
+        public bool CanStack(CardViz cardViz)
         {
             if (card == cardViz.card &&
+                faceDown == false &&
+                cardViz.faceDown == false &&
                 cardDecay.enabled == false &&
                 cardViz.cardDecay.enabled == false)
             {
@@ -427,6 +427,11 @@ namespace CultistLike
             {
                 return false;
             }
+        }
+
+        public void Stack(CardViz cardViz)
+        {
+            cardStack.Push(cardViz);
         }
 
         public void OnDecayComplete(Card card)
@@ -467,7 +472,6 @@ namespace CultistLike
 
         private void Awake()
         {
-            fragTree = GetComponent<FragTree>();
             if (card != null)
             {
                 LoadCard(card);

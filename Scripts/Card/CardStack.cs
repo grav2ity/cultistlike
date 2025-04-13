@@ -38,7 +38,7 @@ namespace CultistLike
         {
             if (Count < maxCount)
             {
-                cardViz.transform.SetParent(transform);
+                cardViz.Parent(transform);
                 cardViz.transform.localPosition = Vector3.zero;
                 //this would disable Decay timer which is fine since stacking Cards with Decay is not allowed
                 cardViz.gameObject.SetActive(false);
@@ -54,7 +54,7 @@ namespace CultistLike
 
         public CardViz Pop()
         {
-            var cardViz = GetComponentInChildren<CardViz>(true);
+            var cardViz = Top();
             if (cardViz != null)
             {
                 cardViz.gameObject.SetActive(true);
@@ -64,6 +64,8 @@ namespace CultistLike
 
             return cardViz;
         }
+
+        public CardViz Top() => GetComponentInChildren<CardViz>(true);
 
         public bool Merge(CardStack stack)
         {

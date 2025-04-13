@@ -123,7 +123,7 @@ namespace CultistLike
         /// <returns></returns>
         public virtual void Place(Viz viz, T t, float moveSpeed)
         {
-            viz.transform.SetParent(transform);
+            viz.Parent(transform);
             DOMove(viz, t, moveSpeed);
 
             lastLocations[viz.gameObject] = t;
@@ -166,6 +166,16 @@ namespace CultistLike
             {
                 StartCoroutine(HighlightCardsE(cards));
             }
+        }
+
+        public virtual bool LastLocation(Viz viz, out T location)
+        {
+            return lastLocations.TryGetValue(viz.gameObject, out location);
+        }
+
+        public virtual bool LastLocation(Viz viz)
+        {
+            return lastLocations.ContainsKey(viz.gameObject);
         }
 
         /// <summary>

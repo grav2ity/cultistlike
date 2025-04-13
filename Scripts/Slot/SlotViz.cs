@@ -63,7 +63,6 @@ namespace CultistLike
         public void OnCardUndock(GameObject go)
         {
             UnslotCard();
-            actWindow.Check();
         }
 
         public void OnPointerClick(PointerEventData eventData)
@@ -134,12 +133,6 @@ namespace CultistLike
                 {
                     cardViz.UnhighlightTargets();
                 }
-
-                if (cardLock == true)
-                {
-                    cardViz.interactive = false;
-                    cardViz.free = false;
-                }
             }
         }
 
@@ -155,12 +148,13 @@ namespace CultistLike
                 //     actWindow.actLogic.fragTree.Add(frag);
                 // }
 
-                slottedCard.transform.SetParent(transform);
-                if (OnChange != null)
+                slottedCard.Parent(transform);
+
+                if (cardLock == true)
                 {
-                    OnChange();
+                    cardViz.interactive = false;
+                    cardViz.free = false;
                 }
-                actWindow.Check();
             }
         }
 
@@ -170,9 +164,8 @@ namespace CultistLike
             {
                 slottedCard.free = true;
                 slottedCard.interactive = true;
-                slottedCard.transform.SetParent(null);
+                slottedCard.Parent(null);
 
-                // SlotCardLogical(null);
                 //TODO slot frags
                 // foreach (var frag in slot.fragments)
                 // {
@@ -187,11 +180,6 @@ namespace CultistLike
                     actWindow.FirstSlotEmpty();
                 }
 
-                if (OnChange != null)
-                {
-                    OnChange();
-                }
-
                 return sc;
             }
             else
@@ -204,9 +192,10 @@ namespace CultistLike
         {
             if (slottedCard != null)
             {
-                slottedCard.ParentToWindow(actWindow.transform);
-                slottedCard.Hide();
+                var card = slottedCard;
                 slottedCard = null;
+                card.ParentToWindow(actWindow.transform);
+                card.Hide();
             }
         }
 

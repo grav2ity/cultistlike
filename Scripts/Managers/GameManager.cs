@@ -106,6 +106,7 @@ namespace CultistLike
         public CardViz CreateCard()
         {
             var cardViz = UnityEngine.Object.Instantiate(cardPrefab);
+            cardViz.draggingPlane = GameManager.Instance.cardDragPlane;
             return cardViz;
         }
 
@@ -120,7 +121,7 @@ namespace CultistLike
         {
             if (cardViz != null)
             {
-                cardViz.transform.SetParent(null);
+                cardViz.Parent(null);
                 cardViz.gameObject.SetActive(false);
                 Destroy(cardViz.gameObject, 0.1f);
             }
@@ -295,7 +296,7 @@ namespace CultistLike
             {
                 var tokenViz = GameManager.Instance.CreateToken();
                 tokenViz.Load(tokenSave);
-                tokenViz.transform.SetParent(table.transform);
+                tokenViz.Parent(table.transform);
             }
 
             foreach (var cardSave in save.cards)
@@ -303,7 +304,7 @@ namespace CultistLike
                 var cardViz = SaveManager.Instance.CardFromID(cardSave.ID);
                 if (cardViz.transform.parent == null)
                 {
-                    cardViz.transform.SetParent(table.transform);
+                    cardViz.Parent(table.transform);
                 }
             }
 
@@ -370,11 +371,6 @@ namespace CultistLike
             {
                 Debug.LogError("GameManager's Special fragments are missing!!");
             }
-
-        #if UNITY_EDITOR
-            QualitySettings.vSyncCount = 0;
-            Application.targetFrameRate = 60;
-        #endif
         }
 
         private void Update()

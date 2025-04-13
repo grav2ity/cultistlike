@@ -47,8 +47,8 @@ namespace CultistLike
             dragOrigin = transform.position;
 
             dragOriginDock = transform.parent?.GetComponentInParent<ICardDock>();
-            // dragOriginDock?.OnCardUndock(gameObject);
-            transform.SetParent(draggingPlane.transform);
+
+            Parent(draggingPlane.transform);
             dragOriginDock?.OnCardUndock(gameObject);
 
             foreach(var collider in gameObject.GetComponentsInChildren<Collider>())
@@ -98,6 +98,17 @@ namespace CultistLike
             if (undrag == true && transform.parent?.GetComponentInParent<ICardDock>() == null)
             {
                 Undrag();
+            }
+        }
+
+        public virtual void Parent(Transform newParent)
+        {
+            var oldParent = transform.parent;
+            if (oldParent != newParent)
+            {
+                transform.SetParent(newParent);
+                oldParent?.GetComponentInParent<FragTree>()?.OnChange();
+                newParent?.GetComponentInParent<FragTree>()?.OnChange();
             }
         }
 

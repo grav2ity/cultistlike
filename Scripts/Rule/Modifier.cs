@@ -316,10 +316,8 @@ namespace CultistLike
                         var frag = deck.Draw();
                         if (frag is Card)
                         {
-                            var newCardViz = GameManager.Instance.CreateCard((Card)frag);
+                            var newCardViz = context.scope.Add((Card)frag);
                             newCardViz.ShowBack();
-
-                            context.scope.Add(newCardViz);
                         }
                         break;
                     // case DeckOp.DrawNext:

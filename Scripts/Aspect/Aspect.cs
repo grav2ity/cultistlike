@@ -6,7 +6,7 @@ using UnityEngine;
 namespace CultistLike
 {
     [CreateAssetMenu(menuName = "Aspect")]
-    public class Aspect : Fragment, IFrag
+    public class Aspect : Fragment
     {
         public override void AddToTree(FragTree fg) => fg.Add(this);
         public override int AdjustInTree(FragTree fg, int level) => fg.Adjust(this, level);

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d7ad74be29e3414894e2ccf6a7e39e6, type: 3}
+  m_Name: Two-handed Sword
+  m_EditorClassIdentifier: 
+  label: Two-handed Sword
+  art: {fileID: 0}
+  color: {r: 0.64779866, g: 0.23426668, b: 0.23426668, a: 1}
+  description: Hits 2 monsters for 1 damage.
+  fragments:
+  - {fileID: 11400000, guid: fa313b8cf01b32b48bfe603fb1b08654, type: 2}
+  - {fileID: 11400000, guid: 6db7a939529ea974f928ebdc71a8dd1b, type: 2}
+  rules: []
+  slots:
+  - {fileID: 11400000, guid: 62c86e6d0b3ed6346827a39f2ceb7c60, type: 2}
+  decayTo: {fileID: 0}
+  lifetime: 0

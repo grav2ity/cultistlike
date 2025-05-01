@@ -12,6 +12,8 @@ namespace CultistLike
         public Sprite art;
         [Tooltip("Solid color used when art is not set.")]
         public Color color;
+        [Tooltip("Do not show inside UI fragment bar.")]
+        public bool hidden;
         [TextArea(3, 10)] public string description;
 
         [Header("Fragments")]
@@ -34,6 +36,7 @@ namespace CultistLike
 
         public virtual Fragment ToFragment() => this;
         public virtual int Count() => 1;
+        public virtual bool Hidden() => hidden;
     }
 
     [Serializable]
@@ -89,5 +92,6 @@ namespace CultistLike
 
         public Fragment ToFragment() => fragment;
         public int Count() => count;
+        public bool Hidden() => fragment.hidden;
     }
 }

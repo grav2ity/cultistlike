@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
+  m_Name: Dungeon Draw
+  m_EditorClassIdentifier: 
+  label: Dungeon Draw
+  token: {fileID: 0}
+  initial: 0
+  time: 5
+  tests: []
+  and: []
+  or: []
+  fragments: []
+  actModifiers: []
+  cardModifiers: []
+  tableModifiers: []
+  pathModifiers:
+  - op: 40
+    act: {fileID: 11400000, guid: cb1f200257f7ce846ba552bdc06bec08, type: 2}
+  deckModifiers:
+  - op: 0
+    deck: {fileID: 11400000, guid: f85f669c1054efa48a7bbe2adb5508bf, type: 2}
+  furthermore: []
+  ignoreGlobalSlots: 0
+  slots: []
+  randomAlt: 0
+  altActs: []
+  randomNext: 0
+  nextActs:
+  - chance: 75
+    act: {fileID: 11400000, guid: 08e79395bfe6beb4d990c2c88c97fd61, type: 2}
+    actRule: {fileID: 0}
+  - chance: 100
+    act: {fileID: 11400000, guid: 15b15a46e23f282428c366929d42ec37, type: 2}
+    actRule: {fileID: 0}
+  spawnedActs: []
+  onSpawn: {fileID: 0}
+  text: Stumbled upon...
+  endText: 

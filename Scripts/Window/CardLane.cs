@@ -40,6 +40,7 @@ namespace CultistLike
             }
         }
 
+        //TODO won't get called when getting card from stack
         public void OnCardUndock(GameObject go)
         {
             CardViz cardViz = go.GetComponent<CardViz>();
@@ -47,13 +48,6 @@ namespace CultistLike
             {
                 cards.Remove(cardViz);
                 cardViz.ShowFace();
-
-                //TODO ??
-                if (actWindow.gameObject.activeInHierarchy == false)
-                {
-                    cardViz.Parent(actWindow.tokenViz.transform);
-                    cardViz.transform.localPosition = Vector3.zero;
-                }
             }
         }
 
@@ -99,7 +93,6 @@ namespace CultistLike
                 Vector3 spacing = new Vector3(
                     Math.Min(rect.width / this.cards.Count, maxSpacingX),
                     0f,
-                    // -spacingZ
                     spacingZ
                 );
 
@@ -112,6 +105,7 @@ namespace CultistLike
                 foreach (var cardViz in this.cards)
                 {
                     cardViz.transform.SetParent(transform);
+
                     cardViz.transform.localPosition = o;
                     o += spacing;
                 }

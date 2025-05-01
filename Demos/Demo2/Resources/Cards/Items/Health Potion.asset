@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d7ad74be29e3414894e2ccf6a7e39e6, type: 3}
+  m_Name: Health Potion
+  m_EditorClassIdentifier: 
+  label: Health Potion
+  art: {fileID: 0}
+  color: {r: 1, g: 0, b: 0.008380413, a: 1}
+  hidden: 0
+  description: Cures 1 Damaged Health.
+  fragments:
+  - {fileID: 11400000, guid: b8ea294195d44f24c896cc510d21af19, type: 2}
+  rules: []
+  slots:
+  - {fileID: 11400000, guid: d0ef6bb906a38e0428787cb1fc569b34, type: 2}
+  decayTo: {fileID: 0}
+  lifetime: 0

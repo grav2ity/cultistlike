@@ -33,11 +33,11 @@ namespace CultistLike
         public Rule spawnRule;
 
         [Header("Accepted Fragments")]
-        [Tooltip("Card must have at least one of the Required Fragments to be accepted in this Slot.")]
+        [Tooltip("Card must have at least Count of one of the Required Fragments to be accepted in this Slot.")]
         public List<HeldFragment> required;
-        [Tooltip("Card must have all the Essential Fragments to be accepted in this Slot.")]
+        [Tooltip("Card must have at least Count for all the Essential Fragments to be accepted in this Slot.")]
         public List<HeldFragment> essential;
-        [Tooltip("Card can't have any of the Forbidden Fragments to be accepted in this Slot.")]
+        [Tooltip("Card must have less that Count for every Forbidden Fragment to be accepted in this Slot.")]
         public List<HeldFragment> forbidden;
 
         [Header("Card Rule")]

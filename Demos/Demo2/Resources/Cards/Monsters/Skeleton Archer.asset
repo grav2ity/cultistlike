@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d7ad74be29e3414894e2ccf6a7e39e6, type: 3}
+  m_Name: Skeleton Archer
+  m_EditorClassIdentifier: 
+  label: Skeleton Archer
+  art: {fileID: 0}
+  color: {r: 0, g: 0, b: 0, a: 1}
+  description: 
+  fragments:
+  - {fileID: 11400000, guid: e24b4729cd6d7f948bc9b00f0a34830a, type: 2}
+  - {fileID: 11400000, guid: 2672b853fbcb07e4a8cc08cb726474d2, type: 2}
+  - {fileID: 11400000, guid: c5180ca64fca4a6468bfc7065b402794, type: 2}
+  - {fileID: 11400000, guid: 946a428fdff73e643849178293ca9432, type: 2}
+  rules: []
+  slots: []
+  decayTo: {fileID: 0}
+  lifetime: 0

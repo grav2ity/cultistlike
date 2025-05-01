@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
+  m_Name: Explore
+  m_EditorClassIdentifier: 
+  label: Explore
+  token: {fileID: 11400000, guid: 6c24370a18ddfc244b2eaf3e70ee6a54, type: 2}
+  initial: 1
+  time: 0
+  tests:
+  - cardTest: 0
+    canFail: 0
+    loc1: 0
+    fragment1: {fileID: 11400000, guid: 86c6ddeb47496f44c9a521e33e54bf8b, type: 2}
+    op: 0
+    constant: 1
+    loc2: 0
+    fragment2: {fileID: 0}
+  and: []
+  or: []
+  fragments: []
+  actModifiers: []
+  cardModifiers: []
+  tableModifiers: []
+  pathModifiers: []
+  deckModifiers: []
+  furthermore: []
+  ignoreGlobalSlots: 0
+  slots: []
+  randomAlt: 0
+  altActs: []
+  randomNext: 0
+  nextActs:
+  - chance: 0
+    act: {fileID: 11400000, guid: 40f543f09f164f7408abb24f95085e91, type: 2}
+    actRule: {fileID: 0}
+  spawnedActs: []
+  onSpawn: {fileID: 0}
+  text: Explore dungeon
+  endText: 

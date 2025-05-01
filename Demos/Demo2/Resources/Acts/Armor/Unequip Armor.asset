@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
+  m_Name: Unequip Armor
+  m_EditorClassIdentifier: 
+  label: Unequip Armor
+  token: {fileID: 11400000, guid: 73aea127f99b9c147afcd4f766da2c0e, type: 2}
+  initial: 1
+  time: 0
+  tests:
+  - cardTest: 1
+    canFail: 0
+    loc1: 0
+    fragment1: {fileID: 11400000, guid: a4ecf4033b56cb844a27f00420f1fa28, type: 2}
+    op: 0
+    constant: 1
+    loc2: 0
+    fragment2: {fileID: 0}
+  - cardTest: 1
+    canFail: 0
+    loc1: 32
+    fragment1: {fileID: 11400000, guid: 6cf9f646677bcf74a98896b177aa43ab, type: 2}
+    op: 0
+    constant: 1
+    loc2: 0
+    fragment2: {fileID: 0}
+  and: []
+  or: []
+  fragments: []
+  actModifiers: []
+  cardModifiers: []
+  tableModifiers: []
+  pathModifiers: []
+  deckModifiers: []
+  furthermore: []
+  ignoreGlobalSlots: 0
+  slots: []
+  randomAlt: 0
+  altActs: []
+  randomNext: 0
+  nextActs:
+  - chance: 100
+    act: {fileID: 11400000, guid: 4a2e816d74e207c4c9763617726abd19, type: 2}
+    actRule: {fileID: 0}
+  spawnedActs: []
+  onSpawn: {fileID: 0}
+  text: Unequip [MC].
+  endText: 

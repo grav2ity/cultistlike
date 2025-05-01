@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
+  m_Name: Enter the Dungeon
+  m_EditorClassIdentifier: 
+  label: Enter the Dungeon
+  token: {fileID: 11400000, guid: 6c24370a18ddfc244b2eaf3e70ee6a54, type: 2}
+  initial: 1
+  time: 1
+  tests:
+  - cardTest: 0
+    canFail: 0
+    loc1: 0
+    fragment1: {fileID: 11400000, guid: d592890b0406ab84584fb77b949d6591, type: 2}
+    op: 1
+    constant: 1
+    loc2: 0
+    fragment2: {fileID: 0}
+  and: []
+  or: []
+  fragments: []
+  actModifiers:
+  - op: 0
+    fragment: {fileID: 11400000, guid: d91d91cf06ab10440839c3935cc6861b, type: 2}
+    level: 3
+    reference: {fileID: 0}
+  - op: 0
+    fragment: {fileID: 11400000, guid: 2a2641067ae391e498d28bdd391523d0, type: 2}
+    level: 3
+    reference: {fileID: 0}
+  - op: 0
+    fragment: {fileID: 11400000, guid: 9c5ccd5591e620842b164f82e18c4d60, type: 2}
+    level: 1
+    reference: {fileID: 0}
+  - op: 0
+    fragment: {fileID: 11400000, guid: 86c6ddeb47496f44c9a521e33e54bf8b, type: 2}
+    level: 1
+    reference: {fileID: 0}
+  - op: 0
+    fragment: {fileID: 11400000, guid: d592890b0406ab84584fb77b949d6591, type: 2}
+    level: -1
+    reference: {fileID: 0}
+  cardModifiers: []
+  tableModifiers:
+  - op: 0
+    act: {fileID: 11400000, guid: 080cfb87af82dbd469e2347c00ca9553, type: 2}
+  - op: 10
+    act: {fileID: 11400000, guid: 1479740cb4905934789fe9cdeb07d59c, type: 2}
+  pathModifiers: []
+  deckModifiers: []
+  furthermore: []
+  ignoreGlobalSlots: 0
+  slots: []
+  randomAlt: 0
+  altActs: []
+  randomNext: 0
+  nextActs: []
+  spawnedActs: []
+  onSpawn: {fileID: 0}
+  text: Enter the Dungeon!
+  endText: 'Welcome to the Dungeon!
+
+
+    (which is very much work in progress and
+    goes nowhere but hopefuly illustrates some points)'

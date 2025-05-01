@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
+  m_Name: Unequip Other Chest Armor
+  m_EditorClassIdentifier: 
+  label: Unequip Chest Armor
+  token: {fileID: 0}
+  initial: 0
+  time: 5
+  tests:
+  - cardTest: 1
+    canFail: 0
+    loc1: 64
+    fragment1: {fileID: 11400000, guid: 0b338c78e8b070b4eafc92022c0c8d6d, type: 2}
+    op: 0
+    constant: 1
+    loc2: 0
+    fragment2: {fileID: 0}
+  - cardTest: 1
+    canFail: 0
+    loc1: 32
+    fragment1: {fileID: 11400000, guid: 6cf9f646677bcf74a98896b177aa43ab, type: 2}
+    op: 0
+    constant: 1
+    loc2: 0
+    fragment2: {fileID: 0}
+  and: []
+  or: []
+  fragments: []
+  actModifiers: []
+  cardModifiers:
+  - op: 0
+    target: {fileID: 11400000, guid: 359609367f1923146b1068c9f2375786, type: 2}
+    fragment: {fileID: 11400000, guid: 6cf9f646677bcf74a98896b177aa43ab, type: 2}
+    level: -1
+    reference: {fileID: 0}
+  tableModifiers: []
+  pathModifiers: []
+  deckModifiers: []
+  furthermore: []
+  ignoreGlobalSlots: 0
+  slots: []
+  randomAlt: 0
+  altActs: []
+  randomNext: 0
+  nextActs:
+  - chance: 0
+    act: {fileID: 11400000, guid: 7aee946398dd3d94ebac91b3b549d3a2, type: 2}
+    actRule: {fileID: 0}
+  spawnedActs: []
+  onSpawn: {fileID: 0}
+  text: 'First you have to enequip the one you are wearing.
+
+    Unequipping [MC]
+    sure takes some time...'
+  endText: 

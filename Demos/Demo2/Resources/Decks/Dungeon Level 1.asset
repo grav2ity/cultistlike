@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51464b304bacc114e9344784d1851bb0, type: 3}
+  m_Name: Dungeon Level 1
+  m_EditorClassIdentifier: 
+  label: Dungeon Level 1
+  text: 
+  fragments:
+  - {fileID: 11400000, guid: 87af825493f16794bb95aa2575c9e107, type: 2}
+  - {fileID: 11400000, guid: 87af825493f16794bb95aa2575c9e107, type: 2}
+  - {fileID: 11400000, guid: 87af825493f16794bb95aa2575c9e107, type: 2}
+  - {fileID: 11400000, guid: 93acb77ba7f2a414aa885e3361984720, type: 2}
+  - {fileID: 11400000, guid: 93acb77ba7f2a414aa885e3361984720, type: 2}
+  - {fileID: 11400000, guid: 93acb77ba7f2a414aa885e3361984720, type: 2}
+  - {fileID: 11400000, guid: 93acb77ba7f2a414aa885e3361984720, type: 2}
+  - {fileID: 11400000, guid: 93acb77ba7f2a414aa885e3361984720, type: 2}
+  defaultFragment: {fileID: 0}
+  shuffle: 1
+  replenish: 1
+  infinite: 0

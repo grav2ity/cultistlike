@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
+  m_Name: Game Over
+  m_EditorClassIdentifier: 
+  label: Game Over
+  token: {fileID: 11400000, guid: 6c24370a18ddfc244b2eaf3e70ee6a54, type: 2}
+  initial: 0
+  time: 0
+  tests: []
+  and: []
+  or: []
+  fragments: []
+  actModifiers:
+  - op: 0
+    fragment: {fileID: 11400000, guid: d592890b0406ab84584fb77b949d6591, type: 2}
+    level: 1
+    reference: {fileID: 0}
+  cardModifiers: []
+  tableModifiers: []
+  pathModifiers: []
+  deckModifiers: []
+  furthermore: []
+  ignoreGlobalSlots: 0
+  slots: []
+  randomAlt: 0
+  altActs: []
+  randomNext: 0
+  nextActs: []
+  spawnedActs: []
+  onSpawn: {fileID: 0}
+  text: 
+  endText: You were slain!

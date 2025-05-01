@@ -37,8 +37,6 @@ namespace CultistLike
         private ActLogic actLogic;
 
         private bool suspendUpdates;
-        private bool updateSlots;
-
         private bool pendingUpdate;
 
 
@@ -46,7 +44,6 @@ namespace CultistLike
         public Timer timer { get => _timer; }
 
         private List<SlotViz> slots => actStatus == ActStatus.Running ? runSlots : idleSlots;
-        private string runText => actLogic.altAct ? actLogic.altAct.text : actLogic.activeAct.text;
         private string runLabel => actLogic.altAct ? actLogic.altAct.label : actLogic.activeAct.label;
 
 
@@ -158,7 +155,6 @@ namespace CultistLike
             if (suspendUpdates == false && actStatus != ActStatus.Finished)
             {
                 suspendUpdates = true;
-
 
                 var slotsToOpen = actLogic.CheckForSlots();
 
@@ -273,6 +269,9 @@ namespace CultistLike
 
             GameManager.Instance.table.Place(tokenViz, l);
             resultLane.cards.Clear();
+
+            //need this to force window update when there are no cards to claim
+            Check();
         }
 
         public void LoadToken(TokenViz tokenViz)
@@ -306,7 +305,7 @@ namespace CultistLike
                     {
                         okButton.interactable = true;
                         label.text = readyAct.label;
-                        text.text = readyAct.text;
+                        text.text = actLogic.fragTree.InterpolateString(readyAct.text);
                         tokenViz.SetResultCount(0);
                     }
                     break;
@@ -317,7 +316,7 @@ namespace CultistLike
                     okButton.interactable = false;
                     tokenViz.SetResultCount(0);
                     label.text = runLabel;
-                    text.text = runText;
+                    text.text = actLogic.runText;
                     break;
                 case ActStatus.Finished:
                     timer.gameObject.SetActive(false);
@@ -325,7 +324,7 @@ namespace CultistLike
                     resultLane.gameObject.SetActive(true);
                     collectButton.interactable = true;
                     label.text = runLabel;
-                    text.text = actLogic.activeAct.endText;
+                    text.text = actLogic.endText;
                     break;
                 default:
                     break;
@@ -356,6 +355,16 @@ namespace CultistLike
             {
                 slot.Show();
             }
+        }
+
+        public void AddFragment(Fragment frag)
+        {
+            actLogic.fragTree.Add(frag);
+        }
+
+        public void RemoveFragment(Fragment frag)
+        {
+            actLogic.fragTree.Remove(frag);
         }
 
         public ActWindowSave Save()
@@ -433,11 +442,6 @@ namespace CultistLike
                     ApplyStatus(ActStatus.Idle);
                 }
             }
-        }
-
-        private List<CardViz> GetResultCards()
-        {
-            return resultLane.cards;
         }
 
         private void StatusIdle()

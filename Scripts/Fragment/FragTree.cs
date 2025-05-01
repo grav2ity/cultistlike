@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 using UnityEngine;
 
@@ -55,7 +56,6 @@ namespace CultistLike
             var results = GetComponentsInChildren<FragTree>(true);
             foreach (var fragTree in results)
             {
-                //TODO
                 if (fragTree.enabled == true)
                 {
                     if (onlyFree == false || fragTree.free == true)
@@ -273,6 +273,23 @@ namespace CultistLike
 
         public int Count(HeldFragment frag, bool onlyFree=false) => frag != null ? Count(frag.fragment, onlyFree) : 0;
 
+        public int Count(string fileName, bool onlyFree=false)
+        {
+            var frag = fragments.Find(x => x.fragment.name == fileName);
+            if (frag != null)
+            {
+                return Count(frag, onlyFree);
+            }
+
+            var cardViz = cards.Find(x => x.card.name == fileName);
+            if (cardViz != null)
+            {
+                return Count(cardViz.card, onlyFree);
+            }
+
+            return 0;
+        }
+
         public FragTreeSave Save()
         {
             var save = new FragTreeSave();
@@ -313,7 +330,78 @@ namespace CultistLike
                 transform.parent.GetComponentInParent<FragTree>()?.OnChange();
             }
         }
+
+        public string InterpolateString(string source)
+        {
+            string s = Regex.Replace(source, @"\{\[(.*?)\s(==|!=|>=|<=|>|<)\s*(\d+)\s*\]\s?([\s\S]*?)\}\n?", match =>
+            {
+                string fragName = match.Groups[1].Value;
+                string op = match.Groups[2].Value;
+                string valString = match.Groups[3].Value;
+
+                bool passed = false;
+
+                try
+                {
+                    int right = Int32.Parse(valString);
+                    int left = Count(fragName);
+
+                    switch (op)
+                    {
+                        case "==":
+                            passed = left == right;
+                            break;
+                        case "!=":
+                            passed = left != right;
+                            break;
+                        case ">=":
+                            passed = left >= right;
+                            break;
+                        case "<=":
+                            passed = left <= right;
+                            break;
+                        case ">":
+                            passed = left > right;
+                            break;
+                        case "<":
+                            passed = left < right;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                catch (OverflowException)
+                {
+                    Debug.LogWarning("Too many digits inside {[fragment] op numeral} expression.");
+                }
+
+                if (passed == true)
+                {
+                    return match.Groups[4].Value;
+                }
+                else
+                {
+                    return "";
+                }
+            });
+
+            return Regex.Replace(s, @"\[(.*?)\]", match =>
+            {
+                string key = match.Groups[1].Value;
+
+                if (key == "MC")
+                {
+                    return matches.Count > 0 ? matches[0].card.label : "";
+                }
+                else
+                {
+                    return Count(key).ToString();
+                }
+            });
+        }
     }
+
+
 
     [Serializable]
     public class FragTreeSave

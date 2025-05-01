@@ -232,6 +232,8 @@ namespace CultistLike
     {
         // NextAct = 0,
         ForceAct = 20,
+        SetCallback = 40,
+        Callback = 41,
         GameOver = 80,
     }
 
@@ -253,11 +255,14 @@ namespace CultistLike
             {
                 switch (op)
                 {
-                    // case PathOp.NextAct:
-                    //     context.actLogic.AddNextAct(act);
-                    //     break;
                     case PathOp.ForceAct:
                         context.actLogic.SetForceAct(act);
+                        break;
+                    case PathOp.SetCallback:
+                        context.actLogic.SetCallback(act);
+                        break;
+                    case PathOp.Callback:
+                        context.actLogic.DoCallback();
                         break;
                     case PathOp.GameOver:
                         GameManager.Instance.Reset();
@@ -370,7 +375,7 @@ namespace CultistLike
                 switch (op)
                 {
                     case TableOp.SpawnAct:
-                        var tokenViz = GameManager.Instance.SpawnAct(act, context.actLogic);
+                        GameManager.Instance.SpawnAct(act, context.actLogic.tokenViz);
                         break;
                     case TableOp.SpawnToken:
                         GameManager.Instance.SpawnToken(act.token, context.actLogic.tokenViz);

@@ -16,8 +16,6 @@ namespace CultistLike
         public Act autoPlay;
         public Rule initRule;
 
-        [HideInInspector] public ActLogic parent;
-
         [Header("Layout")]
         [SerializeField] private TextMeshPro title;
         [SerializeField] private Timer _timer;
@@ -173,7 +171,6 @@ namespace CultistLike
                 actWindow = GameManager.Instance.CreateWindow();
                 actWindow.LoadToken(this);
                 actWindow.GetComponent<ActLogic>().ForceRule(initRule);
-                actWindow.GetComponent<ActLogic>().SetParent(parent);
                 ShowTimer(false);
             }
 
@@ -187,7 +184,6 @@ namespace CultistLike
     public class TokenVizSave
     {
         public Token token;
-        // public ActLogic parent;
         public Vector3 position;
 
         public TimerSave timerSave;

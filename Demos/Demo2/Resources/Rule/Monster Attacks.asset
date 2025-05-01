@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 557f5e0557567a048a53124377707548, type: 3}
+  m_Name: Monster Attacks
+  m_EditorClassIdentifier: 
+  tests:
+  - cardTest: 0
+    canFail: 0
+    loc1: 16
+    fragment1: {fileID: 11400000, guid: 5a08a1e728ee6e24395629340c3249c4, type: 2}
+    op: 1
+    constant: 0
+    loc2: 0
+    fragment2: {fileID: 0}
+  and:
+  - {fileID: 11400000, guid: 4a7099046bd8810459f2387663bf8ea0, type: 2}
+  or: []
+  actModifiers: []
+  cardModifiers: []
+  tableModifiers: []
+  pathModifiers: []
+  deckModifiers: []
+  furthermore: []

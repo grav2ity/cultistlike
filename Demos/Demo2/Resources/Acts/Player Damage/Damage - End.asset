@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
+  m_Name: Damage - End
+  m_EditorClassIdentifier: 
+  label: Print Damage
+  token: {fileID: 0}
+  initial: 0
+  time: 3
+  tests:
+  - cardTest: 1
+    canFail: 0
+    loc1: 0
+    fragment1: {fileID: 11400000, guid: e24b4729cd6d7f948bc9b00f0a34830a, type: 2}
+    op: 0
+    constant: 1
+    loc2: 0
+    fragment2: {fileID: 0}
+  and: []
+  or: []
+  fragments: []
+  actModifiers: []
+  cardModifiers: []
+  tableModifiers: []
+  pathModifiers: []
+  deckModifiers: []
+  furthermore:
+  - {fileID: 11400000, guid: d3b1ba0407a5d6845a41c525bca672b4, type: 2}
+  ignoreGlobalSlots: 0
+  slots: []
+  randomAlt: 0
+  altActs: []
+  randomNext: 0
+  nextActs: []
+  spawnedActs: []
+  onSpawn: {fileID: 0}
+  text: '[MC] attacks!'
+  endText: '[MC] has dealt you [Damage Done] damage!
+
+
+    {[Poison >= 1] You have
+    been poisoned!}'

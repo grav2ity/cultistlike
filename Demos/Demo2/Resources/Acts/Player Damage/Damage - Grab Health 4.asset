@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
+  m_Name: Damage - Grab Health 4
+  m_EditorClassIdentifier: 
+  label: Grab Health 4
+  token: {fileID: 0}
+  initial: 0
+  time: 0
+  tests: []
+  and: []
+  or: []
+  fragments: []
+  actModifiers:
+  - op: 0
+    fragment: {fileID: 11400000, guid: ebe7a828a22f34146a42758fd65b1b44, type: 2}
+    level: -1
+    reference: {fileID: 11400000, guid: 72f410721d8a3ea4b8aabb2b4a00f57e, type: 2}
+  cardModifiers: []
+  tableModifiers: []
+  pathModifiers: []
+  deckModifiers: []
+  furthermore: []
+  ignoreGlobalSlots: 0
+  slots: []
+  randomAlt: 0
+  altActs: []
+  randomNext: 0
+  nextActs:
+  - chance: 0
+    act: {fileID: 11400000, guid: 203753111eed61d4c8911576e0d94a59, type: 2}
+    actRule: {fileID: 0}
+  spawnedActs: []
+  onSpawn: {fileID: 0}
+  text: 
+  endText: 

@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 557f5e0557567a048a53124377707548, type: 3}
+  m_Name: Poison Player
+  m_EditorClassIdentifier: 
+  tests:
+  - cardTest: 0
+    canFail: 0
+    loc1: 0
+    fragment1: {fileID: 11400000, guid: 9506159a2a246314690d20dec7e9b122, type: 2}
+    op: 0
+    constant: 1
+    loc2: 0
+    fragment2: {fileID: 0}
+  - cardTest: 0
+    canFail: 0
+    loc1: 0
+    fragment1: {fileID: 11400000, guid: 0ff5f8fb492663f4dbb667337488e368, type: 2}
+    op: 0
+    constant: 1
+    loc2: 0
+    fragment2: {fileID: 0}
+  and: []
+  or: []
+  actModifiers:
+  - op: 0
+    fragment: {fileID: 11400000, guid: b4ab3860aa9b5894d91393559e9ee79f, type: 2}
+    level: 1
+    reference: {fileID: 0}
+  cardModifiers: []
+  tableModifiers: []
+  pathModifiers: []
+  deckModifiers: []
+  furthermore: []

@@ -19,10 +19,9 @@ namespace CultistLike
         [SerializeField, HideInInspector] private List<Act> spawnedActs;
 
         [SerializeField, HideInInspector] private Act forceAct;
+        [SerializeField, HideInInspector] private Act callbackAct;
+        [SerializeField, HideInInspector] private bool doCallback;
         [SerializeField, HideInInspector] private Rule forceRule;
-
-        [SerializeField, HideInInspector] private ActLogic _parent;
-        [SerializeField, HideInInspector] private List<ActLogic> children;
 
         private ActWindow actWindow;
 
@@ -30,9 +29,10 @@ namespace CultistLike
         public Act activeAct { get => _activeAct; private set => _activeAct = value; }
         public Act altAct { get => _altAct; set => _altAct = value; }
 
-        public ActLogic parent  { get => _parent; private set => _parent = value; }
-
         public TokenViz tokenViz { get => actWindow.tokenViz; }
+
+        public string runText => fragTree.InterpolateString(altAct ? altAct.text : activeAct.text);
+        public string endText => fragTree.InterpolateString(activeAct.endText);
 
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace CultistLike
                 {
                     foreach (var slot in GameManager.Instance.slotSOS)
                     {
-                        if (slot.allActs == true)
+                        if (slot != null && slot.allActs == true)
                         {
                             slotsToAttempt.Add(slot);
                         }
@@ -85,7 +85,7 @@ namespace CultistLike
 
                 foreach (var slot in GameManager.Instance.slotSOS)
                 {
-                    if (slot.allTokens == true || slot.token == tokenViz?.token)
+                    if (slot != null && slot.allTokens == true || slot.token == tokenViz?.token)
                     {
                         slotsToAttempt.Add(slot);
                     }
@@ -94,7 +94,7 @@ namespace CultistLike
 
             foreach (var slot in slotsToAttempt)
             {
-                if (slot.unique == false || slotsToOpen.Contains(slot) == false)
+                if (slot != null && slot.unique == false || slotsToOpen.Contains(slot) == false)
                 {
                     if (slot.Opens(this) == true)
                     {
@@ -227,7 +227,7 @@ namespace CultistLike
             PopulateActList(activeAct?.spawnedActs, spawnedActs, false);
             foreach (var spawnedAct in spawnedActs)
             {
-                GameManager.Instance.SpawnAct(spawnedAct, this);
+                GameManager.Instance.SpawnAct(spawnedAct, tokenViz);
             }
 
             actWindow.ParentSlotCardsToWindow();
@@ -238,6 +238,17 @@ namespace CultistLike
             }
             else
             {
+                if (doCallback == true && callbackAct != null)
+                {
+                    doCallback = false;
+                    Context context = new Context(this);
+                    if (AttemptAct(callbackAct, context) == true)
+                    {
+                        RunAct(callbackAct);
+                        return;
+                    }
+                }
+
                 PopulateActList(activeAct.nextActs, nextActs, activeAct.randomNext);
                 var nextAct = AttemptNextActs();
                 if (nextAct != null)
@@ -246,13 +257,14 @@ namespace CultistLike
                 }
                 else
                 {
-                    SetupFinalResults(activeAct.endText);
+                    SetupFinalResults();
                 }
             }
         }
 
-        private void SetupFinalResults(string endText)
+        private void SetupFinalResults()
         {
+            //TODO this cuts short DOTween animations
             actWindow.SetupResultCards(fragTree.cards);
             actWindow.ApplyStatus(ActStatus.Finished);
         }
@@ -265,6 +277,8 @@ namespace CultistLike
             RunAct(act);
         }
 
+        public void SetCallback(Act act) => callbackAct = act;
+        public void DoCallback() => doCallback = true;
         public void SetForceAct(Act act) => forceAct = act;
         public void ForceRule(Rule rule) => forceRule = rule;
 
@@ -335,25 +349,13 @@ namespace CultistLike
             }
         }
 
-        public void SetParent(ActLogic parent)
-        {
-            if (this.parent != null)
-            {
-                this.parent.RemoveChild(this);
-            }
-            if (parent != null)
-            {
-                parent.AddChild(this);
-            }
-            this.parent = parent;
-        }
-
         public ActLogicSave Save()
         {
             var save = new ActLogicSave();
             save.fragSave = fragTree.Save();
 
             save.activeAct = activeAct;
+            save.callbackAct = callbackAct;
             save.altAct = altAct;
             return save;
         }
@@ -362,24 +364,8 @@ namespace CultistLike
         {
             fragTree.Load(save.fragSave);
             activeAct = save.activeAct;
+            callbackAct = save.callbackAct;
             altAct = save.altAct;
-        }
-
-
-        private void AddChild(ActLogic child)
-        {
-            if (child != null && children.Contains(child) == false)
-            {
-                children.Add(child);
-            }
-        }
-
-        private void RemoveChild(ActLogic child)
-        {
-            if (child != null)
-            {
-                children.Remove(child);
-            }
         }
 
         private void Awake()
@@ -395,9 +381,9 @@ namespace CultistLike
     {
         public FragTreeSave fragSave;
         public Act activeAct;
+        public Act callbackAct;
         //???
         public Act altAct;
-        //parent children
     }
 
 }

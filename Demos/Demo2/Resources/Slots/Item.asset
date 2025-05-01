@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8982c193c92b64445902a2eec82848b5, type: 3}
+  m_Name: Item
+  m_EditorClassIdentifier: 
+  label: Item
+  description: 
+  fragments: []
+  token: {fileID: 0}
+  unique: 0
+  allTokens: 0
+  allActs: 0
+  spawnTests: []
+  spawnRule: {fileID: 0}
+  required:
+  - fragment: {fileID: 11400000, guid: fa313b8cf01b32b48bfe603fb1b08654, type: 2}
+    count: 1
+  - fragment: {fileID: 11400000, guid: a4ecf4033b56cb844a27f00420f1fa28, type: 2}
+    count: 1
+  - fragment: {fileID: 11400000, guid: b8ea294195d44f24c896cc510d21af19, type: 2}
+    count: 1
+  - fragment: {fileID: 11400000, guid: 93acb77ba7f2a414aa885e3361984720, type: 2}
+    count: 1
+  - fragment: {fileID: 11400000, guid: 87af825493f16794bb95aa2575c9e107, type: 2}
+    count: 1
+  essential: []
+  forbidden: []
+  cardRule: {fileID: 0}
+  acceptAll: 0
+  grab: 0
+  cardLock: 0

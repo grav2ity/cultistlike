@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d7ad74be29e3414894e2ccf6a7e39e6, type: 3}
+  m_Name: Stamina
+  m_EditorClassIdentifier: 
+  label: Stamina
+  art: {fileID: 0}
+  color: {r: 0.12932397, g: 0.5849056, b: 0.02391113, a: 1}
+  hidden: 0
+  description: Necessary for swinging at monsters
+  fragments:
+  - {fileID: 11400000, guid: 99d401a7d167c1746a8732ba2990a093, type: 2}
+  - {fileID: 11400000, guid: 946a428fdff73e643849178293ca9432, type: 2}
+  rules:
+  - {fileID: 11400000, guid: a3b2ff9e027a59c48bd5532f59289225, type: 2}
+  slots: []
+  decayTo: {fileID: 11400000}
+  lifetime: 0

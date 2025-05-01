@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51464b304bacc114e9344784d1851bb0, type: 3}
+  m_Name: Chest Items Level 1
+  m_EditorClassIdentifier: 
+  label: Chest Items Level 1
+  text: 
+  fragments:
+  - {fileID: 11400000, guid: 6aaadb11fa81e7a45b127db475a04f4c, type: 2}
+  - {fileID: 11400000, guid: 6aaadb11fa81e7a45b127db475a04f4c, type: 2}
+  - {fileID: 11400000, guid: d2023164b8c373141b6fdf2c49e18a2a, type: 2}
+  - {fileID: 11400000, guid: 46d141dc9b9547244b8cd34f79095b3f, type: 2}
+  - {fileID: 11400000, guid: 8e78cdeab7d7fc9478623a152593bc94, type: 2}
+  - {fileID: 11400000, guid: e3e667671a8d35441b030fbeae3ce81f, type: 2}
+  - {fileID: 11400000, guid: 8ed683219ce9f294e8631132da6987e2, type: 2}
+  defaultFragment: {fileID: 0}
+  shuffle: 1
+  replenish: 1
+  infinite: 0

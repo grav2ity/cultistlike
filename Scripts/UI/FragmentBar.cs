@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace CultistLike
 {
-    //TODO fragment bar displays stacked cards
     public class FragmentBar : MonoBehaviour
     {
         [Header("Layout")]
@@ -19,6 +18,7 @@ namespace CultistLike
         public bool showAspects;
         public bool showCards;
         public bool showSpecial;
+        public bool showHidden;
 
         [Header("Special fragments")]
         public Aspect allowed;
@@ -91,6 +91,9 @@ namespace CultistLike
 
         private void Load<T>(T frag) where T : IFrag
         {
+            if (showHidden == false && frag.Hidden() == true)
+                return;
+
             if (index < fragVizs.Count)
             {
                 fragVizs[index].Load<T>(frag);
@@ -106,11 +109,14 @@ namespace CultistLike
             }
         }
 
-        private void Load(CardViz frag)
+        private void Load(CardViz cardViz)
         {
+            if (showHidden == false && cardViz.card.Hidden() == true)
+                return;
+
             if (index < fragVizs.Count)
             {
-                fragVizs[index].Load(frag);
+                fragVizs[index].Load(cardViz);
                 fragVizs[index].gameObject.SetActive(true);
                 index++;
             }
@@ -119,7 +125,7 @@ namespace CultistLike
                 var fragViz = Instantiate(GameManager.Instance.fragmentPrefab,
                                           vertical == true ? verticalGO.transform : horizontalGO.transform);
                 fragVizs.Add(fragViz);
-                Load(frag);
+                Load(cardViz);
             }
         }
 

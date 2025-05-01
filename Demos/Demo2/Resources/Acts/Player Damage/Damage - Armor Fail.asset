@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
+  m_Name: Damage - Armor Fail
+  m_EditorClassIdentifier: 
+  label: Armor Fail
+  token: {fileID: 0}
+  initial: 0
+  time: 0
+  tests:
+  - cardTest: 1
+    canFail: 1
+    loc1: 64
+    fragment1: {fileID: 11400000, guid: 6cf9f646677bcf74a98896b177aa43ab, type: 2}
+    op: 1
+    constant: 1
+    loc2: 0
+    fragment2: {fileID: 0}
+  - cardTest: 0
+    canFail: 0
+    loc1: 0
+    fragment1: {fileID: 11400000, guid: 946a428fdff73e643849178293ca9432, type: 2}
+    op: 20
+    constant: 1
+    loc2: 32
+    fragment2: {fileID: 11400000, guid: a4ecf4033b56cb844a27f00420f1fa28, type: 2}
+  and: []
+  or: []
+  fragments: []
+  actModifiers:
+  - op: 0
+    fragment: {fileID: 11400000, guid: 69e38da8038b0b7448146642d7374e8b, type: 2}
+    level: 1
+    reference: {fileID: 11400000, guid: 946a428fdff73e643849178293ca9432, type: 2}
+  - op: 0
+    fragment: {fileID: 11400000, guid: ebe7a828a22f34146a42758fd65b1b44, type: 2}
+    level: 1
+    reference: {fileID: 11400000, guid: 946a428fdff73e643849178293ca9432, type: 2}
+  cardModifiers: []
+  tableModifiers: []
+  pathModifiers: []
+  deckModifiers: []
+  furthermore: []
+  ignoreGlobalSlots: 0
+  slots: []
+  randomAlt: 0
+  altActs: []
+  randomNext: 0
+  nextActs:
+  - chance: 0
+    act: {fileID: 11400000, guid: 54168bc406d2d02488a321c155aa638b, type: 2}
+    actRule: {fileID: 0}
+  spawnedActs: []
+  onSpawn: {fileID: 0}
+  text: 
+  endText: 

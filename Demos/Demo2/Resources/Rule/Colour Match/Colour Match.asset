@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 557f5e0557567a048a53124377707548, type: 3}
+  m_Name: Colour Match
+  m_EditorClassIdentifier: 
+  tests: []
+  and: []
+  or:
+  - {fileID: 11400000, guid: af73ce44fe99f9240a3476f847bb6639, type: 2}
+  - {fileID: 11400000, guid: 56e39f911a840834a9d0235005c9d338, type: 2}
+  - {fileID: 11400000, guid: c3cd64e29e4ca0d4fbc48677b06d9b65, type: 2}
+  actModifiers: []
+  cardModifiers: []
+  tableModifiers: []
+  pathModifiers: []
+  deckModifiers: []
+  furthermore: []

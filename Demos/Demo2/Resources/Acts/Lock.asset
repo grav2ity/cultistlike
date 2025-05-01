@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
+  m_Name: Lock
+  m_EditorClassIdentifier: 
+  label: Maybe Lock
+  token: {fileID: 0}
+  initial: 0
+  time: 0
+  tests:
+  - cardTest: 1
+    canFail: 0
+    loc1: 0
+    fragment1: {fileID: 11400000, guid: a8914dff0340a9d4382ceb89261131fc, type: 2}
+    op: 0
+    constant: 1
+    loc2: 0
+    fragment2: {fileID: 0}
+  and: []
+  or: []
+  fragments: []
+  actModifiers: []
+  cardModifiers:
+  - op: 0
+    target: {fileID: 11400000, guid: 359609367f1923146b1068c9f2375786, type: 2}
+    fragment: {fileID: 11400000, guid: e5eed10e6036a2242aac1922df16a468, type: 2}
+    level: 1
+    reference: {fileID: 0}
+  tableModifiers: []
+  pathModifiers: []
+  deckModifiers: []
+  furthermore: []
+  ignoreGlobalSlots: 0
+  slots: []
+  randomAlt: 0
+  altActs: []
+  randomNext: 0
+  nextActs:
+  - chance: 0
+    act: {fileID: 11400000, guid: 15b15a46e23f282428c366929d42ec37, type: 2}
+    actRule: {fileID: 0}
+  spawnedActs: []
+  onSpawn: {fileID: 0}
+  text: 
+  endText: 

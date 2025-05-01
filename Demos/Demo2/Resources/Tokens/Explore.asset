@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b90be55e95f4914094bbfa9c44b694b, type: 3}
+  m_Name: Explore
+  m_EditorClassIdentifier: 
+  label: Explore
+  description: 
+  art: {fileID: 0}
+  color: {r: 0.9685534, g: 0.9327725, b: 0, a: 1}
+  slot: {fileID: 11400000, guid: 3486b6a988395ec40a6529cf2ed49c96, type: 2}
+  dissolve: 0
+  unique: 1

@@ -7,5 +7,6 @@ namespace CultistLike
     {
         Fragment ToFragment();
         int Count();
+        bool Hidden();
     }
 }

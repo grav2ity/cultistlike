@@ -57,7 +57,7 @@ namespace CultistLike
             }
             else
             {
-                //TODO make it possible fot regular test to modify MatchedCards list?
+                //TODO make it possible for regular test to modify MatchedCards list?
                 right = constant * GetCount(context, loc2, fragment2r);
             }
 
@@ -78,8 +78,9 @@ namespace CultistLike
                 bool passed = false;
                 if (fragment1r == null)
                 {
-                    if (right > 0 && right < context.matches.Count)
-                    {
+                    if (right > 0)                     {
+                        right = Math.Min(right, context.matches.Count);
+                        passed = true;
                         context.matches = context.matches.GetRange(0, right);
                     }
                 }
@@ -104,7 +105,6 @@ namespace CultistLike
                     context.matches.Clear();
                     context.matches.InsertRange(0, newMatches);
                 }
-
 
                 return passed;
             }
@@ -183,7 +183,6 @@ namespace CultistLike
                     HeldFragment ha = null;
                     foreach (var card in cards)
                     {
-                        //TODO !!!!!!!
                         ha = card.fragTree.Find(aspect);
                         if (ha != null)
                         {

@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da4f913036c64cb44bbf11356c320551, type: 3}
+  m_Name: Open Chest
+  m_EditorClassIdentifier: 
+  label: Open Chest
+  token: {fileID: 11400000, guid: 73aea127f99b9c147afcd4f766da2c0e, type: 2}
+  initial: 1
+  time: 10
+  tests:
+  - cardTest: 0
+    canFail: 0
+    loc1: 0
+    fragment1: {fileID: 11400000, guid: 93acb77ba7f2a414aa885e3361984720, type: 2}
+    op: 0
+    constant: 1
+    loc2: 0
+    fragment2: {fileID: 0}
+  and: []
+  or:
+  - {fileID: 11400000, guid: db938a1f9af1f38459be1018276009d5, type: 2}
+  - {fileID: 11400000, guid: 73f43d0e9e58e4f489080550921e6aaa, type: 2}
+  fragments: []
+  actModifiers:
+  - op: 0
+    fragment: {fileID: 11400000, guid: 93acb77ba7f2a414aa885e3361984720, type: 2}
+    level: -1
+    reference: {fileID: 0}
+  - op: 0
+    fragment: {fileID: 11400000, guid: d47348897721b7441a110b0e7d8a4fd1, type: 2}
+    level: -1
+    reference: {fileID: 0}
+  cardModifiers: []
+  tableModifiers: []
+  pathModifiers: []
+  deckModifiers: []
+  furthermore: []
+  ignoreGlobalSlots: 0
+  slots: []
+  randomAlt: 0
+  altActs: []
+  randomNext: 0
+  nextActs:
+  - chance: 100
+    act: {fileID: 11400000, guid: 6b454b111798cb345ace27e4de4ffa31, type: 2}
+    actRule: {fileID: 0}
+  spawnedActs: []
+  onSpawn: {fileID: 0}
+  text: 
+  endText: 

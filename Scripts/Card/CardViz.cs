@@ -139,6 +139,7 @@ namespace CultistLike
                 }
                 else
                 {
+                    //TODO does not exactly work with stacks where cards might have different fragments
                     SlotViz readySlot = null;
                     if (GameManager.Instance.openWindow != null)
                     {
@@ -157,9 +158,11 @@ namespace CultistLike
                     }
                     if (readySlot != null)
                     {
-                        gameObject.transform.parent?.
-                            GetComponentInParent<ICardDock>(true)?.OnCardUndock(gameObject);
-                        readySlot.Grab(this, true);
+                        var cardVizY = Yield();
+
+                        cardVizY.transform.parent?.
+                            GetComponentInParent<ICardDock>(true)?.OnCardUndock(cardVizY.gameObject);
+                        readySlot.Grab(cardVizY, true);
                     }
                 }
             }
@@ -339,6 +342,7 @@ namespace CultistLike
                         OnCardUndock(cardVizY.gameObject);
                     cardVizY.gameObject.SetActive(true);
 
+                    cardVizY.transform.position = cardVizY.Position();
                     cardVizY.Parent(null);
 
                     if (onStart != null)
@@ -467,6 +471,19 @@ namespace CultistLike
                 {
                     fragTree.Add(frag);
                 }
+            }
+        }
+
+        private Vector3 Position()
+        {
+            var actWindow = GetComponentInParent<ActWindow>();
+            if (actWindow && actWindow.open == false)
+            {
+                return actWindow.tokenViz.transform.position;
+            }
+            else
+            {
+                return transform.position;
             }
         }
 

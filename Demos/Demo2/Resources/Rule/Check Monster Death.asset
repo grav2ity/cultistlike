@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 557f5e0557567a048a53124377707548, type: 3}
+  m_Name: Check Monster Death
+  m_EditorClassIdentifier: 
+  tests:
+  - cardTest: 1
+    canFail: 0
+    loc1: 0
+    fragment1: {fileID: 11400000, guid: e24b4729cd6d7f948bc9b00f0a34830a, type: 2}
+    op: 0
+    constant: 1
+    loc2: 0
+    fragment2: {fileID: 0}
+  - cardTest: 1
+    canFail: 0
+    loc1: 32
+    fragment1: {fileID: 11400000, guid: c5180ca64fca4a6468bfc7065b402794, type: 2}
+    op: 1
+    constant: 0
+    loc2: 0
+    fragment2: {fileID: 0}
+  and: []
+  or: []
+  actModifiers: []
+  cardModifiers:
+  - op: 10
+    target: {fileID: 11400000, guid: 359609367f1923146b1068c9f2375786, type: 2}
+    fragment: {fileID: 11400000, guid: 08c50ab7a02f43f41a61ba8b5757799c, type: 2}
+    level: 1
+    reference: {fileID: 0}
+  tableModifiers: []
+  pathModifiers: []
+  deckModifiers: []
+  furthermore: []

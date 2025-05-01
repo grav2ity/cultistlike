@@ -31,7 +31,6 @@ namespace CultistLike
         [Tooltip("Removing Card will cause all other Slots to close.")]
         public bool firstSlot;
 
-        public Action OnChange;
 
         [SerializeField, HideInInspector] private ActWindow actWindow;
         [SerializeField, HideInInspector] private CardViz _slottedCard;
@@ -142,11 +141,10 @@ namespace CultistLike
             {
                 slottedCard = cardViz;
 
-                //TODO slot frags
-                // foreach (var frag in slot.fragments)
-                // {
-                //     actWindow.actLogic.fragTree.Add(frag);
-                // }
+                foreach (var frag in slot.fragments)
+                {
+                    actWindow.AddFragment(frag);
+                }
 
                 slottedCard.Parent(transform);
 
@@ -166,11 +164,10 @@ namespace CultistLike
                 slottedCard.interactive = true;
                 slottedCard.Parent(null);
 
-                //TODO slot frags
-                // foreach (var frag in slot.fragments)
-                // {
-                //     actWindow.actLogic.fragTree.Remove(frag);
-                // }
+                foreach (var frag in slot.fragments)
+                {
+                    actWindow.RemoveFragment(frag);
+                }
 
                 var sc = slottedCard;
                 slottedCard = null;

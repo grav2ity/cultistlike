@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 557f5e0557567a048a53124377707548, type: 3}
+  m_Name: Exhaust Stamina
+  m_EditorClassIdentifier: 
+  tests: []
+  and: []
+  or: []
+  actModifiers: []
+  cardModifiers:
+  - op: 10
+    target: {fileID: 11400000, guid: 061650b8809ec324497d66707b41c540, type: 2}
+    fragment: {fileID: 11400000, guid: 86950ade89b690840b5d88b7fe15c87d, type: 2}
+    level: 1
+    reference: {fileID: 0}
+  tableModifiers: []
+  pathModifiers: []
+  deckModifiers: []
+  furthermore: []

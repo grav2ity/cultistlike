@@ -122,8 +122,21 @@ namespace CultistLike
             if (cardViz != null)
             {
                 cardViz.Parent(null);
-                cardViz.gameObject.SetActive(false);
-                Destroy(cardViz.gameObject, 0.1f);
+                //TODO ?? need to break CardViz in two classes (visuals, logic) to do away with this nonsense
+                var tweens = DOTween.TweensByTarget(cardViz.transform);
+                if (tweens != null && tweens.Count > 0)
+                {
+                    tweens[0].OnComplete(() =>
+                    {
+                        cardViz.gameObject.SetActive(false);
+                        Destroy(cardViz.gameObject);
+                    });
+                }
+                else
+                {
+                    cardViz.gameObject.SetActive(false);
+                    Destroy(cardViz.gameObject);
+                }
             }
         }
 
@@ -185,16 +198,15 @@ namespace CultistLike
             }
         }
 
-        public TokenViz SpawnAct(Act act, ActLogic parent)
+        public TokenViz SpawnAct(Act act, Viz viz)
         {
             if (act != null && act.token != null)
             {
-                var newTokenViz = SpawnToken(act.token, parent?.tokenViz);
+                var newTokenViz = SpawnToken(act.token, viz);
                 if (newTokenViz != null)
                 {
                     newTokenViz.autoPlay = act;
                     newTokenViz.initRule = act.onSpawn;
-                    newTokenViz.parent = parent;
                     return newTokenViz;
                 }
             }

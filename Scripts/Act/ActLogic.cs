@@ -29,6 +29,8 @@ namespace CultistLike
         public Act activeAct { get => _activeAct; private set => _activeAct = value; }
         public Act altAct { get => _altAct; set => _altAct = value; }
 
+        public FragTree slotsFragTree { get => actWindow.slotsFragTree; }
+
         public TokenViz tokenViz { get => actWindow.tokenViz; }
 
         public string runText => fragTree.InterpolateString(altAct ? altAct.text : activeAct.text);
@@ -348,6 +350,8 @@ namespace CultistLike
                 }
             }
         }
+
+        public string InterpolateString(string s) => fragTree.InterpolateString(s);
 
         public ActLogicSave Save()
         {

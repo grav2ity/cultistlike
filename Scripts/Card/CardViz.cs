@@ -205,6 +205,7 @@ namespace CultistLike
 
         public void Destroy()
         {
+            transform.parent?.GetComponentInParent<ICardDock>(true)?.OnCardUndock(gameObject);
             GameManager.Instance.DestroyCard(this);
         }
 
@@ -309,9 +310,13 @@ namespace CultistLike
         {
             //TODO clone whole object?
             var newCardViz = GameManager.Instance.CreateCard(card);
-            foreach (var frag in fragTree.localFragments)
+
+            if (newCardViz != null)
             {
-                newCardViz.fragTree.Add(frag);
+                foreach (var frag in fragTree.localFragments)
+                {
+                    newCardViz.fragTree.Add(frag);
+                }
             }
 
             return newCardViz;
@@ -472,6 +477,11 @@ namespace CultistLike
                     fragTree.Add(frag);
                 }
             }
+
+            // if (fragTree.localFragments.Count > 0)
+            // {
+            //     fragTree.memoryFragment = fragTree.localFragments[0].fragment;
+            // }
         }
 
         private Vector3 Position()

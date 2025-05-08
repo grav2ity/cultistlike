@@ -40,6 +40,7 @@ namespace CultistLike
         public Fragment thisAspect;
         public Fragment thisCard;
         public Fragment matchedCards;
+        public Fragment memoryFragment;
 
         [Header("Time control")]
         public float timeScale;
@@ -103,7 +104,7 @@ namespace CultistLike
             onCardInPlay.Invoke(cardViz);
         }
 
-        public CardViz CreateCard()
+        private CardViz CreateCard()
         {
             var cardViz = UnityEngine.Object.Instantiate(cardPrefab);
             cardViz.draggingPlane = GameManager.Instance.cardDragPlane;
@@ -112,9 +113,16 @@ namespace CultistLike
 
         public CardViz CreateCard(Card card)
         {
-            var cardViz = CreateCard();
-            cardViz.LoadCard(card);
-            return cardViz;
+            if (AllowedToCreate(card) == true)
+            {
+                var cardViz = CreateCard();
+                cardViz.LoadCard(card);
+                return cardViz;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public void DestroyCard(CardViz cardViz)
@@ -123,7 +131,7 @@ namespace CultistLike
             {
                 cardViz.Parent(null);
                 //TODO ?? need to break CardViz in two classes (visuals, logic) to do away with this nonsense
-                var tweens = DOTween.TweensByTarget(cardViz.transform);
+                var tweens = DOTween.TweensByTarget(cardViz.transform, true);
                 if (tweens != null && tweens.Count > 0)
                 {
                     tweens[0].OnComplete(() =>
@@ -347,9 +355,23 @@ namespace CultistLike
             }
             windows.Clear();
 
+            DeckManager.Instance.Reset();
+
             openWindow = null;
             UIManager.Instance?.cardInfo?.Unload();
             UIManager.Instance?.aspectInfo?.Unload();
+        }
+
+        private bool AllowedToCreate(Card card)
+        {
+            if (card.unique == false)
+            {
+                return true;
+            }
+            else
+            {
+                return root.Count(card) == 0;
+            }
         }
 
         private void FindIninitalActs()
@@ -379,7 +401,7 @@ namespace CultistLike
             FindSlotSOS();
             FindIninitalActs();
 
-            if (thisAspect == null || thisCard == null || matchedCards == null)
+            if (thisAspect == null || thisCard == null || matchedCards == null || memoryFragment == null)
             {
                 Debug.LogError("GameManager's Special fragments are missing!!");
             }

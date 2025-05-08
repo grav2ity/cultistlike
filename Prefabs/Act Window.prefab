@@ -1153,6 +1153,57 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &5472198100940151178
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1025135475439788831}
+  - component: {fileID: 3338673699594219992}
+  m_Layer: 0
+  m_Name: Slots
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1025135475439788831
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5472198100940151178}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2018682812794367255}
+  - {fileID: 5899669362217091670}
+  m_Father: {fileID: 3707799410444567590}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3338673699594219992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5472198100940151178}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82ae1eded985fed40acba304402545b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localFragments: []
+  localCard: {fileID: 0}
+  matches: []
+  memoryFragment: {fileID: 0}
+  free: 1
 --- !u!1 &6050733521751008755
 GameObject:
   m_ObjectHideFlags: 0
@@ -1319,8 +1370,7 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 8476360870207394352}
-  - {fileID: 2018682812794367255}
-  - {fileID: 5899669362217091670}
+  - {fileID: 1025135475439788831}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2623546043578392633
@@ -1343,6 +1393,7 @@ MonoBehaviour:
   visualsGO: {fileID: 927715334266877889}
   label: {fileID: 7942707299308039800}
   text: {fileID: 8990604413214538326}
+  slotsFrag: {fileID: 3338673699594219992}
   idleSlotsGO: {fileID: 8647200573428268445}
   runSlotsGO: {fileID: 6255190282301801516}
   resultLane: {fileID: 5572996021013042319}
@@ -1399,6 +1450,7 @@ MonoBehaviour:
   localFragments: []
   localCard: {fileID: 0}
   matches: []
+  memoryFragment: {fileID: 0}
   free: 1
 --- !u!1 &6255190282301801516
 GameObject:
@@ -1430,7 +1482,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3918897906205825717}
-  m_Father: {fileID: 3707799410444567590}
+  m_Father: {fileID: 1025135475439788831}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6565020327641556990
 GameObject:
@@ -2253,7 +2305,7 @@ Transform:
   - {fileID: 5775602342264144680}
   - {fileID: 2111615072560849894}
   - {fileID: 1839260164882473375}
-  m_Father: {fileID: 3707799410444567590}
+  m_Father: {fileID: 1025135475439788831}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8770355213627905885
 GameObject:

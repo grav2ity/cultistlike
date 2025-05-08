@@ -123,6 +123,14 @@ namespace CultistLike
                 {
                     return level * scope.Count(thisCard.card);
                 }
+                else if (frag == GameManager.Instance.matchedCards)
+                {
+                    return level * matches.Count;
+                }
+                else if (frag == GameManager.Instance.memoryFragment)
+                {
+                    return level * scope.Count(scope.memoryFragment);
+                }
                 else
                 {
                     return level * scope.Count(frag);
@@ -145,6 +153,10 @@ namespace CultistLike
                 else if (frag == GameManager.Instance.thisCard)
                 {
                     return thisCard.card;
+                }
+                else if (frag == GameManager.Instance.memoryFragment)
+                {
+                    return scope.memoryFragment;
                 }
                 else
                 {
@@ -172,6 +184,10 @@ namespace CultistLike
                 else if (frag == GameManager.Instance.matchedCards)
                 {
                     return new Target(matches);
+                }
+                else if (frag == GameManager.Instance.memoryFragment)
+                {
+                    return new Target(scope.memoryFragment);
                 }
                 else
                 {

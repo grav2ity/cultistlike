@@ -41,6 +41,12 @@ namespace CultistLike
             }
         }
 
+        public void Reset()
+        {
+            deckInsts.Clear();
+            decDict.Clear();
+        }
+
         private void Awake()
         {
             Instance = this;

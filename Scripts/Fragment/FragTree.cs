@@ -15,6 +15,8 @@ namespace CultistLike
         public CardViz localCard;
         public List<CardViz> matches;
 
+        public Fragment memoryFragment;
+
         public bool free;
 
         public Action<CardViz> onCreateCard;
@@ -109,7 +111,7 @@ namespace CultistLike
 
         public void Add(Viz viz)
         {
-            viz.Parent(transform);
+            viz?.Parent(transform);
         }
 
         public CardViz Add(Card card)
@@ -118,7 +120,7 @@ namespace CultistLike
             {
                 var cardViz = GameManager.Instance.CreateCard(card);
                 Add(cardViz);
-                if (onCreateCard != null)
+                if (onCreateCard != null && cardViz != null)
                 {
                     onCreateCard(cardViz);
                 }
@@ -167,14 +169,18 @@ namespace CultistLike
             {
                 if (level > 0)
                 {
-                    int count = level;
-                    while (level-- > 0)
+                    int count = 0;
+                    for (int i=0; i<level; i++)
                     {
                         var newCardViz = cardViz.Duplicate();
-                        Add(newCardViz);
-                        if (onCreateCard != null)
+                        if (newCardViz != null)
                         {
-                            onCreateCard(newCardViz);
+                            Add(newCardViz);
+                            if (onCreateCard != null)
+                            {
+                                onCreateCard(newCardViz);
+                            }
+                            count++;
                         }
                     }
                     OnChange();
@@ -203,10 +209,13 @@ namespace CultistLike
             {
                 if (level > 0)
                 {
-                    int count = level;
-                    while (level-- > 0)
+                    int count = 0;
+                    for (int i=0; i<level; i++)
                     {
-                        Add(card);
+                        if (Add(card) != null)
+                        {
+                            count++;
+                        }
                     }
                     return count;
                 }

@@ -1920,6 +1920,7 @@ MonoBehaviour:
   thisAspect: {fileID: 11400000, guid: 58c3b9f13951cf84fbd36b87b6c26333, type: 2}
   thisCard: {fileID: 11400000, guid: 061650b8809ec324497d66707b41c540, type: 2}
   matchedCards: {fileID: 11400000, guid: 359609367f1923146b1068c9f2375786, type: 2}
+  memoryFragment: {fileID: 11400000, guid: 7b2646c88635c0c4e8203394fc991144, type: 2}
   timeScale: 0
   maxTime: 0
   allTime: 0
@@ -3259,6 +3260,7 @@ MonoBehaviour:
   localFragments: []
   localCard: {fileID: 0}
   matches: []
+  memoryFragment: {fileID: 0}
   free: 0
 --- !u!1001 &1174428571
 PrefabInstance:
@@ -4240,6 +4242,7 @@ MonoBehaviour:
   localFragments: []
   localCard: {fileID: 0}
   matches: []
+  memoryFragment: {fileID: 0}
   free: 0
 --- !u!1 &1561756283
 GameObject:

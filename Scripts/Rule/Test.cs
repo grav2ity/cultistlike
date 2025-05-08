@@ -24,6 +24,7 @@ namespace CultistLike
         Scope          = 0,
         MatchedCards   = 1 << 5,
         // Parent         = 1 << 3,
+        Slots          = 1 << 2,
         Table          = 1 << 4,
         Free          = 1 << 7,
         Anywhere       = 1 << 6,
@@ -154,6 +155,10 @@ namespace CultistLike
             if (loc == ReqLoc.Table)
             {
                 return GameManager.Instance.table.fragTree;
+            }
+            else if (loc == ReqLoc.Slots )
+            {
+                return context.actLogic?.slotsFragTree;
             }
             else if (loc == ReqLoc.Free || loc == ReqLoc.Anywhere )
             {

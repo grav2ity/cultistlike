@@ -9,17 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d7ad74be29e3414894e2ccf6a7e39e6, type: 3}
-  m_Name: New Adventure
+  m_Script: {fileID: 11500000, guid: 936a4de03f38f8c4a824dc6199e33e5d, type: 3}
+  m_Name: ___MemoryFragment
   m_EditorClassIdentifier: 
-  label: New Adventure
+  label: ___MemoryFragment
   art: {fileID: 0}
-  color: {r: 0, g: 0.047800083, b: 0.48235294, a: 1}
+  color: {r: 0, g: 0, b: 0, a: 0}
   hidden: 0
   description: 
   fragments: []
   rules: []
   slots: []
-  decayTo: {fileID: 0}
-  lifetime: 0
-  unique: 0

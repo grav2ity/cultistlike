@@ -35,6 +35,7 @@ namespace CultistLike
         FragmentAdditive = 0,
         Transform = 10,
         Decay = 100,
+        SetMemory = 140,
     }
 
     [Serializable]
@@ -110,6 +111,15 @@ namespace CultistLike
                             }
                         }
                         break;
+                    case CardOp.SetMemory:
+                        foreach (var targetCard in targetCards)
+                        {
+                            if (what.fragment is Aspect)
+                            {
+                                targetCard.fragTree.memoryFragment = what.fragment;
+                            }
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -124,6 +134,7 @@ namespace CultistLike
         Adjust = 0,
         Grab = 20,
         // TransferToParent = 30,
+        SetMemory = 40,
     }
 
     [Serializable]
@@ -219,6 +230,16 @@ namespace CultistLike
                         break;
                     // case ActOp.TransferToParent:
                         // break;
+                    case ActOp.SetMemory:
+                        if (target.fragment != null)
+                        {
+                            context.scope.memoryFragment = target.fragment;
+                        }
+                        else if (target.cards.Count > 0)
+                        {
+                            context.scope.memoryFragment = target.cards[0].fragTree.memoryFragment;
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -323,6 +344,11 @@ namespace CultistLike
                         {
                             var newCardViz = context.scope.Add((Card)frag);
                             newCardViz.ShowBack();
+
+                            if (deck.tagOnFragment != null)
+                            {
+                                newCardViz.fragTree.Add(deck.tagOnFragment);
+                            }
                         }
                         break;
                     // case DeckOp.DrawNext:

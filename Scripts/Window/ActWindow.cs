@@ -17,6 +17,7 @@ namespace CultistLike
         [SerializeField] private GameObject visualsGO;
         [SerializeField] private TextMeshPro label;
         [SerializeField] private TextMeshProUGUI text;
+        [SerializeField] private FragTree slotsFrag;
         [SerializeField] private GameObject idleSlotsGO;
         [SerializeField] private GameObject runSlotsGO;
         [SerializeField] private CardLane resultLane;
@@ -42,6 +43,8 @@ namespace CultistLike
 
         public TokenViz tokenViz { get => _tokenViz; private set => _tokenViz = value; }
         public Timer timer { get => _timer; }
+
+        public FragTree slotsFragTree => slotsFrag;
 
         private List<SlotViz> slots => actStatus == ActStatus.Running ? runSlots : idleSlots;
         private string runLabel => actLogic.altAct ? actLogic.altAct.label : actLogic.activeAct.label;
@@ -107,6 +110,7 @@ namespace CultistLike
         {
             if (suspendUpdates == false)
             {
+                //TODO ?? not when running
                 suspendUpdates = true;
                 ReturnCardsToTable();
                 suspendUpdates = false;
@@ -114,6 +118,14 @@ namespace CultistLike
                 {
                     StatusIdle();
                 }
+            }
+        }
+
+        public void SetFragMemory(CardViz cardViz)
+        {
+            if (cardViz != null)
+            {
+                actLogic.fragTree.memoryFragment = cardViz.fragTree.memoryFragment;
             }
         }
 
@@ -157,32 +169,49 @@ namespace CultistLike
                 suspendUpdates = true;
 
                 var slotsToOpen = actLogic.CheckForSlots();
-
-                CloseSlots(slots);
-
-                foreach (var slot in slotsToOpen)
-                {
-                    OpenSlot(slot, slots);
-                }
+                var slotsToRefresh = new List<SlotViz>();
 
                 bool reUpdate = false;
-                foreach (var slot in slots)
+                foreach (var slotViz in slots)
                 {
-                    if (slot.gameObject.activeSelf == false)
+                    if (slotViz.open == true)
                     {
-                        var cardViz = slot.UnslotCard();
-                        if (cardViz != null)
+                        var foundSlot = slotsToOpen.Find(x => x == slotViz.slot);
+                        if (foundSlot == null)
                         {
-                            reUpdate = true;
-                            GameManager.Instance.table.ReturnToTable(cardViz);
+                            var cardViz = slotViz.UnslotCard();
+                            slotViz.CloseSlot();
+                            if (cardViz != null)
+                            {
+                                reUpdate = true;
+                                GameManager.Instance.table.ReturnToTable(cardViz);
+                            }
+                        }
+                        else
+                        {
+                            slotsToOpen.Remove(foundSlot);
+                            slotsToRefresh.Add(slotViz);
                         }
                     }
                 }
 
-                suspendUpdates = false;
                 if (reUpdate == true)
                 {
+                    suspendUpdates = false;
                     UpdateSlots();
+                }
+                else
+                {
+                    foreach (var slotViz in slotsToRefresh)
+                    {
+                        slotViz.Refresh();
+                    }
+                    foreach (var slot in slotsToOpen)
+                    {
+                        OpenSlot(slot, slots);
+                    }
+
+                    suspendUpdates = false;
                 }
             }
         }
@@ -297,7 +326,7 @@ namespace CultistLike
                     if (tokenViz != null)
                     {
                         label.text = tokenViz?.token?.label;
-                        text.text = tokenViz?.token?.description;
+                        text.text = actLogic.InterpolateString(tokenViz?.token?.description);
                     }
                     break;
                 case ActStatus.Ready:
@@ -305,7 +334,7 @@ namespace CultistLike
                     {
                         okButton.interactable = true;
                         label.text = readyAct.label;
-                        text.text = actLogic.fragTree.InterpolateString(readyAct.text);
+                        text.text = actLogic.InterpolateString(readyAct.text);
                         tokenViz.SetResultCount(0);
                     }
                     break;
@@ -433,7 +462,8 @@ namespace CultistLike
             {
                 readyAct = actLogic.AttemptInitialActs();
 
-                if (readyAct != null)
+                //TODO ?? prevents ready status for acts with no tests when no card is slotted
+                if (readyAct != null && idleSlots.Count > 0 && idleSlots[0].slottedCard != null)
                 {
                     ApplyStatus(ActStatus.Ready);
                 }

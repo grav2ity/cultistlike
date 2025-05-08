@@ -24,6 +24,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 93acb77ba7f2a414aa885e3361984720, type: 2}
   - {fileID: 11400000, guid: 93acb77ba7f2a414aa885e3361984720, type: 2}
   defaultFragment: {fileID: 0}
+  tagOnFragment: {fileID: 0}
   shuffle: 1
   replenish: 1
   infinite: 0

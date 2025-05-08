@@ -35,6 +35,7 @@ namespace CultistLike
         [SerializeField, HideInInspector] private ActWindow actWindow;
         [SerializeField, HideInInspector] private CardViz _slottedCard;
 
+        public bool open { get => gameObject.activeSelf; }
         public CardViz slottedCard { get => _slottedCard; private set => _slottedCard = value; }
 
 
@@ -118,7 +119,7 @@ namespace CultistLike
 
         public void SlotCardPhysical(CardViz cardViz)
         {
-            if (cardViz != null)
+            if (cardViz != null && open == true)
             {
                 cardViz.transform.SetParent(transform);
                 cardViz.transform.localPosition = Vector3.zero;
@@ -137,7 +138,7 @@ namespace CultistLike
 
         public void SlotCardLogical(CardViz cardViz)
         {
-            if (cardViz != null)
+            if (cardViz != null && slot != null)
             {
                 slottedCard = cardViz;
 
@@ -153,11 +154,18 @@ namespace CultistLike
                     cardViz.interactive = false;
                     cardViz.free = false;
                 }
+
+                // if (firstSlot == true)
+                // {
+                //     actWindow.SetFragMemory(cardViz);
+                // }
             }
         }
 
         public CardViz UnslotCard()
         {
+            Debug.Assert(slot != null);
+
             if (slottedCard != null)
             {
                 slottedCard.free = true;
@@ -199,6 +207,8 @@ namespace CultistLike
         public void CloseSlot()
         {
             gameObject.SetActive(false);
+            slot = null;
+            SetHighlight(false);
             if (grab == true)
             {
                 GameManager.Instance.onCardInPlay.RemoveListener(GrabAction);
@@ -208,6 +218,11 @@ namespace CultistLike
         public void OpenSlot()
         {
             gameObject.SetActive(true);
+            Refresh();
+        }
+
+        public void Refresh()
+        {
             if (grab == true && slottedCard == null)
             {
                 foreach (var cardViz in GameManager.Instance.cards)

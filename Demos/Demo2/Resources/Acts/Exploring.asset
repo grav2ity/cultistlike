@@ -23,9 +23,7 @@ MonoBehaviour:
   actModifiers: []
   cardModifiers: []
   tableModifiers: []
-  pathModifiers:
-  - op: 0
-    act: {fileID: 0}
+  pathModifiers: []
   deckModifiers: []
   furthermore: []
   ignoreGlobalSlots: 0

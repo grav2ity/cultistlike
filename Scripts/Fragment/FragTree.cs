@@ -76,6 +76,7 @@ namespace CultistLike
         {
             matches.Clear();
             localFragments.Clear();
+            OnChange();
         }
 
         public void Add(Fragment frag) => frag.AddToTree(this);

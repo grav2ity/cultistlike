@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+
+using UnityEngine;
 
 
 namespace CultistLike
@@ -8,15 +10,21 @@ namespace CultistLike
     {
         [Tooltip("Label to display when no Act is running.")]
         public string label;
-        [TextArea(3, 10)]
-        [Tooltip("Description to display when no Act is running.")]
-        public string description;
         public Sprite art;
         [Tooltip("Solid color used when art is not set.")]
         public Color color;
 
+        [Header("Description")]
+        [Tooltip("Description to display when no Act is running.")]
+        [TextArea(3, 10)]
+        public string description;
+        public List<Rule> textRules;
+
+        [Header("Slot")]
         [Tooltip("First Slot to open for this Token when no Act is running.")]
         public Slot slot;
+
+        [Header("Options")]
         [Tooltip("Destroy Token after completing last Act.")]
         public bool dissolve;
         [Tooltip("Only one Token of this type can be on the table at any given time.")]

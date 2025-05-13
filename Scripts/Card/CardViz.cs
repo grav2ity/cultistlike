@@ -295,6 +295,7 @@ namespace CultistLike
             }
         }
 
+        //TODO this does not casue on update up the FragTree ??
         public void Transform(Card card)
         {
             LoadCard(card, false);
@@ -443,18 +444,26 @@ namespace CultistLike
             cardStack.Push(cardViz);
         }
 
-        public void OnDecayComplete(Card card)
+        public void OnDecayComplete(Card targetCard)
         {
             interactive = false;
 
-            if (card != null)
+            if (targetCard != null)
             {
                 var yScale = transform.localScale.y;
                 var targetScale = new Vector3(transform.localScale.x, 0f, transform.localScale.z);
                 transform.DOScale(targetScale, GameManager.Instance.scaleSpeed).
                     OnComplete(() =>
                     {
-                        Transform(card);
+                        Transform(targetCard);
+                        if (card.onDecayInto != null)
+                        {
+                            using (var context = new Context(this))
+                            {
+                                card.onDecayInto.Run(context);
+                            }
+                        }
+
                         var targetScale2 = new Vector3(transform.localScale.x, yScale, transform.localScale.z);
                         transform.DOScale(targetScale2, GameManager.Instance.scaleSpeed).
                             OnComplete(() => { interactive = true; });

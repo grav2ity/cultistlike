@@ -103,12 +103,34 @@ namespace CultistLike
 
         public void ResetMatches()
         {
-            matches = scope.cards.GetRange(0, actLogic.fragTree.cards.Count);
+            matches = scope.cards.GetRange(0, scope.cards.Count);
         }
 
         public void SaveMatches()
         {
             scope.matches = matches;
+        }
+
+        public FragTree ResolveScope(ReqLoc loc)
+        {
+            switch (loc)
+            {
+                case ReqLoc.Scope:
+                    return scope;
+                // case ReqLoc.MatchedCards:
+                //     return matches.Count > 0 ? matches[0].fragTree : null;
+                case ReqLoc.Slots:
+                    return actLogic?.slotsFragTree;
+                case ReqLoc.Table:
+                    return GameManager.Instance.table.fragTree;
+                case ReqLoc.Heap:
+                    return GameManager.Instance.heap;
+                case ReqLoc.Free:
+                case ReqLoc.Anywhere:
+                    return GameManager.Instance.root;
+                default:
+                    return scope;
+            }
         }
 
         public int Count(Fragment frag, int level)

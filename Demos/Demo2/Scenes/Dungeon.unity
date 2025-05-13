@@ -1911,13 +1911,14 @@ MonoBehaviour:
   fragmentPrefab: {fileID: 4000967335496098963, guid: c3fdbc05d6b0bc146946e75bba68a8d7, type: 3}
   root: {fileID: 1161560767}
   table: {fileID: 1547840997}
+  heap: {fileID: 0}
   windowPlane: {fileID: 1664217702}
   cardDragPlane: {fileID: 1509000456}
   normalSpeed: 0.7
   fastSpeed: 0.05
   rotateSpeed: 0.5
   scaleSpeed: 0.5
-  thisAspect: {fileID: 11400000, guid: 58c3b9f13951cf84fbd36b87b6c26333, type: 2}
+  thisAspect: {fileID: 11400000, guid: e32b76eebd1bfe04394bd167e13d81f3, type: 2}
   thisCard: {fileID: 11400000, guid: 061650b8809ec324497d66707b41c540, type: 2}
   matchedCards: {fileID: 11400000, guid: 359609367f1923146b1068c9f2375786, type: 2}
   memoryFragment: {fileID: 11400000, guid: 7b2646c88635c0c4e8203394fc991144, type: 2}

@@ -1897,13 +1897,14 @@ MonoBehaviour:
   fragmentPrefab: {fileID: 4000967335496098963, guid: c3fdbc05d6b0bc146946e75bba68a8d7, type: 3}
   root: {fileID: 806834362}
   table: {fileID: 1547840997}
+  heap: {fileID: 0}
   windowPlane: {fileID: 1664217702}
   cardDragPlane: {fileID: 1509000456}
   normalSpeed: 0.7
   fastSpeed: 0.05
   rotateSpeed: 0.5
   scaleSpeed: 0.5
-  thisAspect: {fileID: 11400000, guid: 58c3b9f13951cf84fbd36b87b6c26333, type: 2}
+  thisAspect: {fileID: 11400000, guid: e32b76eebd1bfe04394bd167e13d81f3, type: 2}
   thisCard: {fileID: 11400000, guid: 061650b8809ec324497d66707b41c540, type: 2}
   matchedCards: {fileID: 11400000, guid: 359609367f1923146b1068c9f2375786, type: 2}
   memoryFragment: {fileID: 11400000, guid: 7b2646c88635c0c4e8203394fc991144, type: 2}
@@ -2229,7 +2230,6 @@ Transform:
   - {fileID: 1547840989}
   - {fileID: 1664217702}
   - {fileID: 1509000456}
-  - {fileID: 925765975}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &806834362
@@ -2247,9 +2247,7 @@ MonoBehaviour:
   localFragments: []
   localCard: {fileID: 0}
   matches: []
-  memoryFragment:
-    fragment: {fileID: 0}
-    count: 0
+  memoryFragment: {fileID: 0}
   free: 0
 --- !u!1 &845174031
 GameObject:
@@ -2576,7 +2574,7 @@ RectTransform:
   - {fileID: 232701788}
   - {fileID: 1281925797}
   - {fileID: 2083111016}
-  m_Father: {fileID: 806834361}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -4125,9 +4123,7 @@ MonoBehaviour:
   localFragments: []
   localCard: {fileID: 0}
   matches: []
-  memoryFragment:
-    fragment: {fileID: 0}
-    count: 0
+  memoryFragment: {fileID: 0}
   free: 0
 --- !u!1 &1561756283
 GameObject:
@@ -6006,6 +6002,7 @@ SceneRoots:
   - {fileID: 1006185917}
   - {fileID: 34333948}
   - {fileID: 806834361}
+  - {fileID: 925765975}
   - {fileID: 2018515288}
   - {fileID: 326068340}
   - {fileID: 207275732}

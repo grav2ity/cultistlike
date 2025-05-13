@@ -11,6 +11,8 @@ namespace CultistLike
         public Card decayTo;
         [Tooltip("How long will it take for the Decay to complete.")]
         public float lifetime;
+        [Tooltip("Rule will be run when some other Card finishes decaying into this Card.")]
+        public Rule onDecayInto;
 
         [Header("Unique")]
         [Tooltip("Only one instance of this Card can be in a game at any given time.")]

@@ -45,6 +45,7 @@ namespace CultistLike
         public Fragment target;
         public Fragment fragment;
         public int level;
+        // public ReqLoc refLoc;
         public Fragment reference;
 
 
@@ -133,8 +134,8 @@ namespace CultistLike
     {
         Adjust = 0,
         Grab = 20,
-        // TransferToParent = 30,
         SetMemory = 40,
+        RunTriggers = 50,
     }
 
     [Serializable]
@@ -144,6 +145,7 @@ namespace CultistLike
         public Fragment fragment;
         [Tooltip("Reference not set - value. Reference set - multiplier. Accepts negative values.")]
         public int level;
+        public ReqLoc refLoc;
         public Fragment reference;
 
 
@@ -155,7 +157,15 @@ namespace CultistLike
             {
                 result.op = op;
                 result.target = context.ResolveTarget(fragment);
-                result.level = context.Count(reference, level);
+                var frag = context.ResolveFragment(reference);
+                if (frag != null)
+                {
+                    result.level = level * Test.GetCount(context, refLoc, frag);
+                }
+                else
+                {
+                    result.level = level;
+                }
                 //only for Grab
                 result.all = level == 0;
             }
@@ -228,8 +238,6 @@ namespace CultistLike
                             }
                         }
                         break;
-                    // case ActOp.TransferToParent:
-                        // break;
                     case ActOp.SetMemory:
                         if (target.fragment != null)
                         {
@@ -239,6 +247,9 @@ namespace CultistLike
                         {
                             context.scope.memoryFragment = target.cards[0].fragTree.memoryFragment;
                         }
+                        break;
+                    case ActOp.RunTriggers:
+                        context.actLogic?.InjectTriggers(target);
                         break;
                     default:
                         break;
@@ -251,7 +262,9 @@ namespace CultistLike
 
     public enum PathOp
     {
-        // NextAct = 0,
+        BranchOut = 0,
+        // InjectNextAct = 10,
+        // InjectAltAct = 11,
         ForceAct = 20,
         SetCallback = 40,
         Callback = 41,
@@ -276,6 +289,15 @@ namespace CultistLike
             {
                 switch (op)
                 {
+                    case PathOp.BranchOut:
+                        context.actLogic.BranchOut(act);
+                        break;
+                    // case PathOp.InjectNextAct:
+                    //     context.actLogic.InjectNextAct(act);
+                    //     break;
+                    // case PathOp.InjectAltAct:
+                    //     context.actLogic.InjectAltAct(act);
+                    //     break;
                     case PathOp.ForceAct:
                         context.actLogic.SetForceAct(act);
                         break;
@@ -287,7 +309,7 @@ namespace CultistLike
                         break;
                     case PathOp.GameOver:
                         GameManager.Instance.Reset();
-                        GameManager.Instance.SpawnAct(act, null);
+                        GameManager.Instance.SpawnAct(act, null, null);
                         break;
                     default:
                         break;
@@ -301,8 +323,10 @@ namespace CultistLike
     public enum DeckOp
     {
         Draw = 0,
-        // DrawNext = 10,
-        // DrawPrevious = 20,
+        DrawNext = 10,
+        DrawPrevious = 20,
+        Add = 50,
+        ForwardShift = 100
     }
 
     [Serializable]
@@ -310,16 +334,30 @@ namespace CultistLike
     {
         public DeckOp op;
         public Deck deck;
-        // public Fragment reference;
+        public Fragment deckFrom;
+        public Fragment fragment;
 
         public DeckModifierC Evaluate(Context context)
         {
             var result = new DeckModifierC();
-            if (context != null && context.scope != null)
+            if (context != null)
             {
                 result.op = op;
-                result.deck = deck;
-                // result.reference = context.Resolve(reference);
+                if (deck == null && deckFrom != null)
+                {
+                    var frag = context.ResolveFragment(deckFrom);
+                    if (frag == GameManager.Instance.matchedCards &&
+                        context.matches != null && context.matches.Count > 0)
+                    {
+                        frag = context.matches[0].card;
+                    }
+                    result.deck = frag.deck;
+                }
+                else
+                {
+                    result.deck = deck;
+                }
+                result.target = context.ResolveTarget(fragment);
             }
             return result;
         }
@@ -330,48 +368,95 @@ namespace CultistLike
     {
         public DeckOp op;
         public Deck deck;
-        public HeldFragment reference;
+        public Target target;
 
         public void Execute(Context context)
         {
-            if (context != null && context.actLogic != null && context.scope != null && deck != null)
+            if (context != null && context.scope != null && deck != null)
             {
-                switch(op)
+                if (op == DeckOp.Draw)
                 {
-                    case DeckOp.Draw:
-                        var frag = deck.Draw();
-                        if (frag is Card)
+                    CreateCard(context, deck, deck.Draw());
+                }
+                else if (target != null)
+                {
+                    if (target.fragment != null)
+                    {
+                        switch(op)
                         {
-                            var newCardViz = context.scope.Add((Card)frag);
-                            newCardViz.ShowBack();
-
-                            if (deck.tagOnFragment != null)
+                            case DeckOp.DrawNext:
+                                CreateCard(context, deck, deck.DrawOffset(target?.fragment, 1));
+                                break;
+                            case DeckOp.DrawPrevious:
+                                CreateCard(context, deck, deck.DrawOffset(target?.fragment, -1));
+                                break;
+                            case DeckOp.Add:
+                                deck.Add(target.fragment);
+                                break;
+                            case DeckOp.ForwardShift:
+                                var targetCards = context.ResolveTargetCards(target, context.scope);
+                                foreach (var cardViz in targetCards)
+                                {
+                                    ShiftCard(cardViz, deck.DrawOffset(cardViz.card, 1));
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    else if (target.cards != null)
+                    {
+                        foreach (var cardViz in target.cards)
+                        {
+                            switch(op)
                             {
-                                newCardViz.fragTree.Add(deck.tagOnFragment);
+                                case DeckOp.DrawNext:
+                                    CreateCard(context, deck, deck.DrawOffset(cardViz.card, 1));
+                                    break;
+                                case DeckOp.DrawPrevious:
+                                    CreateCard(context, deck, deck.DrawOffset(cardViz.card, -1));
+                                    break;
+                                case DeckOp.Add:
+                                    deck.Add(cardViz.card);
+                                    break;
+                                case DeckOp.ForwardShift:
+                                    ShiftCard(cardViz, deck.DrawOffset(cardViz.card, 1));
+                                    break;
+                                default:
+                                    break;
                             }
                         }
-                        break;
-                    // case DeckOp.DrawNext:
-                    //     {
-                    //         if (reference != null)
-                    //         {
-                    //             var refer = reference.cardViz != null ? reference.cardViz.card : reference.fragment;
-                    //             context.scope.Add(deck.DrawOffset(refer, 1));
-                    //         }
-                    //         break;
-                    //     }
-                    // case DeckOp.DrawPrevious:
-                    //     {
-                    //         if (reference != null)
-                    //         {
-                    //             var refer = reference.cardViz != null ? reference.cardViz.card : reference.fragment;
-                    //             context.scope.Add(deck.DrawOffset(refer, -1));
-                    //         }
-                    //         break;
-                    //     }
-                    default:
-                        break;
+                    }
                 }
+            }
+        }
+
+        private void CreateCard(Context context, Deck deck, Fragment drawnFrag)
+        {
+            if (context != null && drawnFrag is Card)
+            {
+                var newCardViz = context.scope.Add((Card)drawnFrag);
+                newCardViz.ShowBack();
+
+                foreach (var frag in deck.tagOn)
+                {
+                    if (frag != null)
+                    {
+                        newCardViz.fragTree.Add(frag);
+                    }
+                }
+                if (deck.memoryFragment != null)
+                {
+                    newCardViz.fragTree.memoryFragment = deck.memoryFragment;
+                }
+            }
+        }
+
+        private void ShiftCard(CardViz cardViz, Fragment drawnFrag)
+        {
+            if (cardViz != null && drawnFrag is Card)
+            {
+                cardViz.Transform((Card)drawnFrag);
             }
         }
     }
@@ -401,10 +486,10 @@ namespace CultistLike
                 switch (op)
                 {
                     case TableOp.SpawnAct:
-                        GameManager.Instance.SpawnAct(act, context.actLogic.tokenViz);
+                        GameManager.Instance.SpawnAct(act, context.scope, context.actLogic.tokenViz);
                         break;
                     case TableOp.SpawnToken:
-                        GameManager.Instance.SpawnToken(act.token, context.actLogic.tokenViz);
+                        GameManager.Instance.SpawnToken(act.token, context.scope, context.actLogic.tokenViz);
                         break;
                     default:
                         break;

@@ -10,6 +10,7 @@ using DG.Tweening;
 
 namespace CultistLike
 {
+    //TODO save Heap
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
@@ -25,6 +26,9 @@ namespace CultistLike
 
         [Header("Table")]
         public Table<Vector2Int> table;
+
+        [Header("Heap")]
+        public FragTree heap;
 
         [Header("Planes")]
         public RectTransform windowPlane;
@@ -206,11 +210,11 @@ namespace CultistLike
             }
         }
 
-        public TokenViz SpawnAct(Act act, Viz viz)
+        public TokenViz SpawnAct(Act act, FragTree spawner, Viz viz)
         {
             if (act != null && act.token != null)
             {
-                var newTokenViz = SpawnToken(act.token, viz);
+                var newTokenViz = SpawnToken(act.token, spawner, viz);
                 if (newTokenViz != null)
                 {
                     newTokenViz.autoPlay = act;
@@ -221,7 +225,7 @@ namespace CultistLike
             return null;
         }
 
-        public TokenViz SpawnToken(Token token, Viz viz)
+        public TokenViz SpawnToken(Token token, FragTree spawner, Viz viz)
         {
             if (token != null)
             {
@@ -230,6 +234,7 @@ namespace CultistLike
                     var newPosition = viz != null ? viz.transform.position : Vector3.zero;
                     var newTokenViz = UnityEngine.Object.Instantiate(tokenPrefab, newPosition, Quaternion.identity);
                     newTokenViz.LoadToken(token);
+                    newTokenViz.memoryFragment = spawner?.memoryFragment;
 
                     var root = newTokenViz.transform;
                     var localScale = root.localScale;

@@ -41,7 +41,7 @@ namespace CultistLike
             }
         }
 
-        public Fragment Draw(int i)
+        private Fragment Draw(int i)
         {
             if (i >= 0 && i < fragments.Count)
             {
@@ -75,6 +75,14 @@ namespace CultistLike
             else
             {
                 return null;
+            }
+        }
+
+        public void Add(Fragment fragment)
+        {
+            if (fragment != null)
+            {
+                fragments.Add(fragment);
             }
         }
 

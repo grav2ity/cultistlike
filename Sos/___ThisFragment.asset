@@ -10,11 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 936a4de03f38f8c4a824dc6199e33e5d, type: 3}
-  m_Name: ___ThisAspect
+  m_Name: ___ThisFragment
   m_EditorClassIdentifier: 
-  label: ___ThisAspect
+  label: ___ThisFragment
   art: {fileID: 0}
   color: {r: 0, g: 0, b: 0, a: 0}
+  hidden: 0
   description: 
   fragments: []
   rules: []

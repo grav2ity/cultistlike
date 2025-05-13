@@ -28,6 +28,9 @@ namespace CultistLike
         [Tooltip("Slots that will attempt to open if Fragment is present.")]
         public List<Slot> slots;
 
+        [Header("Deck")]
+        public Deck deck;
+
 
         public virtual void AddToTree(FragTree fg) {}
         public virtual void RemoveFromTree(FragTree fg) {}

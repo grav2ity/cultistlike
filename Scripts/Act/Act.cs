@@ -61,8 +61,11 @@ namespace CultistLike
         public Rule onSpawn;
 
         [Space(10)]
+        [Header("Text")]
         [TextArea(3, 10)] public string text;
+        public List<Rule> textRules;
         [TextArea(3, 10)] public string endText;
+        public List<Rule> endTextRules;
 
         public bool Attempt(Context context, bool force = false) => Rule.Evaluate(context, tests, and, or, force);
 

@@ -15,6 +15,7 @@ namespace CultistLike
         public Token token;
         public Act autoPlay;
         public Rule initRule;
+        public Fragment memoryFragment;
 
         [Header("Layout")]
         [SerializeField] private TextMeshPro title;

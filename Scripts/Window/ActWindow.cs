@@ -129,6 +129,11 @@ namespace CultistLike
             }
         }
 
+        public void SetFragMemory(Fragment frag)
+        {
+            actLogic.fragTree.memoryFragment = frag;
+        }
+
         public void ParentSlotCardsToWindow()
         {
             foreach (var slot in slots)
@@ -308,6 +313,7 @@ namespace CultistLike
             if (tokenViz != null)
             {
                 this.tokenViz = tokenViz;
+                SetFragMemory(tokenViz.memoryFragment);
             }
         }
 
@@ -326,7 +332,7 @@ namespace CultistLike
                     if (tokenViz != null)
                     {
                         label.text = tokenViz?.token?.label;
-                        text.text = actLogic.InterpolateString(tokenViz?.token?.description);
+                        text.text = actLogic.TokenDesription();
                     }
                     break;
                 case ActStatus.Ready:
@@ -334,7 +340,7 @@ namespace CultistLike
                     {
                         okButton.interactable = true;
                         label.text = readyAct.label;
-                        text.text = actLogic.InterpolateString(readyAct.text);
+                        text.text = actLogic.GetText(readyAct);
                         tokenViz.SetResultCount(0);
                     }
                     break;
@@ -497,7 +503,7 @@ namespace CultistLike
         {
             if (cardViz != null)
             {
-                if (actStatus != ActStatus.Finished)
+                if (actStatus != ActStatus.Finished || resultLane.cards.Count == 0)
                 {
                     foreach (var slotViz in slots)
                     {

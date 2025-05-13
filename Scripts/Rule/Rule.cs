@@ -29,6 +29,9 @@ namespace CultistLike
         [Tooltip("Additional Rules to be run if this Rule passed. Matched Cards are not carried in nor out.")]
         public List<Rule> furthermore;
 
+        [Space(10)]
+        [TextArea(3, 10)] public string text;
+
 
         public static bool Evaluate(Context context, List<Test> tests, List<Rule> and, List<Rule> or, bool force = false)
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -18,10 +19,18 @@ namespace CultistLike
         [SerializeField, HideInInspector] private List<Act> nextActs;
         [SerializeField, HideInInspector] private List<Act> spawnedActs;
 
+        // [SerializeField, HideInInspector] private List<Act> extraAltActs;
+        // [SerializeField, HideInInspector] private List<Act> extraNextActs;
+
         [SerializeField, HideInInspector] private Act forceAct;
         [SerializeField, HideInInspector] private Act callbackAct;
         [SerializeField, HideInInspector] private bool doCallback;
         [SerializeField, HideInInspector] private Rule forceRule;
+
+        [SerializeField, HideInInspector] private string _endText;
+
+        [SerializeField, HideInInspector] private Act branchOutAct;
+        private Stack<Act> callStack;
 
         private ActWindow actWindow;
 
@@ -33,8 +42,9 @@ namespace CultistLike
 
         public TokenViz tokenViz { get => actWindow.tokenViz; }
 
-        public string runText => fragTree.InterpolateString(altAct ? altAct.text : activeAct.text);
-        public string endText => fragTree.InterpolateString(activeAct.endText);
+        // public string endText => fragTree.InterpolateString(_endText);
+        public string endText => _endText;
+        public string runText => altAct ? GetText(altAct) : GetText(activeAct);
 
 
         /// <summary>
@@ -112,6 +122,7 @@ namespace CultistLike
             Debug.Log("Running act: " + act.name);
             activeAct = act;
             forceAct = null;
+            branchOutAct = null;
 
             if (forceRule != null)
             {
@@ -128,6 +139,11 @@ namespace CultistLike
             actWindow.UpdateSlots();
 
             PopulateActList(act.altActs, altActs, act.randomAlt);
+            // foreach (var altAct in extraAltActs)
+            // {
+            //     altActs.Insert(0, altAct);
+            // }
+            // extraAltActs.Clear();
 
             altAct = AttemptAltActs();
 
@@ -153,6 +169,11 @@ namespace CultistLike
         {
             activeAct = null;
             altAct = null;
+
+            // extraAltActs.Clear();
+            // extraNextActs.Clear();
+
+            _endText = "";
 
             fragTree.Clear();
         }
@@ -229,14 +250,30 @@ namespace CultistLike
             PopulateActList(activeAct?.spawnedActs, spawnedActs, false);
             foreach (var spawnedAct in spawnedActs)
             {
-                GameManager.Instance.SpawnAct(spawnedAct, tokenViz);
+                GameManager.Instance.SpawnAct(spawnedAct, fragTree, tokenViz);
             }
 
             actWindow.ParentSlotCardsToWindow();
 
+            var et = GetEndText(activeAct);
+            if (et != "")
+            {
+                _endText = et;
+            }
+
             if (forceAct != null)
             {
                 ForceAct(forceAct);
+            }
+            else if (branchOutAct != null)
+            {
+                Context context = new Context(this);
+                if (AttemptAct(branchOutAct, context) == true)
+                {
+                    Debug.Log("Branching out to act: " + branchOutAct.name);
+                    callStack.Push(activeAct);
+                    RunAct(branchOutAct);
+                }
             }
             else
             {
@@ -252,7 +289,20 @@ namespace CultistLike
                 }
 
                 PopulateActList(activeAct.nextActs, nextActs, activeAct.randomNext);
+                // foreach (var act in extraNextActs)
+                // {
+                //    nextActs.Insert(0, act);
+                // }
+                // extraNextActs.Clear();
+
                 var nextAct = AttemptNextActs();
+                if (nextAct == null && callStack.Count > 0)
+                {
+                    var act = callStack.Pop();
+                    PopulateActList(act.nextActs, nextActs, act.randomNext);
+                    nextAct = AttemptNextActs();
+                }
+
                 if (nextAct != null)
                 {
                     RunAct(nextAct);
@@ -283,6 +333,17 @@ namespace CultistLike
         public void DoCallback() => doCallback = true;
         public void SetForceAct(Act act) => forceAct = act;
         public void ForceRule(Rule rule) => forceRule = rule;
+
+        public void BranchOut(Act act)
+        {
+            if (act != null)
+            {
+                branchOutAct = act;
+            }
+        }
+
+        // public void InjectNextAct(Act act) => extraNextActs.Add(act);
+        // public void InjectAltAct(Act act) => extraAltActs.Add(act);
 
         public Act AttemptInitialActs() => AttemptActs(GameManager.Instance.initialActs, true);
         public Act AttemptAltActs() => AttemptActs(altActs);
@@ -323,35 +384,93 @@ namespace CultistLike
             return null;
         }
 
-        private void ApplyTriggers()
+        public void InjectTriggers(Target target)
         {
-            using (var context = new Context(this))
+            if (target != null)
             {
-                foreach (var cardViz in context.scope.cards)
+                using (var context = new Context(this))
                 {
-                    context.thisCard = cardViz;
-                    foreach (var rule in cardViz.card.rules)
+                    if (target.fragment != null)
                     {
-                        rule?.Run(context);
+                        ApplyAspectTrigers(context, target.fragment);
                     }
-
-                }
-                context.thisCard = null;
-                foreach (var frag in context.scope.fragments)
-                {
-                    if (frag.fragment != null)
+                    else
                     {
-                        context.thisAspect = frag.fragment;
-                        foreach (var rule in frag.fragment.rules)
+                        foreach (var cardViz in target.cards)
                         {
-                            rule?.Run(context);
+                            ApplyCardTriggers(context, cardViz);
                         }
                     }
                 }
             }
         }
 
+        private void ApplyCardTriggers(Context context, CardViz cardViz)
+        {
+            if (cardViz != null)
+            {
+                context.thisCard = cardViz;
+                context.thisAspect = cardViz.card;
+                foreach (var rule in cardViz.card.rules)
+                {
+                    if (rule) rule.Run(context);
+                }
+            }
+        }
+
+        private void ApplyAspectTrigers(Context context, Fragment fragment)
+        {
+            if (fragment != null)
+            {
+                context.thisAspect = fragment;
+                foreach (var rule in fragment.rules)
+                {
+                    if (rule) rule.Run(context);
+                }
+            }
+        }
+
+        private void ApplyTriggers()
+        {
+            using (var context = new Context(this))
+            {
+                foreach (var cardViz in context.scope.cards)
+                {
+                    ApplyCardTriggers(context, cardViz);
+
+                }
+                context.thisCard = null;
+                foreach (var frag in context.scope.fragments)
+                {
+                    ApplyAspectTrigers(context, frag.fragment);
+                }
+            }
+        }
+
         public string InterpolateString(string s) => fragTree.InterpolateString(s);
+
+        public string TokenDesription() => tokenViz.token != null ? GetText(tokenViz.token.textRules, tokenViz.token.description) : "";
+
+        public string GetText(Act act) => GetText(act.textRules, act.text);
+        public string GetEndText(Act act) => GetText(act.endTextRules, act.endText);
+
+        private string GetText(List<Rule> textRules, string text)
+        {
+            if (textRules != null && textRules.Count > 0)
+            {
+                Context context = new Context(this);
+
+                foreach (var rule in textRules)
+                {
+                    if (rule != null && rule.Evaluate(context) == true)
+                    {
+                        return InterpolateString(rule.text);
+                    }
+                }
+            }
+
+            return InterpolateString(text);
+        }
 
         public ActLogicSave Save()
         {
@@ -360,7 +479,12 @@ namespace CultistLike
 
             save.activeAct = activeAct;
             save.callbackAct = callbackAct;
+            save.branchOutAct = branchOutAct;
+            save.callStack = callStack.ToList();
             save.altAct = altAct;
+
+            save.endText = _endText;
+
             return save;
         }
 
@@ -369,7 +493,11 @@ namespace CultistLike
             fragTree.Load(save.fragSave);
             activeAct = save.activeAct;
             callbackAct = save.callbackAct;
+            branchOutAct = save.branchOutAct;
+            callStack = new Stack<Act>(save.callStack.AsEnumerable().Reverse());
             altAct = save.altAct;
+
+            _endText = save.endText;
         }
 
         private void Awake()
@@ -377,6 +505,8 @@ namespace CultistLike
             actWindow = GetComponent<ActWindow>();
             fragTree = GetComponent<FragTree>();
             fragTree.onCreateCard = x => x.ParentToWindow(actWindow.transform, true);
+
+            callStack = new Stack<Act>();
         }
     }
 
@@ -386,8 +516,13 @@ namespace CultistLike
         public FragTreeSave fragSave;
         public Act activeAct;
         public Act callbackAct;
+        public Act branchOutAct;
+        public List<Act> callStack;
+
         //???
         public Act altAct;
+
+        public string endText;
     }
 
 }

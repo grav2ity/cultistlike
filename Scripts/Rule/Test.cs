@@ -23,10 +23,10 @@ namespace CultistLike
     {
         Scope          = 0,
         MatchedCards   = 1 << 5,
-        // Parent         = 1 << 3,
         Slots          = 1 << 2,
         Table          = 1 << 4,
-        Free          = 1 << 7,
+        Heap           = 1 << 3,
+        Free           = 1 << 7,
         Anywhere       = 1 << 6,
     }
 
@@ -58,13 +58,12 @@ namespace CultistLike
             }
             else
             {
-                //TODO make it possible for regular test to modify MatchedCards list?
                 right = constant * GetCount(context, loc2, fragment2r);
             }
 
             if (cardTest == true)
             {
-                var scope = GetScope(context, loc1);
+                var scope = context.ResolveScope(loc1);
 
                 List<CardViz> cards;
                 if (loc1 == ReqLoc.MatchedCards)
@@ -79,28 +78,48 @@ namespace CultistLike
                 bool passed = false;
                 if (fragment1r == null)
                 {
-                    if (right > 0)                     {
+                    if (right > 0)
+                    {
                         right = Math.Min(right, context.matches.Count);
                         passed = true;
                         context.matches = context.matches.GetRange(0, right);
                     }
                 }
-                else if (fragment1r is Aspect)
+                else
                 {
                     List<CardViz> newMatches = new List<CardViz>();
-                    var aspect = (Aspect)fragment1r;
-                    int left;
-                    foreach (var card in cards)
-                    {
-                        bool result = false;
-                        left = card.fragTree.Count(aspect);
 
-                        result = Compare(op, constant, left, right);
-                        if (result == true && (loc1 != ReqLoc.Free || card.free == true))
+                    if (fragment1r is Aspect)
+                    {
+                        var aspect = (Aspect)fragment1r;
+                        int left;
+                        foreach (var cardViz in cards)
                         {
-                            newMatches.Add(card);
-                            passed = true;
+                            bool result = false;
+                            left = cardViz.fragTree.Count(aspect);
+
+                            result = Compare(op, constant, left, right);
+                            if (result == true && (loc1 != ReqLoc.Free || cardViz.free == true))
+                            {
+                                newMatches.Add(cardViz);
+                                passed = true;
+                            }
                         }
+                    }
+                    else if (fragment1r is Card)
+                    {
+                        var card = (Card)fragment1r;
+                        foreach (var cardViz in cards)
+                        {
+                            bool result = cardViz.card == card;
+                            if (result == true && (loc1 != ReqLoc.Free || cardViz.free == true))
+                            {
+                                newMatches.Add(cardViz);
+                            }
+                        }
+
+                        int left = newMatches.Count;
+                        passed = Compare(op, constant, left, right);
                     }
 
                     context.matches.Clear();
@@ -111,12 +130,19 @@ namespace CultistLike
             }
             else
             {
-                int left = GetCount(context, loc1, fragment1r);
-                return Compare(op, constant, left, right);
+                if (fragment1r != null)
+                {
+                    int left = GetCount(context, loc1, fragment1r);
+                    return Compare(op, constant, left, right);
+                }
+                else
+                {
+                    return true;
+                }
             }
         }
 
-        public bool Compare(ReqOp op, int constant, int left, int right)
+        public static bool Compare(ReqOp op, int constant, int left, int right)
         {
             switch (op)
             {
@@ -150,27 +176,7 @@ namespace CultistLike
             }
         }
 
-        public FragTree GetScope(Context context, ReqLoc loc)
-        {
-            if (loc == ReqLoc.Table)
-            {
-                return GameManager.Instance.table.fragTree;
-            }
-            else if (loc == ReqLoc.Slots )
-            {
-                return context.actLogic?.slotsFragTree;
-            }
-            else if (loc == ReqLoc.Free || loc == ReqLoc.Anywhere )
-            {
-                return GameManager.Instance.root;
-            }
-            else
-            {
-                return context.scope;
-            }
-        }
-
-        public int GetCount(Context context, ReqLoc loc, Fragment fragment)
+        public static int GetCount(Context context, ReqLoc loc, Fragment fragment)
         {
             int total = 0;
 
@@ -210,7 +216,8 @@ namespace CultistLike
             }
             else
             {
-                var scope = GetScope(context, loc);
+                //TODO count matched cards
+                var scope = context.ResolveScope(loc);
 
                 total = scope.Count(fragment, loc == ReqLoc.Free);
             }

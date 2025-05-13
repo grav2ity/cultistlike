@@ -28,15 +28,7 @@ namespace CultistLike
             CardViz cardViz = go.GetComponent<CardViz>();
             if (cardViz != null)
             {
-                if (gameObject.activeInHierarchy == true)
-                {
-                    cards.Add(cardViz);
-                    cardViz.Parent(transform);
-                }
-                else
-                {
-                    GameManager.Instance.table.ReturnToTable(cardViz);
-                }
+                GameManager.Instance.table.ReturnToTable(cardViz);
             }
         }
 

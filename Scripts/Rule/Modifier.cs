@@ -86,15 +86,22 @@ namespace CultistLike
                         }
                         break;
                     case CardOp.Transform:
-                        if (what.fragment is Card)
+                        if (level > 0)
                         {
-                            if (level > 0)
+                            foreach (var targetCard in targetCards)
                             {
-                                foreach (var targetCard in targetCards)
+                                if (what.fragment is Card)
                                 {
                                     targetCard.Transform((Card)what.fragment);
-                                    //TODO ??
                                     context.scope.Adjust(targetCard, level - 1);
+                                }
+                                else if (what.cards != null)
+                                {
+                                    foreach (var cardViz in what.cards)
+                                    {
+                                        targetCard.Transform(cardViz.card);
+                                        context.scope.Adjust(targetCard, level - 1);
+                                    }
                                 }
                             }
                         }
@@ -118,6 +125,10 @@ namespace CultistLike
                             if (what.fragment is Aspect)
                             {
                                 targetCard.fragTree.memoryFragment = what.fragment;
+                            }
+                            else if (what.cards != null && what.cards.Count > 0)
+                            {
+                                targetCard.fragTree.memoryFragment = what.cards[0].fragTree.memoryFragment;
                             }
                         }
                         break;

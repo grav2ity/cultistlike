@@ -23,6 +23,7 @@ namespace CultistLike
         [Header("Special fragments")]
         public Aspect allowed;
         public Aspect forbidden;
+        public Card drawn;
 
 
         [SerializeField, HideInInspector] private List<FragmentViz> fragVizs;
@@ -116,7 +117,14 @@ namespace CultistLike
 
             if (index < fragVizs.Count)
             {
-                fragVizs[index].Load(cardViz);
+                if (cardViz.faceDown == true)
+                {
+                    fragVizs[index].Load(drawn);
+                }
+                else
+                {
+                    fragVizs[index].Load(cardViz);
+                }
                 fragVizs[index].gameObject.SetActive(true);
                 index++;
             }

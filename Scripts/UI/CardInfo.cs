@@ -30,28 +30,41 @@ namespace CultistLike
         {
             if (cardViz != null)
             {
-                gameObject.SetActive(true);
-
-                CardName = cardViz.card.label;
-                Description = cardViz.card.description;
-
-                if (cardViz.card.art != null)
-                {
-                    art.sprite = cardViz.card.art;
-                    art.color = Color.white;
-                }
-                else
-                {
-                    art.sprite = null;
-                    art.color = cardViz.card.color;
-                }
+                LoadCard(cardViz.card);
 
                 fragmentBar.Load(cardViz.fragTree);
             }
         }
 
+        public void LoadCard(Card card)
+        {
+            UIManager.Instance?.aspectInfo?.Unload();
+
+            if (card!= null)
+            {
+                gameObject.SetActive(true);
+
+                CardName = card.label;
+                Description = card.description;
+
+                if (card.art != null)
+                {
+                    art.sprite = card.art;
+                    art.color = Color.white;
+                }
+                else
+                {
+                    art.sprite = null;
+                    art.color = card.color;
+                }
+                fragmentBar.Unload();
+            }
+        }
+
         public void Load(SlotViz slotViz)
         {
+            UIManager.Instance?.aspectInfo?.Unload();
+
             if (slotViz != null)
             {
                 gameObject.SetActive(true);

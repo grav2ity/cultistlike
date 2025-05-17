@@ -13,7 +13,20 @@ namespace CultistLike
     //TODO save Heap
     public class GameManager : MonoBehaviour
     {
-        public static GameManager Instance { get; private set; }
+        private static GameManager _instance;
+
+        public static GameManager Instance
+        {
+            get
+            {
+                if(_instance == null)
+                {
+                    _instance = GameObject.FindObjectOfType<GameManager>();
+                }
+
+                return _instance;
+            }
+        }
 
         [Header("Prefabs")]
         public CardViz cardPrefab;
@@ -72,6 +85,7 @@ namespace CultistLike
         public ActWindow openWindow { get => _openWindow; private set => _openWindow = value; }
         public float time { get => elapsedTime; }
 
+        public bool devTimeOn { get => maxTime > 0 || allTime > 0; }
 
         public float DevTime(float time)
         {
@@ -399,8 +413,6 @@ namespace CultistLike
 
         private void Awake()
         {
-            Instance = this;
-
             timeScale = 1f;
 
             FindSlotSOS();

@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d7ad74be29e3414894e2ccf6a7e39e6, type: 3}
+  m_Name: zzzDrawn
+  m_EditorClassIdentifier: 
+  label: Upcoming draw
+  art: {fileID: 0}
+  color: {r: 0, g: 0, b: 0, a: 1}
+  hidden: 0
+  description: 
+  fragments: []
+  rules: []
+  slots: []
+  deck: {fileID: 0}
+  decayTo: {fileID: 0}
+  lifetime: 0
+  onDecayComplete: {fileID: 0}
+  onDecayInto: {fileID: 0}
+  unique: 0

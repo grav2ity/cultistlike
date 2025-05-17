@@ -11,8 +11,6 @@ namespace CultistLike
 {
     public class ActWindow : Drag
     {
-        [HideInInspector] public bool open;
-
         [Header("Layout")]
         [SerializeField] private GameObject visualsGO;
         [SerializeField] private TextMeshPro label;
@@ -31,7 +29,8 @@ namespace CultistLike
         [SerializeField] private List<SlotViz> idleSlots;
         [SerializeField] private List<SlotViz> runSlots;
 
-        public ActStatus actStatus;
+        [SerializeField, HideInInspector] private bool _open;
+        [SerializeField, HideInInspector] private ActStatus actStatus;
         [SerializeField, HideInInspector] private Act readyAct;
 
         private TokenViz _tokenViz;
@@ -41,13 +40,13 @@ namespace CultistLike
         private bool pendingUpdate;
 
 
+        public bool open { get => _open; private set => _open = value; }
         public TokenViz tokenViz { get => _tokenViz; private set => _tokenViz = value; }
         public Timer timer { get => _timer; }
 
         public FragTree slotsFragTree => slotsFrag;
 
         private List<SlotViz> slots => actStatus == ActStatus.Running ? runSlots : idleSlots;
-        private string runLabel => actLogic.altAct ? actLogic.altAct.label : actLogic.activeAct.label;
 
 
         public bool TrySlotAndBringUp(CardViz cardViz)
@@ -260,7 +259,7 @@ namespace CultistLike
                     AttemptReadyAct();
                     break;
                 case ActStatus.Running:
-                    actLogic.altAct = actLogic.AttemptAltActs();
+                    actLogic.AttemptAltActs();
                     ApplyStatus(ActStatus.Running);
                     break;
                 case ActStatus.Finished:
@@ -334,6 +333,7 @@ namespace CultistLike
                         label.text = tokenViz?.token?.label;
                         text.text = actLogic.TokenDesription();
                     }
+                    cardBar?.gameObject.SetActive(true);
                     break;
                 case ActStatus.Ready:
                     if (readyAct != null)
@@ -343,6 +343,7 @@ namespace CultistLike
                         text.text = actLogic.GetText(readyAct);
                         tokenViz.SetResultCount(0);
                     }
+                    cardBar?.gameObject.SetActive(true);
                     break;
                 case ActStatus.Running:
                     timer.gameObject.SetActive(true);
@@ -350,16 +351,18 @@ namespace CultistLike
                     runSlotsGO.SetActive(true);
                     okButton.interactable = false;
                     tokenViz.SetResultCount(0);
-                    label.text = runLabel;
+                    label.text = actLogic.label;
                     text.text = actLogic.runText;
+                    cardBar?.gameObject.SetActive(true);
                     break;
                 case ActStatus.Finished:
                     timer.gameObject.SetActive(false);
                     runSlotsGO.SetActive(false);
                     resultLane.gameObject.SetActive(true);
                     collectButton.interactable = true;
-                    label.text = runLabel;
+                    label.text = actLogic.label;
                     text.text = actLogic.endText;
+                    cardBar?.gameObject.SetActive(false);
                     break;
                 default:
                     break;

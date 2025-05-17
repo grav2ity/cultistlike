@@ -31,13 +31,16 @@ namespace CultistLike
         [Tooltip("Size on the table for an Array based table; final size is (1,1) + 2*(x,y)")]
         [SerializeField] private Vector2Int CellCount;
 
-        [SerializeField, HideInInspector] private bool faceDown;
+        [SerializeField, HideInInspector] private bool _faceDown;
 
 
         public override Vector2Int GetCellSize() => CellCount;
 
         public bool free { get => fragTree.free; set => fragTree.free = value; }
+        public bool visible { get => visualsGO.activeInHierarchy; }
+        public bool faceDown { get => _faceDown; private set => _faceDown = value; }
 
+        public CardDecay decay { get => cardDecay; }
 
         public override void OnBeginDrag(PointerEventData eventData)
         {
@@ -200,7 +203,15 @@ namespace CultistLike
 
         public void Decay(Card card, float time)
         {
+        #if UNITY_EDITOR
+            cardDecay.StartTimer(GameManager.Instance.DevTime(time), card);
+        #else
             cardDecay.StartTimer(time, card);
+        #endif
+            if (visible == false && cardDecay.pauseOnHide == true)
+            {
+                cardDecay.Pause();
+            }
         }
 
         public void Destroy()
@@ -227,6 +238,7 @@ namespace CultistLike
 
             }
             faceDown = !faceDown;
+            fragTree.OnChange();
         }
 
         public void Hide()
@@ -241,19 +253,25 @@ namespace CultistLike
         public void Show()
         {
             visualsGO.SetActive(true);
-            cardDecay.Unpause();
+            //TODO
+            if (cardDecay.pauseOnSlot == false || GetComponentInParent<SlotViz>() == null)
+            {
+                cardDecay.Unpause();
+            }
         }
 
         public void ShowFace()
         {
             transform.localEulerAngles = new Vector3(0f, 0f, 0f);
             faceDown = false;
+            fragTree.OnChange();
         }
 
         public void ShowBack()
         {
             transform.localEulerAngles = new Vector3(0f, 180f, 0f);
             faceDown = true;
+            fragTree.OnChange();
         }
 
         public void SetHighlight(bool p)
@@ -295,10 +313,11 @@ namespace CultistLike
             }
         }
 
-        //TODO this does not casue on update up the FragTree ??
         public void Transform(Card card)
         {
             LoadCard(card, false);
+
+            fragTree.OnChange();
 
             cardDecay.StopTimer();
             if (card.lifetime > 0f)
@@ -446,7 +465,7 @@ namespace CultistLike
 
         public void OnDecayComplete(Card targetCard)
         {
-            interactive = false;
+            var transform = visualsGO.transform;
 
             if (targetCard != null)
             {
@@ -455,7 +474,16 @@ namespace CultistLike
                 transform.DOScale(targetScale, GameManager.Instance.scaleSpeed).
                     OnComplete(() =>
                     {
+                        if (card.onDecayComplete != null)
+                        {
+                            using (var context = new Context(this))
+                            {
+                                card.onDecayComplete.Run(context);
+                            }
+                        }
+
                         Transform(targetCard);
+
                         if (card.onDecayInto != null)
                         {
                             using (var context = new Context(this))
@@ -465,15 +493,25 @@ namespace CultistLike
                         }
 
                         var targetScale2 = new Vector3(transform.localScale.x, yScale, transform.localScale.z);
-                        transform.DOScale(targetScale2, GameManager.Instance.scaleSpeed).
-                            OnComplete(() => { interactive = true; });
+                        transform.DOScale(targetScale2, GameManager.Instance.scaleSpeed);
                     });
             }
             else
             {
                 var targetScale = new Vector3(transform.localScale.x, 0f, transform.localScale.z);
                 transform.DOScale(targetScale, GameManager.Instance.scaleSpeed).
-                    OnComplete(() => { Destroy(); });
+                    OnComplete(() =>
+                    {
+                        if (card.onDecayComplete != null)
+                        {
+                            using (var context = new Context(this))
+                            {
+                                card.onDecayComplete.Run(context);
+                            }
+                        }
+
+                        Destroy();
+                    });
             }
         }
 
@@ -491,6 +529,10 @@ namespace CultistLike
             // {
             //     fragTree.memoryFragment = fragTree.localFragments[0].fragment;
             // }
+            if (fragTree.memoryFragment == null)
+            {
+                fragTree.memoryFragment = card;
+            }
         }
 
         private Vector3 Position()

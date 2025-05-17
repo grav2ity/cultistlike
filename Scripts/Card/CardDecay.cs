@@ -16,6 +16,7 @@ namespace CultistLike
 
         [Header("Options")]
         public bool pauseOnHide;
+        public bool pauseOnSlot;
 
         [SerializeField, HideInInspector] private Card decayTo;
 

@@ -27,7 +27,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 8265062001254862253}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -53,7 +53,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 7
+  m_ChildAlignment: 4
   m_Spacing: 10
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
@@ -61,7 +61,7 @@ MonoBehaviour:
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
-  m_ReverseArrangement: 1
+  m_ReverseArrangement: 0
 --- !u!1 &2344022428666938829
 GameObject:
   m_ObjectHideFlags: 0
@@ -176,11 +176,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   horizontalGO: {fileID: 2344022428666938829}
   verticalGO: {fileID: 543399014672607862}
+  autoUpdate: 0
   vertical: 0
   showAspects: 1
   showCards: 1
   showSpecial: 1
+  showHidden: 0
   allowed: {fileID: 11400000, guid: d9bffe678047ce74b8ab5f91a9f29e6d, type: 2}
   forbidden: {fileID: 11400000, guid: f305adb0b4084b14f909871f8351d374, type: 2}
+  drawn: {fileID: 11400000, guid: b31607579883ed647a9b340063dc06ed, type: 2}
   fragVizs: []
   index: 0

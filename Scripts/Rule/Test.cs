@@ -216,7 +216,6 @@ namespace CultistLike
             }
             else
             {
-                //TODO count matched cards
                 var scope = context.ResolveScope(loc);
 
                 total = scope.Count(fragment, loc == ReqLoc.Free);

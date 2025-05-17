@@ -155,6 +155,12 @@ namespace CultistLike
                     cardViz.free = false;
                 }
 
+                if (cardViz.decay.pauseOnSlot == true)
+                {
+                    cardViz.decay.Pause();
+                }
+
+
                 // if (firstSlot == true)
                 // {
                 //     actWindow.SetFragMemory(cardViz);
@@ -177,6 +183,11 @@ namespace CultistLike
                     actWindow.RemoveFragment(frag);
                 }
 
+                if ( slottedCard.decay.pauseOnSlot == true)
+                {
+                    slottedCard.decay.Unpause();
+                }
+
                 var sc = slottedCard;
                 slottedCard = null;
 
@@ -184,6 +195,7 @@ namespace CultistLike
                 {
                     actWindow.FirstSlotEmpty();
                 }
+
 
                 return sc;
             }

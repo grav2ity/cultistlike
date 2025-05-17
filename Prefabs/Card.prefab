@@ -590,7 +590,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &2621514992504721388
@@ -706,6 +706,7 @@ MonoBehaviour:
   localFragments: []
   localCard: {fileID: 2231594063718650465}
   matches: []
+  memoryFragment: {fileID: 0}
   free: 1
 --- !u!1 &3912949946651488558
 GameObject:
@@ -1172,6 +1173,7 @@ MonoBehaviour:
   text: {fileID: 135878409765785190}
   art: {fileID: 6939245965619256764}
   pauseOnHide: 1
+  pauseOnSlot: 0
   decayTo: {fileID: 0}
   paused: 0
   decayTime: 0

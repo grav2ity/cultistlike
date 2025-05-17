@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -27,10 +26,13 @@ namespace CultistLike
         [SerializeField, HideInInspector] private bool doCallback;
         [SerializeField, HideInInspector] private Rule forceRule;
 
+        //TODO is seperate endText even necessary
         [SerializeField, HideInInspector] private string _endText;
+        [SerializeField, HideInInspector] private string _runText;
+        [SerializeField, HideInInspector] private string _label;
 
         [SerializeField, HideInInspector] private Act branchOutAct;
-        private Stack<Act> callStack;
+        [SerializeField, HideInInspector] private List<Act> callStack;
 
         private ActWindow actWindow;
 
@@ -42,9 +44,10 @@ namespace CultistLike
 
         public TokenViz tokenViz { get => actWindow.tokenViz; }
 
-        // public string endText => fragTree.InterpolateString(_endText);
         public string endText => _endText;
-        public string runText => altAct ? GetText(altAct) : GetText(activeAct);
+        public string runText => _runText;
+        public string label => _label;
+
 
 
         /// <summary>
@@ -145,9 +148,13 @@ namespace CultistLike
             // }
             // extraAltActs.Clear();
 
-            altAct = AttemptAltActs();
+            AttemptAltActs();
 
+        #if UNITY_EDITOR
+            if (act.time > 0 || GameManager.Instance.devTimeOn == true)
+        #else
             if (act.time > 0)
+        #endif
             {
                 tokenViz.timer.StartTimer(act.time, OnTimeUp);
                 tokenViz.ShowTimer(true);
@@ -174,6 +181,8 @@ namespace CultistLike
             // extraNextActs.Clear();
 
             _endText = "";
+            _runText = "";
+            _label = "";
 
             fragTree.Clear();
         }
@@ -264,6 +273,7 @@ namespace CultistLike
             if (forceAct != null)
             {
                 ForceAct(forceAct);
+                return;
             }
             else if (branchOutAct != null)
             {
@@ -271,46 +281,46 @@ namespace CultistLike
                 if (AttemptAct(branchOutAct, context) == true)
                 {
                     Debug.Log("Branching out to act: " + branchOutAct.name);
-                    callStack.Push(activeAct);
+                    callStack.Add(activeAct);
                     RunAct(branchOutAct);
+                    return;
                 }
+            }
+
+            if (doCallback == true && callbackAct != null)
+            {
+                doCallback = false;
+                Context context = new Context(this);
+                if (AttemptAct(callbackAct, context) == true)
+                {
+                    RunAct(callbackAct);
+                    return;
+                }
+            }
+
+            PopulateActList(activeAct.nextActs, nextActs, activeAct.randomNext);
+            // foreach (var act in extraNextActs)
+            // {
+            //    nextActs.Insert(0, act);
+            // }
+            // extraNextActs.Clear();
+
+            var nextAct = AttemptNextActs();
+            while (nextAct == null && callStack.Count > 0)
+            {
+                var act = callStack[callStack.Count - 1];
+                callStack.RemoveAt(callStack.Count - 1);
+                PopulateActList(act.nextActs, nextActs, act.randomNext);
+                nextAct = AttemptNextActs();
+            }
+
+            if (nextAct != null)
+            {
+                RunAct(nextAct);
             }
             else
             {
-                if (doCallback == true && callbackAct != null)
-                {
-                    doCallback = false;
-                    Context context = new Context(this);
-                    if (AttemptAct(callbackAct, context) == true)
-                    {
-                        RunAct(callbackAct);
-                        return;
-                    }
-                }
-
-                PopulateActList(activeAct.nextActs, nextActs, activeAct.randomNext);
-                // foreach (var act in extraNextActs)
-                // {
-                //    nextActs.Insert(0, act);
-                // }
-                // extraNextActs.Clear();
-
-                var nextAct = AttemptNextActs();
-                if (nextAct == null && callStack.Count > 0)
-                {
-                    var act = callStack.Pop();
-                    PopulateActList(act.nextActs, nextActs, act.randomNext);
-                    nextAct = AttemptNextActs();
-                }
-
-                if (nextAct != null)
-                {
-                    RunAct(nextAct);
-                }
-                else
-                {
-                    SetupFinalResults();
-                }
+                SetupFinalResults();
             }
         }
 
@@ -346,7 +356,13 @@ namespace CultistLike
         // public void InjectAltAct(Act act) => extraAltActs.Add(act);
 
         public Act AttemptInitialActs() => AttemptActs(GameManager.Instance.initialActs, true);
-        public Act AttemptAltActs() => AttemptActs(altActs);
+        public Act AttemptAltActs()
+        {
+            altAct = AttemptActs(altActs);
+            UpdateText();
+            return altAct;
+        }
+
         private Act AttemptNextActs() => AttemptActs(nextActs);
 
         private bool AttemptAct(Act act, Context context, bool force = false)
@@ -447,6 +463,20 @@ namespace CultistLike
             }
         }
 
+        private void UpdateText()
+        {
+            string newRunText = altAct ? GetText(altAct) : GetText(activeAct);
+            string newLabel = altAct ? altAct.label : activeAct.label;
+            if (newRunText != "")
+            {
+                _runText = newRunText;
+            }
+            if (newLabel != "")
+            {
+                _label = newLabel;
+            }
+        }
+
         public string InterpolateString(string s) => fragTree.InterpolateString(s);
 
         public string TokenDesription() => tokenViz.token != null ? GetText(tokenViz.token.textRules, tokenViz.token.description) : "";
@@ -480,10 +510,12 @@ namespace CultistLike
             save.activeAct = activeAct;
             save.callbackAct = callbackAct;
             save.branchOutAct = branchOutAct;
-            save.callStack = callStack.ToList();
+            save.callStack = callStack;
             save.altAct = altAct;
 
             save.endText = _endText;
+            save.runText = _runText;
+            save.label = _label;
 
             return save;
         }
@@ -494,10 +526,17 @@ namespace CultistLike
             activeAct = save.activeAct;
             callbackAct = save.callbackAct;
             branchOutAct = save.branchOutAct;
-            callStack = new Stack<Act>(save.callStack.AsEnumerable().Reverse());
+            callStack = save.callStack;
             altAct = save.altAct;
 
+            if (activeAct != null)
+            {
+                PopulateActList(activeAct.altActs, altActs, activeAct.randomAlt);
+            }
+
             _endText = save.endText;
+            _runText = save.runText;
+            _label = save.label;
         }
 
         private void Awake()
@@ -505,8 +544,6 @@ namespace CultistLike
             actWindow = GetComponent<ActWindow>();
             fragTree = GetComponent<FragTree>();
             fragTree.onCreateCard = x => x.ParentToWindow(actWindow.transform, true);
-
-            callStack = new Stack<Act>();
         }
     }
 
@@ -523,6 +560,8 @@ namespace CultistLike
         public Act altAct;
 
         public string endText;
+        public string runText;
+        public string label;
     }
 
 }

@@ -384,6 +384,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7752337396020216672}
   - component: {fileID: 5572996021013042319}
+  - component: {fileID: 1479448047524415684}
   m_Layer: 0
   m_Name: ResultsLane
   m_TagString: Untagged
@@ -398,13 +399,13 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1428775211973714651}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -0.08}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5450090837657187645}
-  m_Father: {fileID: 247597986769105161}
+  m_Father: {fileID: 3707799410444567590}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -428,6 +429,24 @@ MonoBehaviour:
   spacingZ: 0.01
   cards: []
   actWindow: {fileID: 0}
+--- !u!114 &1479448047524415684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1428775211973714651}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82ae1eded985fed40acba304402545b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localFragments: []
+  localCard: {fileID: 0}
+  matches: []
+  memoryFragment: {fileID: 0}
+  free: 1
+  pause: 0
 --- !u!1 &1446713774958358522
 GameObject:
   m_ObjectHideFlags: 0
@@ -1204,6 +1223,7 @@ MonoBehaviour:
   matches: []
   memoryFragment: {fileID: 0}
   free: 1
+  pause: 0
 --- !u!1 &6050733521751008755
 GameObject:
   m_ObjectHideFlags: 0
@@ -1370,6 +1390,7 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 8476360870207394352}
+  - {fileID: 7752337396020216672}
   - {fileID: 1025135475439788831}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1395,7 +1416,6 @@ MonoBehaviour:
   slotsFrag: {fileID: 3338673699594219992}
   idleSlotsGO: {fileID: 8647200573428268445}
   runSlotsGO: {fileID: 6255190282301801516}
-  cardsGO: {fileID: 0}
   resultLane: {fileID: 5572996021013042319}
   aspectBar: {fileID: 3082728217431792779}
   cardBar: {fileID: 0}
@@ -1458,6 +1478,7 @@ MonoBehaviour:
   matches: []
   memoryFragment: {fileID: 0}
   free: 1
+  pause: 1
 --- !u!1 &6255190282301801516
 GameObject:
   m_ObjectHideFlags: 0
@@ -2450,7 +2471,6 @@ Transform:
   - {fileID: 806722257033219940}
   - {fileID: 8440397270192019973}
   - {fileID: 5030697575778731041}
-  - {fileID: 7752337396020216672}
   - {fileID: 3279215898972820839}
   m_Father: {fileID: 8476360870207394352}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

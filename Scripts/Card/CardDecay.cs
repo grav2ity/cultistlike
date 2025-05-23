@@ -14,13 +14,10 @@ namespace CultistLike
         [SerializeField] private TextMeshPro text;
         [SerializeField] private SpriteRenderer art;
 
-        [Header("Options")]
-        public bool pauseOnHide;
-        public bool pauseOnSlot;
-
         [SerializeField, HideInInspector] private Card decayTo;
 
-        [SerializeField, HideInInspector] private bool paused;
+        // [SerializeField, HideInInspector] private bool paused;
+        public bool paused;
 
         [SerializeField, HideInInspector] private float decayTime;
         [SerializeField, HideInInspector] private float elapsedTime;
@@ -73,20 +70,12 @@ namespace CultistLike
 
         public void Pause()
         {
-            if (enabled == true)
-            {
-                paused = true;
-                enabled = false;
-            }
+            paused = true;
         }
 
         public void Unpause()
         {
-            if (paused == true)
-            {
-                paused = false;
-                enabled = true;
-            }
+            paused = false;
         }
 
         public CardDecaySave Save()
@@ -134,14 +123,17 @@ namespace CultistLike
 
         private void Update()
         {
-            elapsedTime += Time.deltaTime * GameManager.Instance.timeScale;
-
-            UpdateDisplay(timeLeft);
-
-            if (timeLeft <= 0f)
+            if (paused == false)
             {
-                StopTimer();
-                GetComponent<CardViz>()?.OnDecayComplete(decayTo);
+                elapsedTime += Time.deltaTime * GameManager.Instance.timeScale;
+
+                UpdateDisplay(timeLeft);
+
+                if (timeLeft <= 0f)
+                {
+                    StopTimer();
+                    GetComponent<CardViz>()?.OnDecayComplete(decayTo);
+                }
             }
         }
     }

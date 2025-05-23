@@ -10,11 +10,12 @@ namespace CultistLike
     public class Rule : ScriptableObject
     {
         [Header("Tests")]
+        public bool invert;
         [Tooltip("All the tests must pass for this Rule to pass. Matched Cards from Card tests will be available in the Modifiers section.")]
         public List<Test> tests;
         [Tooltip("All of the And Rules must pass for this Rule to pass. Modifiers are not applied. Matched Cards are not carried in nor out.")]
         public List<Rule> and;
-        [Tooltip("One of the Or Rules must pass for this Rules to pass. Modifiers are not applied. Matched Cards are not carried in nor out.")]
+        [Tooltip("One of the Or Rules must pass for this Rule to pass. Modifiers are not applied. Matched Cards are not carried in nor out.")]
         public List<Rule> or;
         [Space(10)]
 
@@ -33,8 +34,13 @@ namespace CultistLike
         [TextArea(3, 10)] public string text;
 
 
-        public static bool Evaluate(Context context, List<Test> tests, List<Rule> and, List<Rule> or, bool force = false)
+        public static bool Evaluate(Context context, List<Test> tests, List<Rule> and, List<Rule> or, bool invert, bool force = false)
         {
+            if (invert == true && force == false)
+            {
+                return !Evaluate(context, tests, and, or, false);
+            }
+
             foreach (var test in tests)
             {
                 var r = test.Attempt(context);
@@ -121,7 +127,7 @@ namespace CultistLike
             context.ResetMatches();
         }
 
-        public bool Evaluate(Context context) => Evaluate(context, tests, and, or);
+        public bool Evaluate(Context context) => Evaluate(context, tests, and, or, invert);
 
         public void Execute(Context context) => Execute(context, actModifiers,
                                                         cardModifiers, tableModifiers,

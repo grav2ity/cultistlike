@@ -20,8 +20,6 @@ namespace CultistLike
         [SerializeField] private Renderer highlight;
 
         [Header("Card Options")]
-        [Tooltip("Accept all Cards.")]
-        public bool acceptAll;
         [Tooltip("Grabs Cards for itself.")]
         public bool grab;
         [Tooltip("Cannot remove Card from the Slot.")]
@@ -84,7 +82,7 @@ namespace CultistLike
         {
             if (gameObject.activeSelf == true && cardViz != null)
             {
-                if (acceptAll == true || AcceptsCard(cardViz) == true)
+                if (AcceptsCard(cardViz) == true)
                 {
                     if (slottedCard == null)
                     {
@@ -155,12 +153,6 @@ namespace CultistLike
                     cardViz.free = false;
                 }
 
-                if (cardViz.decay.pauseOnSlot == true)
-                {
-                    cardViz.decay.Pause();
-                }
-
-
                 // if (firstSlot == true)
                 // {
                 //     actWindow.SetFragMemory(cardViz);
@@ -181,11 +173,6 @@ namespace CultistLike
                 foreach (var frag in slot.fragments)
                 {
                     actWindow.RemoveFragment(frag);
-                }
-
-                if ( slottedCard.decay.pauseOnSlot == true)
-                {
-                    slottedCard.decay.Unpause();
                 }
 
                 var sc = slottedCard;
@@ -209,10 +196,9 @@ namespace CultistLike
         {
             if (slottedCard != null)
             {
-                var card = slottedCard;
+                var cardViz = slottedCard;
                 slottedCard = null;
-                card.ParentToWindow(actWindow.transform);
-                card.Hide();
+                cardViz.ParentTo(actWindow.transform, true);
             }
         }
 
@@ -281,7 +267,6 @@ namespace CultistLike
                 label.text = slot.label;
                 grab = slot.grab;
                 cardLock = slot.cardLock;
-                acceptAll = slot.acceptAll;
             }
         }
 

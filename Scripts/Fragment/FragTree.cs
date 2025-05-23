@@ -18,6 +18,7 @@ namespace CultistLike
         public Fragment memoryFragment;
 
         public bool free;
+        public bool pause;
 
         public Action<CardViz> onCreateCard;
         public Action ChangeEvent;
@@ -28,6 +29,28 @@ namespace CultistLike
             get
             {
                 var list = new List<CardViz>(GetComponentsInChildren<CardViz>(true));
+                if (localCard != null)
+                {
+                    list.Add(localCard);
+                }
+                return list;
+            }
+        }
+
+        public List<CardViz> directCards
+        {
+            get
+            {
+                var list = new List<CardViz>();
+                CardViz cardViz = null;
+                foreach (Transform child in transform)
+                {
+                    cardViz = child.GetComponent<CardViz>();
+                    if (cardViz != null)
+                    {
+                        list.Add(cardViz);
+                    }
+                }
                 if (localCard != null)
                 {
                     list.Add(localCard);
@@ -259,6 +282,27 @@ namespace CultistLike
             return 0;
         }
 
+        public int Count(Target target)
+        {
+            if (target != null)
+            {
+                //TODO
+                // if (target.cards != null)
+                // {
+                //     foreach (var cardViz in target.cards)
+                //     {
+                //         Adjust(cardViz, level);
+                //     }
+                // }
+                // else if (target.fragment != null)
+                if (target.fragment != null)
+                {
+                    return Count(target.fragment);
+                }
+            }
+            return 0;
+        }
+
         public HeldFragment Find(Aspect aspect) => fragments.Find(x => x.fragment == aspect);
 
         public List<CardViz> FindAll(Card card) => cards.FindAll(x => x.card == card);
@@ -337,7 +381,23 @@ namespace CultistLike
             }
             if (transform.parent != null)
             {
-                transform.parent.GetComponentInParent<FragTree>()?.OnChange();
+                transform.parent.GetComponentInNearestParent<FragTree>()?.OnChange();
+            }
+        }
+
+        public void OnAddCard(MonoBehaviour cardViz)
+        {
+            var cards = cardViz.GetComponentsInChildren<CardViz>(true);
+            foreach (var card in cards)
+            {
+                if (pause == true)
+                {
+                    card.decay.Pause();
+                }
+                else
+                {
+                    card.decay.Unpause();
+                }
             }
         }
 

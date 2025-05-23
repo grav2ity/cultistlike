@@ -141,7 +141,7 @@ namespace CultistLike
         {
             if (autoUpdate == true)
             {
-                var fragTree = GetComponentInParent<FragTree>();
+                var fragTree = transform.GetComponentInNearestParent<FragTree>();
                 if (fragTree != null)
                 {
                     fragTree.ChangeEvent += () => Load(fragTree);
@@ -154,7 +154,7 @@ namespace CultistLike
         {
             if (autoUpdate == true)
             {
-                var fragTree = GetComponentInParent<FragTree>();
+                var fragTree = transform.GetComponentInNearestParent<FragTree>();
                 if (fragTree != null)
                 {
                     Load(fragTree);

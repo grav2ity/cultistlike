@@ -111,7 +111,7 @@ namespace CultistLike
                     target = targetPosition;
                 }
 
-                Action<CardViz> onStart = x => x.ParentToWindow(actWindow.transform);
+                Action<CardViz> onStart = x => x.ParentTo(actWindow.transform);
                 Action<CardViz> onComplete = x => x.Hide();
 
                 cardViz.Grab(target, onStart, onComplete);

@@ -108,6 +108,14 @@ namespace CultistLike
             openWindow = null;
         }
 
+        public void CloseWindow(ActWindow window)
+        {
+            if (openWindow == window)
+            {
+                CloseWindow();
+            }
+        }
+
         public void OpenWindow(ActWindow window)
         {
             if (openWindow != window)
@@ -188,6 +196,7 @@ namespace CultistLike
             return tokenViz;
         }
 
+        //TODO destroy window
         public void DestroyToken(TokenViz tokenViz)
         {
             if (tokenViz != null)
@@ -422,6 +431,11 @@ namespace CultistLike
             {
                 Debug.LogError("GameManager's Special fragments are missing!!");
             }
+
+        #if UNITY_EDITOR
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = 60;
+        #endif
         }
 
         private void Update()

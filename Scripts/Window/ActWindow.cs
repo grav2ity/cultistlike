@@ -97,7 +97,7 @@ namespace CultistLike
 
             Hide();
             open = false;
-            GameManager.Instance.CloseWindow();
+            GameManager.Instance.CloseWindow(this);
         }
 
         public void GoForIt()
@@ -243,7 +243,7 @@ namespace CultistLike
 
         public void SetupResultCards(List<CardViz> cards)
         {
-            resultLane.PlaceCards(cards);
+            resultLane.ParentCards(cards);
             tokenViz.SetResultCount(cards.Count);
         }
 
@@ -263,7 +263,7 @@ namespace CultistLike
                     ApplyStatus(ActStatus.Running);
                     break;
                 case ActStatus.Finished:
-                    var count = actLogic.fragTree.cards.Count;
+                    var count = resultLane.Count;
                     if (count == 0)
                     {
                         StatusIdle();
@@ -380,7 +380,7 @@ namespace CultistLike
             {
                 slot.Hide();
             }
-
+            resultLane.Hide();
         }
         public void Show()
         {
@@ -393,6 +393,7 @@ namespace CultistLike
             {
                 slot.Show();
             }
+            resultLane.Show();
         }
 
         public void AddFragment(Fragment frag)
@@ -446,7 +447,7 @@ namespace CultistLike
 
             foreach (var cardID in save.localCards)
             {
-                SaveManager.Instance.CardFromID(cardID).ParentToWindow(transform, true);
+                SaveManager.Instance.CardFromID(cardID).ParentTo(transform, true);
             }
 
             resultLane.Load(save.cardLane);

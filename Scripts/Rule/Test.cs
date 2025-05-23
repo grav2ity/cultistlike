@@ -15,6 +15,7 @@ namespace CultistLike
         More = 3,
         NotEqual = 4,
         Less = 5,
+        Mod = 6,
         RandomChallenge = 10,
         RandomClash = 20
     }
@@ -130,15 +131,8 @@ namespace CultistLike
             }
             else
             {
-                if (fragment1r != null)
-                {
-                    int left = GetCount(context, loc1, fragment1r);
-                    return Compare(op, constant, left, right);
-                }
-                else
-                {
-                    return true;
-                }
+                int left = GetCount(context, loc1, fragment1r);
+                return Compare(op, constant, left, right);
             }
         }
 
@@ -158,6 +152,8 @@ namespace CultistLike
                     return left > right;
                 case ReqOp.MoreOrEqual:
                     return left >= right;
+                case ReqOp.Mod:
+                    return left % right == 0;
                 case ReqOp.RandomChallenge:
                     return constant * left > Random.Range(0, 100);
                 case ReqOp.RandomClash:
@@ -218,7 +214,15 @@ namespace CultistLike
             {
                 var scope = context.ResolveScope(loc);
 
-                total = scope.Count(fragment, loc == ReqLoc.Free);
+                if (fragment != null)
+                {
+                    total = scope.Count(fragment, loc == ReqLoc.Free);
+                }
+                else
+                {
+                    //TODO just count fragments?
+                    total = 0;
+                }
             }
 
             return total;

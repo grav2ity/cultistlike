@@ -111,6 +111,11 @@ namespace CultistLike
 
         public bool AcceptsCard(CardViz cardViz)
         {
+            if (acceptAll == true)
+            {
+                return true;
+            }
+
             if (cardViz != null && CheckFragRules(cardViz) == true)
             {
                 if (cardRule == null)

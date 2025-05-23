@@ -242,7 +242,7 @@ namespace CultistLike
                 activeAct = altAct;
             }
 
-            actWindow.ParentSlotCardsToWindow();
+            // actWindow.ParentSlotCardsToWindow();
 
             foreach (var frag in activeAct.fragments)
             {
@@ -262,7 +262,7 @@ namespace CultistLike
                 GameManager.Instance.SpawnAct(spawnedAct, fragTree, tokenViz);
             }
 
-            actWindow.ParentSlotCardsToWindow();
+            // actWindow.ParentSlotCardsToWindow();
 
             var et = GetEndText(activeAct);
             if (et != "")
@@ -327,7 +327,7 @@ namespace CultistLike
         private void SetupFinalResults()
         {
             //TODO this cuts short DOTween animations
-            actWindow.SetupResultCards(fragTree.cards);
+            actWindow.SetupResultCards(fragTree.directCards);
             actWindow.ApplyStatus(ActStatus.Finished);
         }
 
@@ -543,7 +543,7 @@ namespace CultistLike
         {
             actWindow = GetComponent<ActWindow>();
             fragTree = GetComponent<FragTree>();
-            fragTree.onCreateCard = x => x.ParentToWindow(actWindow.transform, true);
+            fragTree.onCreateCard = x => x.ParentTo(actWindow.transform, true);
         }
     }
 

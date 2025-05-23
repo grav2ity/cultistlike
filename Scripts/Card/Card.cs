@@ -22,10 +22,17 @@ namespace CultistLike
         // [Tooltip("Only one Card from this set can be in a game at any given time.")]
         // public Deck uniqueGroup;
 
+        [Header("Memory")]
+        public bool memoryFromFirst;
+
         public override void AddToTree(FragTree fg) => fg.Add(this);
         public override int AdjustInTree(FragTree fg, int level) => fg.Adjust(this, level);
         public override void RemoveFromTree(FragTree fg) => fg.Remove(this);
         public override int CountInTree(FragTree fg, bool onlyFree=false) => fg.Count(this, onlyFree);
 
+        public bool isMutator =>
+                label.Length >= 4 &&
+                label[0] == '{' && label[1] == '{' &&
+                label[label.Length - 1] == '}' && label[label.Length - 2] == '}';
     }
 }

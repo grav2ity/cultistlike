@@ -46,7 +46,7 @@ namespace CultistLike
 
             dragOrigin = transform.position;
 
-            dragOriginDock = transform.parent?.GetComponentInParent<ICardDock>();
+            dragOriginDock = transform.parent?.GetComponentInNearestParent<ICardDock>();
 
             Parent(draggingPlane.transform);
             dragOriginDock?.OnCardUndock(gameObject);
@@ -95,7 +95,7 @@ namespace CultistLike
                 collider.enabled = true;
             }
 
-            if (undrag == true && transform.parent?.GetComponentInParent<ICardDock>() == null)
+            if (undrag == true && transform.parent?.GetComponentInNearestParent<ICardDock>() == null)
             {
                 Undrag();
             }
@@ -107,10 +107,15 @@ namespace CultistLike
             if (oldParent != newParent)
             {
                 transform.SetParent(newParent);
-                oldParent?.GetComponentInParent<FragTree>()?.OnChange();
-                newParent?.GetComponentInParent<FragTree>()?.OnChange();
+                oldParent?.GetComponentInNearestParent<FragTree>()?.OnChange();
+                newParent?.GetComponentInNearestParent<FragTree>()?.OnChange();
+
+                newParent?.GetComponentInNearestParent<FragTree>()?.OnAddCard(this);
             }
         }
+
+        // public T GetComponentInNearestParent<T>(bool includeInactive = false) where T : class?
+        //     => transform.GetComponentInNearestParent<T>(includeInactive);
 
         public virtual void DOMove(Vector3 target, float speed, Action<Drag> onStart = null, Action<Drag> onComplete = null)
         {

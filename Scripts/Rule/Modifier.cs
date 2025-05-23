@@ -33,9 +33,11 @@ namespace CultistLike
     public enum CardOp
     {
         FragmentAdditive = 0,
+        FragmentSet = 5,
         Transform = 10,
         Decay = 100,
         SetMemory = 140,
+        Spread = 150,
     }
 
     [Serializable]
@@ -75,14 +77,31 @@ namespace CultistLike
 
         public void Execute(Context context)
         {
+            //TODO what != null prevents from setting memory to null
             if (context?.scope != null && targetCards != null && what != null)
             {
+                for (int i=targetCards.Count-1; i>=0; i--)
+                {
+                    if (targetCards[i] == null)
+                    {
+                        targetCards.RemoveAt(i);
+                        Debug.LogWarning("One of the target cards was destroyed. Please refer to the __MatchedCards WARNING section in the manual.");
+                    }
+                }
+
                 switch (op)
                 {
                     case CardOp.FragmentAdditive:
                         foreach (var targetCard in targetCards)
                         {
                             targetCard.fragTree.Adjust(what, level);
+                        }
+                        break;
+                    case CardOp.FragmentSet:
+                        foreach (var targetCard in targetCards)
+                        {
+                            int count = targetCard.fragTree.Count(what);
+                            targetCard.fragTree.Adjust(what, level - count);
                         }
                         break;
                     case CardOp.Transform:
@@ -130,6 +149,30 @@ namespace CultistLike
                             {
                                 targetCard.fragTree.memoryFragment = what.cards[0].fragTree.memoryFragment;
                             }
+                            else
+                            {
+                                targetCard.fragTree.memoryFragment = null;
+                            }
+                        }
+                        break;
+                    case CardOp.Spread:
+                        foreach (var targetCard in targetCards)
+                        {
+                            if (what.fragment is Card)
+                            {
+                                // targetCard.Transform((Card)what.fragment);
+                                // context.scope.Adjust(targetCard, level - 1);
+                            }
+                            else if (what.cards != null)
+                            {
+                                foreach (var cardViz in what.cards)
+                                {
+                                    if (targetCard.fragTree.cards.FindAll(x => x.MemoryEqual(cardViz)).Count == 0)
+                                    {
+                                        var newCardViz = targetCard.fragTree.Adjust(cardViz, 1);
+                                    }
+                                }
+                            }
                         }
                         break;
                     default:
@@ -145,6 +188,7 @@ namespace CultistLike
     {
         Adjust = 0,
         Grab = 20,
+        Expulse = 30,
         SetMemory = 40,
         RunTriggers = 50,
     }
@@ -249,6 +293,19 @@ namespace CultistLike
                             }
                         }
                         break;
+                    case ActOp.Expulse:
+                        targetCardsY = context.ResolveTargetCards(target, GameManager.Instance.root);
+                        if (targetCardsY != null)
+                        {
+                            foreach (var cardViz in targetCardsY)
+                            {
+                                cardViz.free = true;
+                                cardViz.Show();
+                                cardViz.transform.position = cardViz.Position();
+                                GameManager.Instance.table.ReturnToTable(cardViz);
+                            }
+                        }
+                        break;
                     case ActOp.SetMemory:
                         if (target.fragment != null)
                         {
@@ -257,6 +314,10 @@ namespace CultistLike
                         else if (target.cards.Count > 0)
                         {
                             context.scope.memoryFragment = target.cards[0].fragTree.memoryFragment;
+                        }
+                        else
+                        {
+                            context.scope.memoryFragment = null;
                         }
                         break;
                     case ActOp.RunTriggers:

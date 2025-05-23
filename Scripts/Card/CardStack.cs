@@ -96,7 +96,7 @@ namespace CultistLike
 
         private void Awake()
         {
-            parent = GetComponentInParent<CardViz>();
+            parent = transform.GetComponentInNearestParent<CardViz>();
         }
 
         private void Start()

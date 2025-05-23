@@ -20,6 +20,19 @@ namespace CultistLike
         [SerializeField, HideInInspector] private ActWindow actWindow;
 
 
+        public int Count
+        {
+            get
+            {
+                int count = 0;
+                foreach (var cardViz in cards)
+                {
+                    count += cardViz.stackCount;
+                }
+                return count;
+            }
+        }
+
         private Rect rect { get => GetComponent<RectTransform>().rect; }
 
 
@@ -33,6 +46,7 @@ namespace CultistLike
         }
 
         //TODO won't get called when getting card from stack
+        //TODO parent ??
         public void OnCardUndock(GameObject go)
         {
             CardViz cardViz = go.GetComponent<CardViz>();
@@ -43,15 +57,26 @@ namespace CultistLike
             }
         }
 
-        public void PlaceCards(List<CardViz> cards)
+        public void ParentCards(List<CardViz> newCards)
         {
-            foreach (var cardViz in cards)
+            foreach (var cardViz in newCards)
             {
                 cardViz.transform.DOComplete(true);
                 cardViz.Show();
                 cardViz.free = true;
                 cardViz.interactive = true;
+                cardViz.Parent(transform);
+
+                cardViz.DecayDefault();
             }
+            cards = newCards;
+
+            PlaceCards();
+        }
+
+        public void PlaceCards()
+        {
+            var newCards = cards;
 
             if (stackMatching == true)
             {
@@ -73,39 +98,53 @@ namespace CultistLike
                         cardsStacked.Add(cardViz);
                     }
                 }
-                this.cards = cardsStacked;
-            }
-            else
-            {
-                this.cards = cards.GetRange(0, cards.Count);
+                cards = cardsStacked;
             }
 
-            if (this.cards.Count > 0)
+            if (cards.Count > 0)
             {
                 Vector3 spacing = new Vector3(
-                    Math.Min(rect.width / this.cards.Count, maxSpacingX),
+                    Math.Min(rect.width / cards.Count, maxSpacingX),
                     0f,
                     spacingZ
                 );
 
                 Vector3 o = new Vector3(
-                    -0.5f * spacing.x * (this.cards.Count - 1),
+                    -0.5f * spacing.x * (cards.Count - 1),
                     0,
-                    -spacingZ * (this.cards.Count)
+                    -spacingZ * (cards.Count)
                 );
 
-                foreach (var cardViz in this.cards)
+                foreach (var cardViz in cards)
                 {
-                    cardViz.transform.SetParent(transform);
-
+                    if (actWindow.open == false)
+                    {
+                        cardViz.Hide();
+                    }
                     cardViz.transform.localPosition = o;
                     o += spacing;
                 }
             }
 
-            for (int i = cards.Count - 1; i >= 0; i--)
+            for (int i = newCards.Count - 1; i >= 0; i--)
             {
-                GameManager.Instance.CardInPlay(cards[i]);
+                GameManager.Instance.CardInPlay(newCards[i]);
+            }
+        }
+
+        public void Hide()
+        {
+            foreach (var cardViz in cards)
+            {
+                cardViz.Hide();
+            }
+        }
+
+        public void Show()
+        {
+            foreach (var cardViz in cards)
+            {
+                cardViz.Show();
             }
         }
 
@@ -133,7 +172,7 @@ namespace CultistLike
             {
                 cards.Add(SaveManager.Instance.CardFromID(cardID));
             }
-            PlaceCards(cards);
+            ParentCards(cards);
         }
 
         private void Awake()

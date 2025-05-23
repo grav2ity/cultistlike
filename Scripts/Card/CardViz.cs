@@ -39,6 +39,7 @@ namespace CultistLike
         public bool free { get => fragTree.free; set => fragTree.free = value; }
         public bool visible { get => visualsGO.activeInHierarchy; }
         public bool faceDown { get => _faceDown; private set => _faceDown = value; }
+        public int stackCount { get => cardStack.Count; }
 
         public CardDecay decay { get => cardDecay; }
 
@@ -164,7 +165,7 @@ namespace CultistLike
                         var cardVizY = Yield();
 
                         cardVizY.transform.parent?.
-                            GetComponentInParent<ICardDock>(true)?.OnCardUndock(cardVizY.gameObject);
+                            GetComponentInNearestParent<ICardDock>(true)?.OnCardUndock(cardVizY.gameObject);
                         readySlot.Grab(cardVizY, true);
                     }
                 }
@@ -208,15 +209,19 @@ namespace CultistLike
         #else
             cardDecay.StartTimer(time, card);
         #endif
-            if (visible == false && cardDecay.pauseOnHide == true)
+        }
+
+        public void DecayDefault()
+        {
+            if (cardDecay.timeLeft == 0f && card.lifetime > 0f)
             {
-                cardDecay.Pause();
+                Decay(card.decayTo, card.lifetime);
             }
         }
 
         public void Destroy()
         {
-            transform.parent?.GetComponentInParent<ICardDock>(true)?.OnCardUndock(gameObject);
+            transform.parent?.GetComponentInNearestParent<ICardDock>(true)?.OnCardUndock(gameObject);
             GameManager.Instance.DestroyCard(this);
         }
 
@@ -244,20 +249,11 @@ namespace CultistLike
         public void Hide()
         {
             visualsGO.SetActive(false);
-            if (cardDecay.pauseOnHide == true)
-            {
-                cardDecay.Pause();
-            }
         }
 
         public void Show()
         {
             visualsGO.SetActive(true);
-            //TODO
-            if (cardDecay.pauseOnSlot == false || GetComponentInParent<SlotViz>() == null)
-            {
-                cardDecay.Unpause();
-            }
         }
 
         public void ShowFace()
@@ -315,15 +311,26 @@ namespace CultistLike
 
         public void Transform(Card card)
         {
-            LoadCard(card, false);
+            if (card.isMutator == true)
+            {
+                title.text = title.text + "\n[" + card.label.Substring(2, card.label.Length - 4) + ']';
+
+                cardDecay.StopTimer();
+
+                Decay(this.card, card.lifetime);
+            }
+            else
+            {
+                LoadCard(card, false);
+
+                cardDecay.StopTimer();
+                if (card.lifetime > 0f)
+                {
+                    Decay(card.decayTo, card.lifetime);
+                }
+            }
 
             fragTree.OnChange();
-
-            cardDecay.StopTimer();
-            if (card.lifetime > 0f)
-            {
-                Decay(card.decayTo, card.lifetime);
-            }
         }
 
         public CardViz Duplicate()
@@ -333,23 +340,29 @@ namespace CultistLike
 
             if (newCardViz != null)
             {
+                newCardViz.fragTree.Clear();
+
                 foreach (var frag in fragTree.localFragments)
                 {
                     newCardViz.fragTree.Add(frag);
                 }
+
+                newCardViz.fragTree.memoryFragment = fragTree.memoryFragment;
             }
 
             return newCardViz;
         }
 
-        public void ParentToWindow(Transform trans, bool hide = false)
+        public void ParentTo(Transform trans, bool hide = false)
         {
             if (hide == true)
             {
                 Hide();
             }
+
             free = false;
             Parent(trans);
+            transform.localPosition = Vector3.zero;
         }
 
         public bool Grab(Vector3 target, Action<CardViz> onStart, Action<CardViz> onComplete)
@@ -363,7 +376,7 @@ namespace CultistLike
                     cardVizY.transform.DOComplete(true);
                     cardVizY.isDragging = false;
 
-                    cardVizY.transform.parent?.GetComponentInParent<ICardDock>(true)?.
+                    cardVizY.transform.parent?.GetComponentInNearestParent<ICardDock>(true)?.
                         OnCardUndock(cardVizY.gameObject);
                     cardVizY.gameObject.SetActive(true);
 
@@ -515,6 +528,9 @@ namespace CultistLike
             }
         }
 
+        public bool MemoryEqual(CardViz cardViz) => cardViz != null &&
+            cardViz.card == card && cardViz.fragTree.memoryFragment == fragTree.memoryFragment;
+
         private void LoadFragments()
         {
             foreach (var frag in card.fragments)
@@ -525,17 +541,20 @@ namespace CultistLike
                 }
             }
 
-            // if (fragTree.localFragments.Count > 0)
-            // {
-            //     fragTree.memoryFragment = fragTree.localFragments[0].fragment;
-            // }
             if (fragTree.memoryFragment == null)
             {
-                fragTree.memoryFragment = card;
+                if (card.memoryFromFirst == true && fragTree.localFragments.Count > 0)
+                {
+                    fragTree.memoryFragment = fragTree.localFragments[0].fragment;
+                }
+                else
+                {
+                    fragTree.memoryFragment = card;
+                }
             }
         }
 
-        private Vector3 Position()
+        public Vector3 Position()
         {
             var actWindow = GetComponentInParent<ActWindow>();
             if (actWindow && actWindow.open == false)
@@ -554,6 +573,14 @@ namespace CultistLike
             {
                 LoadCard(card);
             }
+            fragTree.onCreateCard = x =>
+            {
+                x.ParentTo(fragTree.transform, true);
+                if (decay.paused == true)
+                {
+                    x.decay.Pause();
+                }
+            };
         }
 
         private void Start()
@@ -563,10 +590,7 @@ namespace CultistLike
                 Debug.LogError("Please set Card for " + this.name);
             }
 
-            if (cardDecay.timeLeft == 0f && card.lifetime > 0f)
-            {
-                Decay(card.decayTo, card.lifetime);
-            }
+            DecayDefault();
 
             draggingPlane = GameManager.Instance.cardDragPlane;
         }

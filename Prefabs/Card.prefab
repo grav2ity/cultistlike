@@ -708,6 +708,7 @@ MonoBehaviour:
   matches: []
   memoryFragment: {fileID: 0}
   free: 1
+  pause: 0
 --- !u!1 &3912949946651488558
 GameObject:
   m_ObjectHideFlags: 0
@@ -954,7 +955,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4056867988049479970}
   m_Layer: 0
-  m_Name: Card Decay
+  m_Name: Decay Timer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1157,7 +1158,7 @@ MonoBehaviour:
   cardStack: {fileID: 3757678567134121052}
   cardDecay: {fileID: 2129266061847676189}
   CellCount: {x: 1, y: 1}
-  faceDown: 0
+  _faceDown: 0
 --- !u!114 &2129266061847676189
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1172,8 +1173,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   text: {fileID: 135878409765785190}
   art: {fileID: 6939245965619256764}
-  pauseOnHide: 1
-  pauseOnSlot: 0
   decayTo: {fileID: 0}
   paused: 0
   decayTime: 0

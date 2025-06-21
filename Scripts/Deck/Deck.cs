@@ -31,11 +31,13 @@ namespace CultistLike
         public bool replenish;
         [Tooltip("Drawing does not remove fragments from the Deck.")]
         public bool infinite;
+        public bool random;
         // public bool wrapAround;
 
         public Fragment Draw() => DeckManager.Instance.GetDeckInst(this).Draw();
         public Fragment DrawOffset(Fragment frag, int di) => DeckManager.Instance.GetDeckInst(this).DrawOffset(frag, di);
 
         public void Add(Fragment frag) => DeckManager.Instance.GetDeckInst(this).Add(frag);
+        public void AddFront(Fragment frag) => DeckManager.Instance.GetDeckInst(this).AddFront(frag);
     }
 }

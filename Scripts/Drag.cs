@@ -51,6 +51,7 @@ namespace CultistLike
             Parent(draggingPlane.transform);
             dragOriginDock?.OnCardUndock(gameObject);
 
+            //TODO this affects all children
             foreach(var collider in gameObject.GetComponentsInChildren<Collider>())
             {
                 collider.enabled = false;
@@ -88,17 +89,24 @@ namespace CultistLike
             if (isDragging == false)
                 return;
 
-            isDragging = false;
-
-            foreach(var collider in gameObject.GetComponentsInChildren<Collider>())
-            {
-                collider.enabled = true;
-            }
+            InterruptDrag();
 
             if (undrag == true && transform.parent?.GetComponentInNearestParent<ICardDock>() == null)
             {
                 Undrag();
             }
+        }
+
+        public virtual void InterruptDrag()
+        {
+            isDragging = false;
+
+            //TODO this affects all children
+            foreach(var collider in gameObject.GetComponentsInChildren<Collider>())
+            {
+                collider.enabled = true;
+            }
+
         }
 
         public virtual void Parent(Transform newParent)

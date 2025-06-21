@@ -11,7 +11,7 @@ namespace CultistLike
     {
         public static DeckManager Instance { get; private set; }
 
-        [HideInInspector] public List<DeckInst> deckInsts;
+        public List<DeckInst> deckInsts;
 
         private Dictionary<Deck, DeckInst> decDict;
 

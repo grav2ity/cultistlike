@@ -10,7 +10,6 @@ using DG.Tweening;
 
 namespace CultistLike
 {
-    //TODO save Heap
     public class GameManager : MonoBehaviour
     {
         private static GameManager _instance;
@@ -196,7 +195,6 @@ namespace CultistLike
             return tokenViz;
         }
 
-        //TODO destroy window
         public void DestroyToken(TokenViz tokenViz)
         {
             if (tokenViz != null)
@@ -204,7 +202,7 @@ namespace CultistLike
                 tokens.Remove(tokenViz);
                 table.Remove(tokenViz);
                 tokenViz.gameObject.SetActive(false);
-                Destroy(tokenViz.gameObject, 0.1f);
+                Destroy(tokenViz.gameObject);
             }
         }
 
@@ -229,7 +227,7 @@ namespace CultistLike
             {
                 windows.Remove(actWindow);
                 actWindow.gameObject.SetActive(false);
-                Destroy(actWindow.gameObject, 0.1f);
+                Destroy(actWindow.gameObject);
             }
         }
 
@@ -316,8 +314,18 @@ namespace CultistLike
 
             save.table = table.Save();
 
+            if (heap != null)
+            {
+                save.heap = heap.Save();
+                foreach (var cardViz in heap.cards)
+                {
+                    save.heapCards.Add(cardViz.GetInstanceID());
+                }
+            }
+
             var jsonSave = JsonUtility.ToJson(save);
             SaveManager.Instance.Save(jsonSave);
+
         }
 
         public void Load()
@@ -358,6 +366,17 @@ namespace CultistLike
 
             DeckManager.Instance.Load(save.decks);
 
+            if (heap != null)
+            {
+                heap.Load(save.heap);
+                foreach (var cardID in save.heapCards)
+                {
+                    var cardViz = SaveManager.Instance.CardFromID(cardID);
+                    cardViz.ParentTo(heap.transform, true);
+                    cardViz.name = cardViz.card.name;
+                }
+            }
+
             //load table last
             table.Load(save.table);
         }
@@ -390,15 +409,22 @@ namespace CultistLike
             UIManager.Instance?.aspectInfo?.Unload();
         }
 
-        private bool AllowedToCreate(Card card)
+        public bool AllowedToCreate(Card card)
         {
-            if (card.unique == false)
+            if (card != null)
             {
-                return true;
+                if (card.unique == false)
+                {
+                    return true;
+                }
+                else
+                {
+                    return root.Count(card) == 0;
+                }
             }
             else
             {
-                return root.Count(card) == 0;
+                return true;
             }
         }
 
@@ -452,10 +478,17 @@ namespace CultistLike
         public List<DeckInst> decks;
         public string table;
 
+        //TODO move out of here?
+        public List<int> heapCards;
+        public FragTreeSave heap;
+
         public GameManagerSave()
         {
             cards = new List<CardVizSave>();
             tokens = new List<TokenVizSave>();
+
+            heap = null;
+            heapCards = new List<int>();
         }
 
         public GameManagerSave(string json)

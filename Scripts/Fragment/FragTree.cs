@@ -289,12 +289,7 @@ namespace CultistLike
                 //TODO
                 // if (target.cards != null)
                 // {
-                //     foreach (var cardViz in target.cards)
-                //     {
-                //         Adjust(cardViz, level);
-                //     }
                 // }
-                // else if (target.fragment != null)
                 if (target.fragment != null)
                 {
                     return Count(target.fragment);
@@ -355,6 +350,7 @@ namespace CultistLike
             }
 
             save.localFragments = localFragments;
+            save.memoryFragment = memoryFragment;
             save.free = free;
 
             return save;
@@ -370,6 +366,7 @@ namespace CultistLike
             }
 
             localFragments = save.localFragments;
+            memoryFragment = save.memoryFragment;
             free = save.free;
         }
 
@@ -478,6 +475,7 @@ namespace CultistLike
     {
         public List<HeldFragment> localFragments;
         public List<int> matches;
+        public Fragment memoryFragment;
         public bool free;
     }
 }

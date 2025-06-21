@@ -242,7 +242,8 @@ namespace CultistLike
                 activeAct = altAct;
             }
 
-            // actWindow.ParentSlotCardsToWindow();
+            //need this to get cards from run slots
+            actWindow.ParentSlotCardsToWindow();
 
             foreach (var frag in activeAct.fragments)
             {

@@ -51,6 +51,7 @@ namespace CultistLike
         public bool grab;
         [Tooltip("Cannot remove Card from the Slot.")]
         public bool cardLock;
+        public bool actGrab;
 
 
         public bool Opens(ActLogic actLogic)

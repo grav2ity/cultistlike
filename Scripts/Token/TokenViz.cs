@@ -76,6 +76,8 @@ namespace CultistLike
                     art.sprite = token.art;
                 }
                 artBack.material.SetColor("_Color", token.color);
+
+                gameObject.name = "[TOKEN] " + token.name;
             }
         }
 

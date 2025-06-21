@@ -51,7 +51,6 @@ namespace CultistLike
             decayTime = 0f;
             elapsedTime = 0f;
             enabled = false;
-            paused = false;
             art.color = originalColor;
             HideTimer();
         }

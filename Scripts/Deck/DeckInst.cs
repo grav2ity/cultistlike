@@ -25,14 +25,22 @@ namespace CultistLike
         {
             if (fragments.Count > 0)
             {
-                return Draw(0);
+                if (deck.random == true)
+                {
+                    return Draw(Random.Range(0, fragments.Count));
+
+                }
+                else
+                {
+                    return Draw(0);
+                }
             }
             else
             {
                 if (deck.replenish == true)
                 {
                     Reshuffle();
-                    return Draw(0);
+                    return Draw();
                 }
                 else
                 {
@@ -83,6 +91,14 @@ namespace CultistLike
             if (fragment != null)
             {
                 fragments.Add(fragment);
+            }
+        }
+
+        public void AddFront(Fragment fragment)
+        {
+            if (fragment != null)
+            {
+                fragments.Insert(0, fragment);
             }
         }
 

@@ -131,6 +131,8 @@ namespace CultistLike
                 {
                     cardViz.UnhighlightTargets();
                 }
+
+                cardViz.CastShadow(false);
             }
         }
 
@@ -169,6 +171,8 @@ namespace CultistLike
                 slottedCard.free = true;
                 slottedCard.interactive = true;
                 slottedCard.Parent(null);
+
+                slottedCard.CastShadow(true);
 
                 foreach (var frag in slot.fragments)
                 {
@@ -232,6 +236,10 @@ namespace CultistLike
                 }
                 GameManager.Instance.onCardInPlay.AddListener(GrabAction);
             }
+            else if (slot.actGrab == true && slottedCard == null)
+            {
+                ActGrab();
+            }
         }
 
         public bool AcceptsCard(CardViz cardViz)
@@ -267,6 +275,21 @@ namespace CultistLike
                 label.text = slot.label;
                 grab = slot.grab;
                 cardLock = slot.cardLock;
+            }
+        }
+
+        public void ActGrab()
+        {
+            foreach (var cardViz in actWindow.cards)
+            {
+                if (AcceptsCard(cardViz) == true)
+                {
+                    cardViz.free = true;
+                    cardViz.interactive = true;
+                    cardViz.Show();
+                    SlotCard(cardViz);
+                    return;
+                }
             }
         }
 

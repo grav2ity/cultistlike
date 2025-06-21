@@ -46,6 +46,8 @@ namespace CultistLike
 
         public FragTree slotsFragTree => slotsFrag;
 
+        public List<CardViz> cards => actLogic.fragTree.cards;
+
         private List<SlotViz> slots => actStatus == ActStatus.Running ? runSlots : idleSlots;
 
 
@@ -271,7 +273,7 @@ namespace CultistLike
                         {
                             tokenViz.Dissolve();
                             Close();
-                            Destroy(this, 0.1f);
+                            Destroy(gameObject, 0.1f);
                         }
                     }
                     else
@@ -313,6 +315,8 @@ namespace CultistLike
             {
                 this.tokenViz = tokenViz;
                 SetFragMemory(tokenViz.memoryFragment);
+
+                gameObject.name = "[WINDOW] " + tokenViz.token.name;
             }
         }
 
@@ -326,7 +330,7 @@ namespace CultistLike
                     runSlotsGO.SetActive(false);
                     resultLane.gameObject.SetActive(false);
                     okButton.interactable = false;
-                    collectButton.interactable = false;
+                    collectButton.gameObject.SetActive(false);
                     tokenViz.SetResultCount(0);
                     if (tokenViz != null)
                     {
@@ -350,6 +354,7 @@ namespace CultistLike
                     idleSlotsGO.SetActive(false);
                     runSlotsGO.SetActive(true);
                     okButton.interactable = false;
+                    collectButton.gameObject.SetActive(false);
                     tokenViz.SetResultCount(0);
                     label.text = actLogic.label;
                     text.text = actLogic.runText;
@@ -360,9 +365,11 @@ namespace CultistLike
                     runSlotsGO.SetActive(false);
                     resultLane.gameObject.SetActive(true);
                     collectButton.interactable = true;
+                    collectButton.gameObject.SetActive(true);
                     label.text = actLogic.label;
                     text.text = actLogic.endText;
                     cardBar?.gameObject.SetActive(false);
+                    Check();
                     break;
                 default:
                     break;
@@ -503,6 +510,7 @@ namespace CultistLike
             }
         }
 
+        //TODO accessing destroyed?
         private IEnumerable<SlotViz> MatchingSlots(CardViz cardViz, bool onlyEmpty = false)
         {
             if (cardViz != null)
@@ -511,7 +519,7 @@ namespace CultistLike
                 {
                     foreach (var slotViz in slots)
                     {
-                        if (slotViz.gameObject.activeSelf == true && slotViz.AcceptsCard(cardViz) == true)
+                        if (slotViz != null && slotViz.gameObject.activeSelf == true && slotViz.AcceptsCard(cardViz) == true)
                         {
                             if (onlyEmpty == false || slotViz.slottedCard == null)
                             {

@@ -37,6 +37,9 @@ namespace CultistLike
         Transform = 10,
         Decay = 100,
         SetMemory = 140,
+        // MoveToHeap = 170,
+        // MoveFromHeap = 171,
+        // Slot = 160,
         Spread = 150,
     }
 
@@ -77,8 +80,7 @@ namespace CultistLike
 
         public void Execute(Context context)
         {
-            //TODO what != null prevents from setting memory to null
-            if (context?.scope != null && targetCards != null && what != null)
+            if (context?.scope != null && targetCards != null)
             {
                 for (int i=targetCards.Count-1; i>=0; i--)
                 {
@@ -105,7 +107,7 @@ namespace CultistLike
                         }
                         break;
                     case CardOp.Transform:
-                        if (level > 0)
+                        if (level > 0 && what != null)
                         {
                             foreach (var targetCard in targetCards)
                             {
@@ -128,7 +130,7 @@ namespace CultistLike
                     case CardOp.Decay:
                         foreach (var targetCard in targetCards)
                         {
-                            if (what.fragment is Card)
+                            if (what != null && what.fragment is Card)
                             {
                                 targetCard.Decay((Card)what.fragment, level);
                             }
@@ -139,15 +141,19 @@ namespace CultistLike
                         }
                         break;
                     case CardOp.SetMemory:
+                        //TODO only level times?
                         foreach (var targetCard in targetCards)
                         {
-                            if (what.fragment is Aspect)
+                            if (what != null)
                             {
-                                targetCard.fragTree.memoryFragment = what.fragment;
-                            }
-                            else if (what.cards != null && what.cards.Count > 0)
-                            {
-                                targetCard.fragTree.memoryFragment = what.cards[0].fragTree.memoryFragment;
+                                if (what.fragment is Aspect)
+                                {
+                                    targetCard.fragTree.memoryFragment = what.fragment;
+                                }
+                                else if (what.cards != null && what.cards.Count > 0)
+                                {
+                                    targetCard.fragTree.memoryFragment = what.cards[0].fragTree.memoryFragment;
+                                }
                             }
                             else
                             {
@@ -156,20 +162,23 @@ namespace CultistLike
                         }
                         break;
                     case CardOp.Spread:
-                        foreach (var targetCard in targetCards)
+                        if (what != null)
                         {
-                            if (what.fragment is Card)
+                            foreach (var targetCard in targetCards)
                             {
-                                // targetCard.Transform((Card)what.fragment);
-                                // context.scope.Adjust(targetCard, level - 1);
-                            }
-                            else if (what.cards != null)
-                            {
-                                foreach (var cardViz in what.cards)
+                                if (what.fragment is Card)
                                 {
-                                    if (targetCard.fragTree.cards.FindAll(x => x.MemoryEqual(cardViz)).Count == 0)
+                                    // targetCard.Transform((Card)what.fragment);
+                                    // context.scope.Adjust(targetCard, level - 1);
+                                }
+                                else if (what.cards != null)
+                                {
+                                    foreach (var cardViz in what.cards)
                                     {
-                                        var newCardViz = targetCard.fragTree.Adjust(cardViz, 1);
+                                        if (targetCard.fragTree.cards.FindAll(x => x.MemoryEqual(cardViz)).Count == 0)
+                                        {
+                                            var newCardViz = targetCard.fragTree.Adjust(cardViz, 1);
+                                        }
                                     }
                                 }
                             }
@@ -300,8 +309,9 @@ namespace CultistLike
                             foreach (var cardViz in targetCardsY)
                             {
                                 cardViz.free = true;
+                                cardViz.interactive = true;
                                 cardViz.Show();
-                                cardViz.transform.position = cardViz.Position();
+                                cardViz.transform.position = cardViz.Position(true);
                                 GameManager.Instance.table.ReturnToTable(cardViz);
                             }
                         }
@@ -398,6 +408,7 @@ namespace CultistLike
         DrawNext = 10,
         DrawPrevious = 20,
         Add = 50,
+        AddFront = 51,
         ForwardShift = 100
     }
 
@@ -448,7 +459,17 @@ namespace CultistLike
             {
                 if (op == DeckOp.Draw)
                 {
-                    CreateCard(context, deck, deck.Draw());
+                    //TODO
+                    int maxTries = 3;
+                    Fragment frag = null;
+                    do
+                    {
+                        frag = deck.Draw();
+                        maxTries--;
+                    }
+                    while (maxTries > 0 && GameManager.Instance.AllowedToCreate((Card)frag) == false);
+
+                    CreateCard(context, deck, frag);
                 }
                 else if (target != null)
                 {
@@ -457,13 +478,16 @@ namespace CultistLike
                         switch(op)
                         {
                             case DeckOp.DrawNext:
-                                CreateCard(context, deck, deck.DrawOffset(target?.fragment, 1));
+                                CreateCard(context, deck, deck.DrawOffset(target.fragment, 1));
                                 break;
                             case DeckOp.DrawPrevious:
-                                CreateCard(context, deck, deck.DrawOffset(target?.fragment, -1));
+                                CreateCard(context, deck, deck.DrawOffset(target.fragment, -1));
                                 break;
                             case DeckOp.Add:
                                 deck.Add(target.fragment);
+                                break;
+                            case DeckOp.AddFront:
+                                deck.AddFront(target.fragment);
                                 break;
                             case DeckOp.ForwardShift:
                                 var targetCards = context.ResolveTargetCards(target, context.scope);
@@ -490,6 +514,9 @@ namespace CultistLike
                                     break;
                                 case DeckOp.Add:
                                     deck.Add(cardViz.card);
+                                    break;
+                                case DeckOp.AddFront:
+                                    deck.AddFront(cardViz.card);
                                     break;
                                 case DeckOp.ForwardShift:
                                     ShiftCard(cardViz, deck.DrawOffset(cardViz.card, 1));

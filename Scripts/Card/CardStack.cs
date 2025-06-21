@@ -6,6 +6,7 @@ using TMPro;
 
 namespace CultistLike
 {
+    //TODO collider on card stack is not being disabled
     public class CardStack : MonoBehaviour, IBeginDragHandler, IDragHandler
     {
         [HideInInspector] public bool stackDrag;

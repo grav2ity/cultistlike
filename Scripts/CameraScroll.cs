@@ -8,19 +8,33 @@ namespace CultistLike
         public float verticalSpeed = 1.0f;
         public float zoomSpeed = 4.0f;
 
+        private bool changedFocus;
+
+
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            changedFocus = true;
+        }
 
         private void Update()
         {
-            float h = horizontalSpeed * Input.GetAxis("Mouse X");
-            float v = verticalSpeed * Input.GetAxis("Mouse Y");
-
-            if (Input.GetMouseButton(1) || Input.GetMouseButton(2))
+            if (changedFocus == false)
             {
-                transform.Translate(new Vector3(-h, -v, 0));
-            }
+                float h = horizontalSpeed * Input.GetAxis("Mouse X");
+                float v = verticalSpeed * Input.GetAxis("Mouse Y");
 
-            float z = zoomSpeed * Input.GetAxis("Mouse ScrollWheel");
-            transform.Translate(new Vector3(0, 0, z));
+                if (Input.GetMouseButton(1) || Input.GetMouseButton(2))
+                {
+                    transform.Translate(new Vector3(-h, -v, 0));
+                }
+
+                float z = zoomSpeed * Input.GetAxis("Mouse ScrollWheel");
+                transform.Translate(new Vector3(0, 0, z));
+            }
+            else
+            {
+                changedFocus = false;
+            }
         }
     }
 }

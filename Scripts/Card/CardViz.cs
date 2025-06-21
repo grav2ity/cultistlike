@@ -256,6 +256,18 @@ namespace CultistLike
             visualsGO.SetActive(true);
         }
 
+        //TODO
+        public void CastShadow(bool enable)
+        {
+            var meshrs = GetComponentsInChildren<MeshRenderer>(true);
+            foreach (var meshr in meshrs)
+            {
+                meshr.shadowCastingMode = enable ?
+                    UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off;
+            }
+
+        }
+
         public void ShowFace()
         {
             transform.localEulerAngles = new Vector3(0f, 0f, 0f);
@@ -307,12 +319,20 @@ namespace CultistLike
             {
                 LoadFragments();
             }
+
+            gameObject.name = "[CARD] " + card.name;
         }
 
         public void Transform(Card card)
         {
             if (card.isMutator == true)
             {
+                int index = title.text.IndexOf("\n[");
+                if (index != -1)
+                {
+                    title.text = title.text.Substring(0, index);
+                }
+
                 title.text = title.text + "\n[" + card.label.Substring(2, card.label.Length - 4) + ']';
 
                 cardDecay.StopTimer();
@@ -360,9 +380,11 @@ namespace CultistLike
                 Hide();
             }
 
+            interactive = false;
             free = false;
             Parent(trans);
-            transform.localPosition = Vector3.zero;
+            //TODO
+            // transform.localPosition = Vector3.zero;
         }
 
         public bool Grab(Vector3 target, Action<CardViz> onStart, Action<CardViz> onComplete)
@@ -374,7 +396,7 @@ namespace CultistLike
                 if (cardVizY.free == true)
                 {
                     cardVizY.transform.DOComplete(true);
-                    cardVizY.isDragging = false;
+                    cardVizY.InterruptDrag();
 
                     cardVizY.transform.parent?.GetComponentInNearestParent<ICardDock>(true)?.
                         OnCardUndock(cardVizY.gameObject);
@@ -427,6 +449,17 @@ namespace CultistLike
                     save.stackedCards.Add(cardViz.GetInstanceID());
                 }
             }
+            if (fragTree.directCards.Count > 1)
+            {
+                save.childCards = new List<int>();
+                foreach (var cardViz in fragTree.directCards)
+                {
+                    if (cardViz != this)
+                    {
+                        save.childCards.Add(cardViz.GetInstanceID());
+                    }
+                }
+            }
             return save;
         }
 
@@ -435,8 +468,7 @@ namespace CultistLike
             LoadCard(save.card, false);
             fragTree.Load(save.fragSave);
             free = save.free;
-            faceDown = save.faceDown;
-            if (faceDown == true)
+            if (save.faceDown == true)
             {
                 ShowBack();
             }
@@ -452,7 +484,17 @@ namespace CultistLike
                     cardStack.Push(SaveManager.Instance.CardFromID(cardID));
                 }
             }
-            draggingPlane = GameManager.Instance.cardDragPlane;
+            if (save.childCards != null)
+            {
+                foreach (var cardID in save.childCards)
+                {
+                    var cardViz = SaveManager.Instance.CardFromID(cardID);
+                    cardViz.Hide();
+                    cardViz.interactive = false;
+                    fragTree.Add(cardViz);
+
+                }
+            }
         }
 
         public bool CanStack(CardViz cardViz)
@@ -554,10 +596,10 @@ namespace CultistLike
             }
         }
 
-        public Vector3 Position()
+        public Vector3 Position(bool forceToken=false)
         {
             var actWindow = GetComponentInParent<ActWindow>();
-            if (actWindow && actWindow.open == false)
+            if (actWindow && (forceToken == true || actWindow.open == false))
             {
                 return actWindow.tokenViz.transform.position;
             }
@@ -606,6 +648,7 @@ namespace CultistLike
         public bool faceDown;
         public CardDecaySave decaySave;
         public List<int> stackedCards;
+        public List<int> childCards;
         public Vector3 position;
     }
 }

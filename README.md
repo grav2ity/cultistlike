@@ -2,7 +2,7 @@
 
 3D recreation of a Cultist-like game experience.
 
-[Play Demo](https://vegoliwebgl.s3.eu-north-1.amazonaws.com/CultistLike/index.html) in a browser.
+[Asset Store](https://assetstore.unity.com/packages/templates/packs/cultistlike-card-game-294373)
 
 ## Setup
 

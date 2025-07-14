@@ -21,7 +21,7 @@ namespace CultistLike
         private const int maxCount = 99;
 
 
-        public int Count { get => count; private set => SetCount(value); }
+        public int Count => count;
 
 
         public void OnBeginDrag(PointerEventData eventData)

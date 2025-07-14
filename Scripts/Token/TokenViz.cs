@@ -45,7 +45,7 @@ namespace CultistLike
             if (eventData.button == PointerEventData.InputButton.Left)
             {
                 var droppedCard = eventData.pointerDrag.GetComponent<CardViz>();
-                if (droppedCard != null && droppedCard.isDragging == true)
+                if (droppedCard != null && droppedCard.isDragging)
                 {
                     actWindow.TrySlotAndBringUp(droppedCard);
                 }
@@ -101,22 +101,14 @@ namespace CultistLike
         //used by modifiers. distinct from SlotViz grab
         public bool Grab(CardViz cardViz)
         {
-            if (cardViz.free == true)
+            if (cardViz.free)
             {
-                Vector3 target;
-                if (actWindow.open == true)
-                {
-                    target = actWindow.transform.position;
-                }
-                else
-                {
-                    target = targetPosition;
-                }
+                var target = actWindow.open ? actWindow.transform.position : targetPosition;
 
-                Action<CardViz> onStart = x => x.ParentTo(actWindow.transform);
-                Action<CardViz> onComplete = x => x.Hide();
+                void OnStart(CardViz x) => x.ParentTo(actWindow.transform);
+                void OnComplete(CardViz x) => x.Hide();
 
-                cardViz.Grab(target, onStart, onComplete);
+                cardViz.Grab(target, OnStart, OnComplete);
                 return true;
             }
             return false;
@@ -124,13 +116,14 @@ namespace CultistLike
 
         public TokenVizSave Save()
         {
-            var save = new TokenVizSave();
-            save.token = token;
-            save.position = transform.position;
-
-            save.timerSave = timer.Save();
-            save.windowSave = actWindow.Save();
-            save.logicSave = actWindow.GetComponent<ActLogic>().Save();
+            var save = new TokenVizSave
+            {
+                token = token,
+                position = transform.position,
+                timerSave = timer.Save(),
+                windowSave = actWindow.Save(),
+                logicSave = actWindow.GetComponent<ActLogic>().Save()
+            };
 
             return save;
         }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using UnityEngine;
-
 
 namespace CultistLike
 {
@@ -26,7 +24,7 @@ namespace CultistLike
         public List<PathModifier> pathModifiers = new List<PathModifier>();
         public List<DeckModifierC> deckModifiers = new List<DeckModifierC>();
 
-        private List<CardViz> toDestroy = new List<CardViz>();
+        private readonly List<CardViz> toDestroy = new List<CardViz>();
 
 
         public Context(Context context, bool keepMatches = false) : this(context.actLogic, keepMatches) {}
@@ -37,14 +35,7 @@ namespace CultistLike
             {
                 scope = fragments;
 
-                if (keepMatches == true)
-                {
-                    matches = scope.matches;
-                }
-                else
-                {
-                    matches = scope.cards.GetRange(0, scope.cards.Count);
-                }
+                matches = keepMatches ? scope.matches : scope.cards.GetRange(0, scope.cards.Count);
             }
         }
 
@@ -230,13 +221,13 @@ namespace CultistLike
                 {
                     return target.cards;
                 }
-                else if (target.fragment is Card)
+                else if (target.fragment is Card card)
                 {
-                   return scope.FindAll((Card)target.fragment);
+                   return scope.FindAll(card);
                 }
-                else if (target.fragment is Aspect)
+                else if (target.fragment is Aspect aspect)
                 {
-                    return scope.FindAll((Aspect)target.fragment);
+                    return scope.FindAll(aspect);
                 }
             }
             return null;

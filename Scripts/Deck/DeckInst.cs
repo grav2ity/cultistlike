@@ -25,7 +25,7 @@ namespace CultistLike
         {
             if (fragments.Count > 0)
             {
-                if (deck.random == true)
+                if (deck.random)
                 {
                     return Draw(Random.Range(0, fragments.Count));
 
@@ -37,7 +37,7 @@ namespace CultistLike
             }
             else
             {
-                if (deck.replenish == true)
+                if (deck.replenish)
                 {
                     Reshuffle();
                     return Draw();
@@ -104,12 +104,12 @@ namespace CultistLike
 
         private void Reshuffle()
         {
-            if (deck.shuffle == true)
+            if (deck.shuffle)
             {
-                for (int i=0; i<deck.fragments.Count; i++)
+                foreach (var fragment in deck.fragments)
                 {
                     int r = Random.Range(0, fragments.Count);
-                    fragments.Insert(r, deck.fragments[i]);
+                    fragments.Insert(r, fragment);
                 }
             }
             else

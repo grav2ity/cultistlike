@@ -6,7 +6,7 @@ namespace CultistLike
     public static class MyExtensions
     {
         public static T GetComponentInNearestParent<T>(this Transform tran,
-                                                       bool includeInactive = false) where T : class?
+                                                       bool includeInactive = false) where T : class
         {
             if (tran == null)
             {
@@ -19,7 +19,7 @@ namespace CultistLike
                 return comp;
             }
             else if (tran.parent != null &&
-                     (includeInactive || tran.parent.gameObject.activeInHierarchy == true))
+                     (includeInactive || tran.parent.gameObject.activeInHierarchy))
             {
                 return GetComponentInNearestParent<T>(tran.parent, includeInactive);
             }

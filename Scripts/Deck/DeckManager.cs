@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 using UnityEngine;
 
@@ -18,9 +17,9 @@ namespace CultistLike
 
         public DeckInst GetDeckInst(Deck deck)
         {
-            if (decDict.ContainsKey(deck) == true)
+            if (decDict.TryGetValue(deck, out var inst))
             {
-                return decDict[deck];
+                return inst;
             }
             else
             {

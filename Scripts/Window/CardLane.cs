@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 using DG.Tweening;
 
@@ -33,7 +32,7 @@ namespace CultistLike
             }
         }
 
-        private Rect rect { get => GetComponent<RectTransform>().rect; }
+        private Rect rect => GetComponent<RectTransform>().rect;
 
 
         public void OnCardDock(GameObject go)
@@ -78,7 +77,7 @@ namespace CultistLike
         {
             var newCards = cards;
 
-            if (stackMatching == true)
+            if (stackMatching)
             {
                 List<CardViz> cardsStacked = new List<CardViz>();
                 foreach (var cardViz in cards)
@@ -150,11 +149,13 @@ namespace CultistLike
 
         public CardLaneSave Save()
         {
-            var save = new CardLaneSave();
-            save.maxSpacingX = maxSpacingX;
-            save.spacingZ = spacingZ;
+            var save = new CardLaneSave
+            {
+                maxSpacingX = maxSpacingX,
+                spacingZ = spacingZ,
+                cards = new List<int>()
+            };
 
-            save.cards = new List<int>();
             foreach (var cardViz in cards)
             {
                 save.cards.Add(cardViz.GetInstanceID());

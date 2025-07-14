@@ -15,13 +15,13 @@ namespace CultistLike
 
 
         public string Description {
-            get { return description.text; }
-            set { description.text = value; }
+            get => description.text;
+            set => description.text = value;
         }
 
         public string AspectName {
-            get { return aspectName.text; }
-            set { aspectName.text = value; }
+            get => aspectName.text;
+            set => aspectName.text = value;
         }
 
 

@@ -42,10 +42,9 @@ namespace CultistLike
             get
             {
                 var list = new List<CardViz>();
-                CardViz cardViz = null;
                 foreach (Transform child in transform)
                 {
-                    cardViz = child.GetComponent<CardViz>();
+                    var cardViz = child.GetComponent<CardViz>();
                     if (cardViz != null)
                     {
                         list.Add(cardViz);
@@ -59,20 +58,11 @@ namespace CultistLike
             }
         }
 
-        public List<CardViz> freeCards
-        {
-            get => cards.FindAll(x => x.free == true);
-        }
+        public List<CardViz> freeCards => cards.FindAll(x => x.free);
 
-        public List<HeldFragment> fragments
-        {
-            get => GetFragments(false);
-        }
+        public List<HeldFragment> fragments => GetFragments(false);
 
-        public List<HeldFragment> freeFragments
-        {
-            get => GetFragments(true);
-        }
+        public List<HeldFragment> freeFragments => GetFragments(true);
 
 
         public List<HeldFragment> GetFragments(bool onlyFree)
@@ -81,9 +71,9 @@ namespace CultistLike
             var results = GetComponentsInChildren<FragTree>(true);
             foreach (var fragTree in results)
             {
-                if (fragTree.enabled == true)
+                if (fragTree.enabled)
                 {
-                    if (onlyFree == false || fragTree.free == true)
+                    if (onlyFree == false || fragTree.free)
                     {
                         foreach (var fragment in fragTree.localFragments)
                         {
@@ -387,7 +377,7 @@ namespace CultistLike
             var cards = cardViz.GetComponentsInChildren<CardViz>(true);
             foreach (var card in cards)
             {
-                if (pause == true)
+                if (pause)
                 {
                     card.decay.Pause();
                 }
@@ -433,8 +423,6 @@ namespace CultistLike
                         case "<":
                             passed = left < right;
                             break;
-                        default:
-                            break;
                     }
                 }
                 catch (OverflowException)
@@ -442,7 +430,7 @@ namespace CultistLike
                     Debug.LogWarning("Too many digits inside {[fragment] op numeral} expression.");
                 }
 
-                if (passed == true)
+                if (passed)
                 {
                     return match.Groups[4].Value;
                 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 using UnityEngine;
 
@@ -107,17 +106,17 @@ namespace CultistLike
                     return true;
                 }
             }
-            return (required.Count == 0 ? true : false);
+            return (required.Count == 0);
         }
 
         public bool AcceptsCard(CardViz cardViz)
         {
-            if (acceptAll == true)
+            if (acceptAll)
             {
                 return true;
             }
 
-            if (cardViz != null && CheckFragRules(cardViz) == true)
+            if (cardViz != null && CheckFragRules(cardViz))
             {
                 if (cardRule == null)
                 {

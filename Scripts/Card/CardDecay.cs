@@ -1,7 +1,6 @@
 ﻿using System;
 
 using UnityEngine;
-using UnityEngine.Events;
 
 using TMPro;
 
@@ -27,10 +26,7 @@ namespace CultistLike
         private Renderer timerRenderer;
 
 
-        public float timeLeft
-        {
-            get => decayTime - elapsedTime;
-        }
+        public float timeLeft => decayTime - elapsedTime;
 
         public void StartTimer(float time, Card decayTo)
         {
@@ -79,11 +75,13 @@ namespace CultistLike
 
         public CardDecaySave Save()
         {
-            var save = new CardDecaySave();
-            save.duration = decayTime;
-            save.elapsedTime = elapsedTime;
-            save.decayTo = decayTo;
-            save.paused = paused;
+            var save = new CardDecaySave
+            {
+                duration = decayTime,
+                elapsedTime = elapsedTime,
+                decayTo = decayTo,
+                paused = paused
+            };
             return save;
         }
 
@@ -97,7 +95,7 @@ namespace CultistLike
             {
                 enabled = true;
             }
-            if (save.paused == true)
+            if (save.paused)
             {
                 Pause();
             }

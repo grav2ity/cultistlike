@@ -37,15 +37,15 @@ namespace CultistLike
         public override Vector2Int GetCellSize() => CellCount;
 
         public bool free { get => fragTree.free; set => fragTree.free = value; }
-        public bool visible { get => visualsGO.activeInHierarchy; }
+        public bool visible => visualsGO.activeInHierarchy;
         public bool faceDown { get => _faceDown; private set => _faceDown = value; }
-        public int stackCount { get => cardStack.Count; }
+        public int stackCount => cardStack.Count;
 
-        public CardDecay decay { get => cardDecay; }
+        public CardDecay decay => cardDecay;
 
         public override void OnBeginDrag(PointerEventData eventData)
         {
-            if (interactive == true && eventData.button == PointerEventData.InputButton.Left)
+            if (interactive && eventData.button == PointerEventData.InputButton.Left)
             {
                 //if not dragging whole stack yield one card
                 if (cardStack.stackDrag == false && cardStack.Count > 1)
@@ -82,10 +82,10 @@ namespace CultistLike
 
         public void OnDrop(PointerEventData eventData)
         {
-            if (interactive == true && eventData.button == PointerEventData.InputButton.Left)
+            if (interactive && eventData.button == PointerEventData.InputButton.Left)
             {
                 var droppedCard = eventData.pointerDrag.GetComponent<CardViz>();
-                if (droppedCard != null && droppedCard.isDragging == true)
+                if (droppedCard != null && droppedCard.isDragging)
                 {
                     //handles stacking cards
                     //TODO
@@ -93,7 +93,7 @@ namespace CultistLike
                     {
                         if (CanStack(droppedCard))
                         {
-                            bool stacked = false;
+                            bool stacked;
                             if (droppedCard.cardStack.Count > 1)
                             {
                                 stacked = cardStack.Merge(droppedCard.cardStack);
@@ -103,7 +103,7 @@ namespace CultistLike
                                 stacked = cardStack.Push(droppedCard);
                             }
 
-                            if (stacked == true)
+                            if (stacked)
                             {
                                 droppedCard.OnEndDrag(eventData);
                             }
@@ -116,7 +116,6 @@ namespace CultistLike
                     if (slot != null)
                     {
                         slot.OnCardDock(droppedCard.gameObject);
-                        return;
                     }
                 }
             }
@@ -124,7 +123,7 @@ namespace CultistLike
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (interactive == true && faceDown == true)
+            if (interactive && faceDown)
             {
                 Reverse();
             }
@@ -174,7 +173,7 @@ namespace CultistLike
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (cardDecay.enabled == true)
+            if (cardDecay.enabled)
             {
                 cardDecay.ShowTimer();
             }
@@ -182,7 +181,7 @@ namespace CultistLike
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            if (cardDecay.enabled == true)
+            if (cardDecay.enabled)
             {
                 cardDecay.HideTimer();
             }
@@ -227,7 +226,7 @@ namespace CultistLike
 
         public void Reverse(bool instant = false)
         {
-            if (instant == true)
+            if (instant)
             {
                 transform.localEulerAngles += new Vector3(0f, 180f, 0f);
             }
@@ -315,7 +314,7 @@ namespace CultistLike
                 artBack.material.SetColor("_Color", card.color);
             }
 
-            if (loadFragments == true)
+            if (loadFragments)
             {
                 LoadFragments();
             }
@@ -325,7 +324,7 @@ namespace CultistLike
 
         public void Transform(Card card)
         {
-            if (card.isMutator == true)
+            if (card.isMutator)
             {
                 int index = title.text.IndexOf("\n[");
                 if (index != -1)
@@ -375,7 +374,7 @@ namespace CultistLike
 
         public void ParentTo(Transform trans, bool hide = false)
         {
-            if (hide == true)
+            if (hide)
             {
                 Hide();
             }
@@ -389,11 +388,11 @@ namespace CultistLike
 
         public bool Grab(Vector3 target, Action<CardViz> onStart, Action<CardViz> onComplete)
         {
-            if (gameObject.activeSelf == true && free == true)
+            if (gameObject.activeSelf && free)
             {
                 var cardVizY = this.Yield();
 
-                if (cardVizY.free == true)
+                if (cardVizY.free)
                 {
                     cardVizY.transform.DOComplete(true);
                     cardVizY.InterruptDrag();
@@ -410,15 +409,15 @@ namespace CultistLike
                         onStart(cardVizY);
                     }
 
-                    Action<Drag> onMoveEnd = x =>
+                    void OnMoveEnd(Drag _)
                     {
                         if (onComplete != null)
                         {
                             onComplete(cardVizY);
                         }
-                    };
+                    }
 
-                    cardVizY.DOMove(target, GameManager.Instance.normalSpeed, null, onMoveEnd);
+                    cardVizY.DOMove(target, GameManager.Instance.normalSpeed, null, OnMoveEnd);
 
                     return true;
                 }
@@ -428,13 +427,15 @@ namespace CultistLike
 
         public CardVizSave Save()
         {
-            var save = new CardVizSave();
-            save.ID = GetInstanceID();
-            save.card = card;
-            save.fragSave = fragTree.Save();
-            save.free = free;
-            save.faceDown = faceDown;
-            save.position = transform.position;
+            var save = new CardVizSave
+            {
+                ID = GetInstanceID(),
+                card = card,
+                fragSave = fragTree.Save(),
+                free = free,
+                faceDown = faceDown,
+                position = transform.position
+            };
             if (cardDecay.timeLeft != 0f)
             {
                 save.decaySave = cardDecay.Save();
@@ -468,7 +469,7 @@ namespace CultistLike
             LoadCard(save.card, false);
             fragTree.Load(save.fragSave);
             free = save.free;
-            if (save.faceDown == true)
+            if (save.faceDown)
             {
                 ShowBack();
             }
@@ -585,7 +586,7 @@ namespace CultistLike
 
             if (fragTree.memoryFragment == null)
             {
-                if (card.memoryFromFirst == true && fragTree.localFragments.Count > 0)
+                if (card.memoryFromFirst && fragTree.localFragments.Count > 0)
                 {
                     fragTree.memoryFragment = fragTree.localFragments[0].fragment;
                 }
@@ -599,7 +600,7 @@ namespace CultistLike
         public Vector3 Position(bool forceToken=false)
         {
             var actWindow = GetComponentInParent<ActWindow>();
-            if (actWindow && (forceToken == true || actWindow.open == false))
+            if (actWindow && (forceToken || actWindow.open == false))
             {
                 return actWindow.tokenViz.transform.position;
             }
@@ -618,7 +619,7 @@ namespace CultistLike
             fragTree.onCreateCard = x =>
             {
                 x.ParentTo(fragTree.transform, true);
-                if (decay.paused == true)
+                if (decay.paused)
                 {
                     x.decay.Pause();
                 }

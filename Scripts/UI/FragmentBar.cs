@@ -37,14 +37,14 @@ namespace CultistLike
             {
                 index = 0;
 
-                if (showCards == true)
+                if (showCards)
                 {
                     foreach (var card in fragments.cards)
                     {
                         Load(card);
                     }
                 }
-                if (showAspects == true)
+                if (showAspects)
                 {
                     foreach (var frag in fragments.fragments)
                     {
@@ -61,7 +61,7 @@ namespace CultistLike
             {
                 index = 0;
 
-                if (slot.required.Count > 0 && showSpecial == true)
+                if (slot.required.Count > 0 && showSpecial)
                 {
                     Load(allowed);
                 }
@@ -69,7 +69,7 @@ namespace CultistLike
                 {
                     Load(frag);
                 }
-                if (slot.forbidden.Count > 0 && showSpecial == true)
+                if (slot.forbidden.Count > 0 && showSpecial)
                 {
                     Load(forbidden);
                 }
@@ -82,9 +82,9 @@ namespace CultistLike
 
         public void Unload()
         {
-            for (int i = 0; i < fragVizs.Count; i++)
+            foreach (var t in fragVizs)
             {
-                fragVizs[i].gameObject.SetActive(false);
+                t.gameObject.SetActive(false);
             }
 
             index = 0;
@@ -92,32 +92,32 @@ namespace CultistLike
 
         private void Load<T>(T frag) where T : IFrag
         {
-            if (showHidden == false && frag.Hidden() == true)
+            if (showHidden == false && frag.Hidden())
                 return;
 
             if (index < fragVizs.Count)
             {
-                fragVizs[index].Load<T>(frag);
+                fragVizs[index].Load(frag);
                 fragVizs[index].gameObject.SetActive(true);
                 index++;
             }
             else
             {
                 var fragViz = Instantiate(GameManager.Instance.fragmentPrefab,
-                                          vertical == true ? verticalGO.transform : horizontalGO.transform);
+                                          vertical ? verticalGO.transform : horizontalGO.transform);
                 fragVizs.Add(fragViz);
-                Load<T>(frag);
+                Load(frag);
             }
         }
 
         private void Load(CardViz cardViz)
         {
-            if (showHidden == false && cardViz.card.Hidden() == true)
+            if (showHidden == false && cardViz.card.Hidden())
                 return;
 
             if (index < fragVizs.Count)
             {
-                if (cardViz.faceDown == true)
+                if (cardViz.faceDown)
                 {
                     fragVizs[index].Load(drawn);
                 }
@@ -131,7 +131,7 @@ namespace CultistLike
             else
             {
                 var fragViz = Instantiate(GameManager.Instance.fragmentPrefab,
-                                          vertical == true ? verticalGO.transform : horizontalGO.transform);
+                                          vertical ? verticalGO.transform : horizontalGO.transform);
                 fragVizs.Add(fragViz);
                 Load(cardViz);
             }
@@ -139,7 +139,7 @@ namespace CultistLike
 
         private void Awake()
         {
-            if (autoUpdate == true)
+            if (autoUpdate)
             {
                 var fragTree = transform.GetComponentInNearestParent<FragTree>();
                 if (fragTree != null)
@@ -152,7 +152,7 @@ namespace CultistLike
         //TODO
         private void Start()
         {
-            if (autoUpdate == true)
+            if (autoUpdate)
             {
                 var fragTree = transform.GetComponentInNearestParent<FragTree>();
                 if (fragTree != null)

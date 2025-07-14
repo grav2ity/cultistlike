@@ -71,20 +71,18 @@ namespace CultistLike
         [SerializeField, HideInInspector] private ActWindow _openWindow;
         [SerializeField, HideInInspector] private float elapsedTime;
 
-        private List<Act> _initialActs;
-        private List<Slot> _slotSOS;
+        public List<CardViz> cards => root.cards;
+        public List<TokenViz> tokens => _tokens;
+        public List<ActWindow> windows => _windows;
 
-        public List<CardViz> cards { get => root.cards; }
-        public List<TokenViz> tokens { get => _tokens; }
-        public List<ActWindow> windows { get => _windows; }
+        public List<Act> initialActs { get; private set; }
 
-        public List<Act> initialActs { get => _initialActs; private set => _initialActs = value; }
-        public List<Slot> slotSOS { get => _slotSOS; private set => _slotSOS = value; }
+        public List<Slot> slotSOS { get; private set; }
 
         public ActWindow openWindow { get => _openWindow; private set => _openWindow = value; }
-        public float time { get => elapsedTime; }
+        public float time => elapsedTime;
 
-        public bool devTimeOn { get => maxTime > 0 || allTime > 0; }
+        public bool devTimeOn => maxTime > 0 || allTime > 0;
 
         public float DevTime(float time)
         {
@@ -138,7 +136,7 @@ namespace CultistLike
 
         public CardViz CreateCard(Card card)
         {
-            if (AllowedToCreate(card) == true)
+            if (AllowedToCreate(card))
             {
                 var cardViz = CreateCard();
                 cardViz.LoadCard(card);
@@ -428,13 +426,13 @@ namespace CultistLike
             }
         }
 
-        private void FindIninitalActs()
+        private void FindInitialActs()
         {
             initialActs = new List<Act>();
             var acts = Resources.LoadAll("", typeof(Act)).Cast<Act>().ToArray();
             foreach (var act in acts)
             {
-                if (act.initial == true)
+                if (act.initial)
                 {
                     initialActs.Add(act);
                 }
@@ -451,7 +449,7 @@ namespace CultistLike
             timeScale = 1f;
 
             FindSlotSOS();
-            FindIninitalActs();
+            FindInitialActs();
 
             if (thisAspect == null || thisCard == null || matchedCards == null || memoryFragment == null)
             {

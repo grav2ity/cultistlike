@@ -23,15 +23,9 @@ namespace CultistLike
         [SerializeField, HideInInspector] private Timer following;
 
 
-        public float timeLeft
-        {
-            get => following != null ? following.timeLeft : _duration - elapsedTime;
-        }
+        public float timeLeft => following != null ? following.timeLeft : _duration - elapsedTime;
 
-        public float duration
-        {
-            get => following != null ? following.duration : _duration;
-        }
+        public float duration => following != null ? following.duration : _duration;
 
         public void OnEnable()
         {
@@ -64,9 +58,11 @@ namespace CultistLike
 
         public TimerSave Save()
         {
-            var save = new TimerSave();
-            save.duration = duration;
-            save.elapsedTime = elapsedTime;
+            var save = new TimerSave
+            {
+                duration = duration,
+                elapsedTime = elapsedTime
+            };
             return save;
         }
 

@@ -7,6 +7,7 @@ using UnityEngine.EventSystems;
 using TMPro;
 
 
+
 namespace CultistLike
 {
     public class SlotViz : MonoBehaviour, IDropHandler, ICardDock, IPointerClickHandler
@@ -33,7 +34,7 @@ namespace CultistLike
         [SerializeField, HideInInspector] private ActWindow actWindow;
         [SerializeField, HideInInspector] private CardViz _slottedCard;
 
-        public bool open { get => gameObject.activeSelf; }
+        public bool open => gameObject.activeSelf;
         public CardViz slottedCard { get => _slottedCard; private set => _slottedCard = value; }
 
 
@@ -42,7 +43,7 @@ namespace CultistLike
             if (eventData.button == PointerEventData.InputButton.Left)
             {
                 Drag drag = eventData.pointerDrag?.GetComponent<Drag>();
-                if (drag != null && drag.isDragging == true)
+                if (drag != null && drag.isDragging)
                 {
                     OnCardDock(eventData.pointerDrag);
                 }
@@ -68,7 +69,7 @@ namespace CultistLike
             List<CardViz> cardsToH = new List<CardViz>();
             foreach (var cardViz in GameManager.Instance.table.GetCards())
             {
-                if (AcceptsCard(cardViz) == true)
+                if (AcceptsCard(cardViz))
                 {
                     cardsToH.Add(cardViz);
                 }
@@ -80,9 +81,9 @@ namespace CultistLike
 
         public bool TrySlotCard(CardViz cardViz)
         {
-            if (gameObject.activeSelf == true && cardViz != null)
+            if (gameObject.activeSelf && cardViz != null)
             {
-                if (AcceptsCard(cardViz) == true)
+                if (AcceptsCard(cardViz))
                 {
                     if (slottedCard == null)
                     {
@@ -117,7 +118,7 @@ namespace CultistLike
 
         public void SlotCardPhysical(CardViz cardViz)
         {
-            if (cardViz != null && open == true)
+            if (cardViz != null && open)
             {
                 cardViz.transform.SetParent(transform);
                 cardViz.transform.localPosition = Vector3.zero;
@@ -127,7 +128,7 @@ namespace CultistLike
                     cardViz.Hide();
                 }
 
-                if (cardViz.isDragging == true)
+                if (cardViz.isDragging)
                 {
                     cardViz.UnhighlightTargets();
                 }
@@ -149,7 +150,7 @@ namespace CultistLike
 
                 slottedCard.Parent(transform);
 
-                if (cardLock == true)
+                if (cardLock)
                 {
                     cardViz.interactive = false;
                     cardViz.free = false;
@@ -182,7 +183,7 @@ namespace CultistLike
                 var sc = slottedCard;
                 slottedCard = null;
 
-                if (firstSlot == true)
+                if (firstSlot)
                 {
                     actWindow.FirstSlotEmpty();
                 }
@@ -211,7 +212,7 @@ namespace CultistLike
             gameObject.SetActive(false);
             slot = null;
             SetHighlight(false);
-            if (grab == true)
+            if (grab)
             {
                 GameManager.Instance.onCardInPlay.RemoveListener(GrabAction);
             }
@@ -225,18 +226,18 @@ namespace CultistLike
 
         public void Refresh()
         {
-            if (grab == true && slottedCard == null)
+            if (grab && slottedCard == null)
             {
                 foreach (var cardViz in GameManager.Instance.cards)
                 {
-                    if (Grab(cardViz) == true)
+                    if (Grab(cardViz))
                     {
                         return;
                     }
                 }
                 GameManager.Instance.onCardInPlay.AddListener(GrabAction);
             }
-            else if (slot.actGrab == true && slottedCard == null)
+            else if (slot.actGrab && slottedCard == null)
             {
                 ActGrab();
             }
@@ -261,7 +262,7 @@ namespace CultistLike
 
         public void GrabAction(CardViz cardViz)
         {
-            if (Grab(cardViz) == true)
+            if (Grab(cardViz))
             {
                 GameManager.Instance.onCardInPlay.RemoveListener(GrabAction);
             }
@@ -282,7 +283,7 @@ namespace CultistLike
         {
             foreach (var cardViz in actWindow.cards)
             {
-                if (AcceptsCard(cardViz) == true)
+                if (AcceptsCard(cardViz))
                 {
                     cardViz.free = true;
                     cardViz.interactive = true;
@@ -295,29 +296,22 @@ namespace CultistLike
 
         public bool Grab(CardViz cardViz, bool bringUp = false)
         {
-            if (cardViz != null && cardViz.free == true && AcceptsCard(cardViz) == true)
+            if (cardViz != null && cardViz.free && AcceptsCard(cardViz))
             {
-                Vector3 target;
-                if (actWindow.open == true)
-                {
-                    target = transform.position;
-                }
-                else
-                {
-                    target =  actWindow.tokenViz.targetPosition;
-                }
+                var target = actWindow.open ? transform.position : actWindow.tokenViz.targetPosition;
 
-                Action<CardViz> onStart = x => SlotCardLogical(x);
-                Action<CardViz> onComplete = x =>
+                void OnStart(CardViz x) => SlotCardLogical(x);
+
+                void OnComplete(CardViz x)
                 {
                     SlotCardPhysical(x);
-                    if (bringUp == true)
+                    if (bringUp)
                     {
                         actWindow.BringUp();
                     }
-                };
+                }
 
-                return cardViz.Grab(target, onStart, onComplete);
+                return cardViz.Grab(target, OnStart, OnComplete);
             }
             else
             {
@@ -339,9 +333,11 @@ namespace CultistLike
 
         public SlotVizSave Save()
         {
-            var save = new SlotVizSave();
-            save.slot = slot;
-            save.cardID = slottedCard != null ? slottedCard.GetInstanceID() : 0;
+            var save = new SlotVizSave
+            {
+                slot = slot,
+                cardID = slottedCard != null ? slottedCard.GetInstanceID() : 0
+            };
             return save;
         }
 
@@ -353,6 +349,11 @@ namespace CultistLike
             if (cardViz != null)
             {
                 slottedCard = cardViz;
+                if (cardLock)
+                {
+                    cardViz.interactive = false;
+                    cardViz.free = false;
+                }
                 SlotCardPhysical(cardViz);
             }
         }

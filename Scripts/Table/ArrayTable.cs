@@ -27,8 +27,8 @@ namespace CultistLike
         };
 
 
-        private float planeWidth { get => cellCount.x * cellSize.x; }
-        private float planeHeight { get => cellCount.y * cellSize.y; }
+        private float planeWidth => cellCount.x * cellSize.x;
+        private float planeHeight => cellCount.y * cellSize.y;
 
 
         public override Vector3 ToLocalPosition(Vector2Int v) => GridCoordsToLocal(v);
@@ -43,8 +43,7 @@ namespace CultistLike
         {
             base.OnCardUndock(go);
 
-            Vector2Int v;
-            if (lastLocations.TryGetValue(go, out v))
+            if (lastLocations.TryGetValue(go, out var v))
             {
                 var viz = go.GetComponent<Viz>();
                 if (viz == null)
@@ -52,7 +51,7 @@ namespace CultistLike
                     return;
                 }
 
-                array.ForV(v, viz.GetCellSize(), a => null);
+                array.ForV(v, viz.GetCellSize(), _ => null);
             }
         }
 
@@ -79,10 +78,10 @@ namespace CultistLike
 
                 if (Math.Abs(directions4[phase4].x * (newV.x - origin.x)) <= distance &&
                     Math.Abs(directions4[phase4].y * (newV.y - origin.y)) <= distance )
-                    {
-                        v = newV;
-                        steps++;
-                    }
+                {
+                    v = newV;
+                    steps++;
+                }
                 else
                 {
                     phase++;
@@ -110,14 +109,14 @@ namespace CultistLike
         {
             var localP = viz.transform.position - transform.position;
             List<Vector2Int> locs = new List<Vector2Int>();
-            if (FindFreeLocationsC(LocalToGridCoords(localP), l, ref locs) == true)
+            if (FindFreeLocationsC(LocalToGridCoords(localP), l, ref locs))
             {
                 return locs;
             }
             else
             {
                 locs.Clear();
-                if (FindFreeLocationsNC(LocalToGridCoords(localP), l, ref locs) == true)
+                if (FindFreeLocationsNC(LocalToGridCoords(localP), l, ref locs))
                 {
                     return locs;
                 }
@@ -133,14 +132,14 @@ namespace CultistLike
         /// Place object on the table.
         /// </summary>
         /// <param name="viz">Object to be placed.</param>
-        /// <param name="t">Location where the object will be placed.</param>
+        /// <param name="v">Location where the object will be placed.</param>
         /// <param name="moveSpeed"></param>
         /// <returns></returns>
         public override void Place(Viz viz, Vector2Int v, float moveSpeed)
         {
             base.Place(viz, v, moveSpeed);
 
-            array.ForV(v, viz.GetCellSize(), a => viz);
+            array.ForV(v, viz.GetCellSize(), _ => viz);
         }
 
         public override string Save()
@@ -189,7 +188,7 @@ namespace CultistLike
                 foundAll = true;
                 for (int i=0; i<l.Count; i++)
                 {
-                    if (FitsInLocation(v, l[i].GetCellSize()) == true)
+                    if (FitsInLocation(v, l[i].GetCellSize()))
                     {
                         locs.Add(v);
                     }
@@ -212,15 +211,14 @@ namespace CultistLike
 
         private bool FindFreeLocationsNC(Vector2Int v, List<Viz> l, ref List<Vector2Int> locs)
         {
-            bool foundOne;
             int steps = 0;
             for (int i=0; i<l.Count; i++)
             {
-                foundOne = false;
+                var foundOne = false;
                 while (foundOne == false && steps < cellCount.x * cellCount.y)
                 {
                     foundOne = FitsInLocation(v, l[i].GetCellSize());
-                    if (foundOne == true)
+                    if (foundOne)
                     {
                         locs.Add(v);
                     }
@@ -266,7 +264,7 @@ namespace CultistLike
             {
                 var child = transform.GetChild(i);
 
-                if (child.gameObject.activeInHierarchy == true && child.GetComponent<Viz>() != null)
+                if (child.gameObject.activeInHierarchy && child.GetComponent<Viz>() != null)
                 {
                     OnCardDock(child.gameObject);
                 }
@@ -327,14 +325,14 @@ namespace CultistLike
 
             public T this[int x, int y]
             {
-                get { return array[w * y + x]; }
-                set { array[w * y + x] = value; }
+                get => array[w * y + x];
+                set => array[w * y + x] = value;
             }
 
             public T this[Vector2Int v]
             {
-                get { return array[w * v.y + v.x]; }
-                set { array[w * v.y + v.x] = value; }
+                get => array[w * v.y + v.x];
+                set => array[w * v.y + v.x] = value;
             }
 
             private bool WithinBounds(Vector2Int v) => v.x >= 0 && v.x < w && v.y >= 0 && v.y < h;
@@ -361,7 +359,7 @@ namespace CultistLike
                 {
                     for (int y=-size.y; y<=size.y; y++)
                     {
-                        if (WithinBounds(v + new Vector2Int(x, y)) == true)
+                        if (WithinBounds(v + new Vector2Int(x, y)))
                             this[v + new Vector2Int(x, y)] = f(this[v + new Vector2Int(x, y)]);
                     }
                 }
@@ -387,14 +385,13 @@ namespace CultistLike
             public void MaxV<U>(Vector2Int v, Vector2Int size, ref U u, Func<T, U> f)
                 where U : IComparable<U>
             {
-                U newU;
                 for (int x=-size.x;  x<=size.x; x++)
                 {
                     for (int y=-size.y; y<=size.y; y++)
                     {
-                        if (WithinBounds(v + new Vector2Int(x, y)) == true)
+                        if (WithinBounds(v + new Vector2Int(x, y)))
                         {
-                            newU = f(this[v + new Vector2Int(x, y)]);
+                            var newU = f(this[v + new Vector2Int(x, y)]);
                             if (newU.CompareTo(u) >= 0)
                             {
                                 u = newU;

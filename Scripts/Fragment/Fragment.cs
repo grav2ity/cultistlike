@@ -49,13 +49,12 @@ namespace CultistLike
         public int count;
 
 
-        public HeldFragment(Fragment fragment, int count)
+        public HeldFragment(Fragment fragment, int count = 1)
         {
             this.fragment = fragment;
             this.count = count;
         }
 
-        public HeldFragment(Fragment fragment) : this(fragment, 1) {}
         public HeldFragment(HeldFragment fragment) : this(fragment.fragment, fragment.count) {}
 
         public static int AdjustInList(List<HeldFragment> list, Fragment fragment, int level)

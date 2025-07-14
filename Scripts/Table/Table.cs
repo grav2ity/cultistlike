@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-using DG.Tweening;
-
 
 namespace CultistLike
 {
@@ -141,8 +139,7 @@ namespace CultistLike
                 return;
             }
 
-            T v;
-            if (lastLocations.TryGetValue(viz.gameObject, out v) == true)
+            if (lastLocations.TryGetValue(viz.gameObject, out var v))
             {
                 if (FindFreeLocation(ref v, viz))
                 {
@@ -193,14 +190,14 @@ namespace CultistLike
         {
             List<CardViz> cards = new List<CardViz>();
 
-            GetComponentsInChildren<CardViz>(false, cards);
+            GetComponentsInChildren(false, cards);
             return cards;
         }
 
         protected void DOMove(Viz viz, T t, float speed)
         {
             Vector3 targetPosition = ToLocalPosition(t) + transform.position;
-            viz.DOMove(targetPosition, speed, x => PutOn(viz.gameObject));
+            viz.DOMove(targetPosition, speed, _ => PutOn(viz.gameObject));
         }
 
         protected IEnumerator HighlightCardsE(List<CardViz> cards)

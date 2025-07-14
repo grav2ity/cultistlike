@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 using UnityEngine;
 
@@ -19,7 +18,7 @@ namespace CultistLike
         public List<Rule> or;
         [Space(10)]
 
-        [Header("Modfiers")]
+        [Header("Modifiers")]
         public List<ActModifier> actModifiers;
         public List<CardModifier> cardModifiers;
         public List<TableModifier> tableModifiers;
@@ -36,7 +35,7 @@ namespace CultistLike
 
         public static bool Evaluate(Context context, List<Test> tests, List<Rule> and, List<Rule> or, bool invert, bool force = false)
         {
-            if (invert == true && force == false)
+            if (invert && force == false)
             {
                 return !Evaluate(context, tests, and, or, false);
             }
@@ -51,7 +50,7 @@ namespace CultistLike
             }
 
             //force is used only to save CardMatches for forced and spawned Acts
-            if (force == true)
+            if (force)
             {
                 return true;
             }
@@ -76,7 +75,7 @@ namespace CultistLike
                 {
                     using (var context2 = new Context(context))
                     {
-                        if (rule.Evaluate(context2) == true)
+                        if (rule.Evaluate(context2))
                         {
                             return true;
                         }
@@ -124,7 +123,7 @@ namespace CultistLike
                     }
                 }
             }
-            context.ResetMatches();
+            context?.ResetMatches();
         }
 
         public bool Evaluate(Context context) => Evaluate(context, tests, and, or, invert);

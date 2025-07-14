@@ -19,8 +19,7 @@ namespace CultistLike
 
         public Target(CardViz cardViz)
         {
-            cards = new List<CardViz>();
-            cards.Add(cardViz);
+            cards = new List<CardViz> { cardViz };
         }
 
         public Target(List<CardViz> cards)
@@ -111,9 +110,9 @@ namespace CultistLike
                         {
                             foreach (var targetCard in targetCards)
                             {
-                                if (what.fragment is Card)
+                                if (what.fragment is Card card)
                                 {
-                                    targetCard.Transform((Card)what.fragment);
+                                    targetCard.Transform(card);
                                     context.scope.Adjust(targetCard, level - 1);
                                 }
                                 else if (what.cards != null)
@@ -130,9 +129,9 @@ namespace CultistLike
                     case CardOp.Decay:
                         foreach (var targetCard in targetCards)
                         {
-                            if (what != null && what.fragment is Card)
+                            if (what != null && what.fragment is Card card)
                             {
-                                targetCard.Decay((Card)what.fragment, level);
+                                targetCard.Decay(card, level);
                             }
                             else
                             {
@@ -184,11 +183,8 @@ namespace CultistLike
                             }
                         }
                         break;
-                    default:
-                        break;
                 }
             }
-            return;
         }
     }
 
@@ -263,9 +259,9 @@ namespace CultistLike
                                 }
                             }
                         }
-                        else if (target.fragment is Card && level < 0)
+                        else if (target.fragment is Card card && level < 0)
                         {
-                            var cards = context.scope.FindAll((Card)target.fragment);
+                            var cards = context.scope.FindAll(card);
                             var count = context.scope.Adjust(target.fragment, level);
                             if (count < 0)
                             {
@@ -289,13 +285,13 @@ namespace CultistLike
                             foreach (var cardViz in targetCardsY)
                             {
                                 var targetCard = cardViz.stack != null ? cardViz.stack : cardViz;
-                                if (targetCard.gameObject.activeSelf == true)
+                                if (targetCard.gameObject.activeSelf)
                                 {
                                     targetCards.Add(targetCard);
                                 }
                             }
 
-                            level = all == true ? targetCards.Count : level;
+                            level = all ? targetCards.Count : level;
                             for (int i=0; i<level && i<targetCards.Count; i++)
                             {
                                 context.actLogic.tokenViz.Grab(targetCards[i]);
@@ -333,11 +329,8 @@ namespace CultistLike
                     case ActOp.RunTriggers:
                         context.actLogic?.InjectTriggers(target);
                         break;
-                    default:
-                        break;
                 }
             }
-            return;
         }
     }
 
@@ -393,11 +386,8 @@ namespace CultistLike
                         GameManager.Instance.Reset();
                         GameManager.Instance.SpawnAct(act, null, null);
                         break;
-                    default:
-                        break;
                 }
             }
-            return;
         }
     }
 
@@ -461,7 +451,7 @@ namespace CultistLike
                 {
                     //TODO
                     int maxTries = 3;
-                    Fragment frag = null;
+                    Fragment frag;
                     do
                     {
                         frag = deck.Draw();
@@ -496,8 +486,6 @@ namespace CultistLike
                                     ShiftCard(cardViz, deck.DrawOffset(cardViz.card, 1));
                                 }
                                 break;
-                            default:
-                                break;
                         }
                     }
                     else if (target.cards != null)
@@ -521,8 +509,6 @@ namespace CultistLike
                                 case DeckOp.ForwardShift:
                                     ShiftCard(cardViz, deck.DrawOffset(cardViz.card, 1));
                                     break;
-                                default:
-                                    break;
                             }
                         }
                     }
@@ -532,9 +518,9 @@ namespace CultistLike
 
         private void CreateCard(Context context, Deck deck, Fragment drawnFrag)
         {
-            if (context != null && drawnFrag is Card)
+            if (context != null && drawnFrag is Card card)
             {
-                var newCardViz = context.scope.Add((Card)drawnFrag);
+                var newCardViz = context.scope.Add(card);
                 newCardViz.ShowBack();
 
                 foreach (var frag in deck.tagOn)
@@ -553,9 +539,9 @@ namespace CultistLike
 
         private void ShiftCard(CardViz cardViz, Fragment drawnFrag)
         {
-            if (cardViz != null && drawnFrag is Card)
+            if (cardViz != null && drawnFrag is Card card)
             {
-                cardViz.Transform((Card)drawnFrag);
+                cardViz.Transform(card);
             }
         }
     }
@@ -589,8 +575,6 @@ namespace CultistLike
                         break;
                     case TableOp.SpawnToken:
                         GameManager.Instance.SpawnToken(act.token, context.scope, context.actLogic.tokenViz);
-                        break;
-                    default:
                         break;
                 }
             }

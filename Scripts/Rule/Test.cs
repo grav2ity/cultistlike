@@ -62,19 +62,11 @@ namespace CultistLike
                 right = constant * GetCount(context, loc2, fragment2r);
             }
 
-            if (cardTest == true)
+            if (cardTest)
             {
                 var scope = context.ResolveScope(loc1);
 
-                List<CardViz> cards;
-                if (loc1 == ReqLoc.MatchedCards)
-                {
-                    cards = context.matches;
-                }
-                else
-                {
-                    cards = scope.cards;
-                }
+                var cards = loc1 == ReqLoc.MatchedCards ? context.matches : scope.cards;
 
                 bool passed = false;
                 if (fragment1r == null)
@@ -90,30 +82,26 @@ namespace CultistLike
                 {
                     List<CardViz> newMatches = new List<CardViz>();
 
-                    if (fragment1r is Aspect)
+                    if (fragment1r is Aspect aspect)
                     {
-                        var aspect = (Aspect)fragment1r;
-                        int left;
                         foreach (var cardViz in cards)
                         {
-                            bool result = false;
-                            left = cardViz.fragTree.Count(aspect);
+                            var left = cardViz.fragTree.Count(aspect);
 
-                            result = Compare(op, constant, left, right);
-                            if (result == true && (loc1 != ReqLoc.Free || cardViz.free == true))
+                            var result = Compare(op, constant, left, right);
+                            if (result && (loc1 != ReqLoc.Free || cardViz.free))
                             {
                                 newMatches.Add(cardViz);
                                 passed = true;
                             }
                         }
                     }
-                    else if (fragment1r is Card)
+                    else if (fragment1r is Card card)
                     {
-                        var card = (Card)fragment1r;
                         foreach (var cardViz in cards)
                         {
                             bool result = cardViz.card == card;
-                            if (result == true && (loc1 != ReqLoc.Free || cardViz.free == true))
+                            if (result && (loc1 != ReqLoc.Free || cardViz.free))
                             {
                                 newMatches.Add(cardViz);
                             }
@@ -157,10 +145,10 @@ namespace CultistLike
                 case ReqOp.RandomChallenge:
                     return constant * left > Random.Range(0, 100);
                 case ReqOp.RandomClash:
-                    float div = (float)(left + right);
+                    float div = left + right;
                     if (div > 0f)
                     {
-                        float chance = ((float)left / div);
+                        float chance = left / div;
                         return chance > Random.Range(0f, 1f);
                     }
                     else
@@ -184,23 +172,19 @@ namespace CultistLike
                 {
                     total = cards.Count;
                 }
-                else if (fragment is Aspect)
+                else if (fragment is Aspect aspect)
                 {
-                    var aspect = (Aspect)fragment;
-                    HeldFragment ha = null;
                     foreach (var card in cards)
                     {
-                        ha = card.fragTree.Find(aspect);
+                        var ha = card.fragTree.Find(aspect);
                         if (ha != null)
                         {
                             total += ha.count;
-                            ha = null;
                         }
                     }
                 }
-                else if (fragment is Card)
+                else if (fragment is Card car)
                 {
-                    var car = (Card)fragment;
                     foreach (var card in cards)
                     {
                         if (card.card == car)

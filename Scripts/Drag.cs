@@ -32,7 +32,7 @@ namespace CultistLike
         public bool isDragging { get => _isDragging; protected set => _isDragging = value; }
         public bool interactive { get => _interactive; set => _interactive = value; }
 
-        public Vector3 targetPosition => isBeingMoved == true ? moveTarget : transform.position;
+        public Vector3 targetPosition => isBeingMoved ? moveTarget : transform.position;
 
 
         public virtual void OnBeginDrag(PointerEventData eventData)
@@ -57,11 +57,10 @@ namespace CultistLike
                 collider.enabled = false;
             }
 
-            Vector3 globalMousePos;
             if (RectTransformUtility.ScreenPointToWorldPointInRectangle(draggingPlane,
-                                                                        eventData.position,
-                                                                        eventData.pressEventCamera,
-                                                                        out globalMousePos))
+                    eventData.position,
+                    eventData.pressEventCamera,
+                    out var globalMousePos))
             {
                 var screenPosition = Camera.main.WorldToScreenPoint(transform.position);
                 if (RectTransformUtility.ScreenPointToWorldPointInRectangle(draggingPlane,
@@ -91,7 +90,7 @@ namespace CultistLike
 
             InterruptDrag();
 
-            if (undrag == true && transform.parent?.GetComponentInNearestParent<ICardDock>() == null)
+            if (undrag && transform.parent?.GetComponentInNearestParent<ICardDock>() == null)
             {
                 Undrag();
             }
@@ -153,7 +152,7 @@ namespace CultistLike
         public void Undrag()
         {
             //TODO dock OnStart?
-            DOMove(dragOrigin, GameManager.Instance.normalSpeed, null, x =>
+            DOMove(dragOrigin, GameManager.Instance.normalSpeed, null, _ =>
                    dragOriginDock?.OnCardDock(gameObject));
         }
 
@@ -163,11 +162,10 @@ namespace CultistLike
 
         private void SetDraggedPosition(PointerEventData eventData)
         {
-            Vector3 worldMousePos;
             if (RectTransformUtility.ScreenPointToWorldPointInRectangle(draggingPlane,
-                                                                        eventData.position,
-                                                                        eventData.pressEventCamera,
-                                                                        out worldMousePos))
+                    eventData.position,
+                    eventData.pressEventCamera,
+                    out var worldMousePos))
             {
                 if (centerOnCursor == false)
                 {

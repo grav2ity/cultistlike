@@ -7,7 +7,7 @@ namespace CultistLike
     public class TimeControl : MonoBehaviour
     {
         public Color selectedColor;
-        public Color defualtColor;
+        public Color defaultColor;
 
         [SerializeField] private Button selectedButton;
         private Button[] buttons;
@@ -16,7 +16,7 @@ namespace CultistLike
         {
             foreach (var button in buttons)
             {
-                button.GetComponent<Image>().color = defualtColor;
+                button.GetComponent<Image>().color = defaultColor;
             }
 
             this.selectedButton = selectedButton;

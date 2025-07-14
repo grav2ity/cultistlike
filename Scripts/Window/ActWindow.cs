@@ -33,7 +33,6 @@ namespace CultistLike
         [SerializeField, HideInInspector] private ActStatus actStatus;
         [SerializeField, HideInInspector] private Act readyAct;
 
-        private TokenViz _tokenViz;
         private ActLogic actLogic;
 
         private bool suspendUpdates;
@@ -41,8 +40,9 @@ namespace CultistLike
 
 
         public bool open { get => _open; private set => _open = value; }
-        public TokenViz tokenViz { get => _tokenViz; private set => _tokenViz = value; }
-        public Timer timer { get => _timer; }
+        public TokenViz tokenViz { get; private set; }
+
+        public Timer timer => _timer;
 
         public FragTree slotsFragTree => slotsFrag;
 
@@ -56,7 +56,7 @@ namespace CultistLike
             if (actStatus != ActStatus.Finished)
             {
                 var slotViz = AcceptsCard(cardViz);
-                if (slotViz != null && slotViz.TrySlotCard(cardViz) == true)
+                if (slotViz != null && slotViz.TrySlotCard(cardViz))
                 {
                     BringUp();
                     return true;
@@ -92,8 +92,6 @@ namespace CultistLike
                 case ActStatus.Ready:
                     ReturnCardsToTable();
                     StatusIdle();
-                    break;
-                default:
                     break;
             }
 
@@ -180,7 +178,7 @@ namespace CultistLike
                 bool reUpdate = false;
                 foreach (var slotViz in slots)
                 {
-                    if (slotViz.open == true)
+                    if (slotViz.open)
                     {
                         var foundSlot = slotsToOpen.Find(x => x == slotViz.slot);
                         if (foundSlot == null)
@@ -201,7 +199,7 @@ namespace CultistLike
                     }
                 }
 
-                if (reUpdate == true)
+                if (reUpdate)
                 {
                     suspendUpdates = false;
                     UpdateSlots();
@@ -269,7 +267,7 @@ namespace CultistLike
                     if (count == 0)
                     {
                         StatusIdle();
-                        if (tokenViz.token.dissolve == true)
+                        if (tokenViz.token.dissolve)
                         {
                             tokenViz.Dissolve();
                             Close();
@@ -281,8 +279,6 @@ namespace CultistLike
                         tokenViz.SetResultCount(count);
                     }
                     break;
-                default:
-                    break;
             }
         }
 
@@ -292,7 +288,7 @@ namespace CultistLike
             foreach (var cardViz in resultLane.cards)
             {
                 cardViz.ShowFace();
-                if (GameManager.Instance.table.LastLocation(cardViz) == true)
+                if (GameManager.Instance.table.LastLocation(cardViz))
                 {
                     GameManager.Instance.table.ReturnToTable(cardViz);
                 }
@@ -335,7 +331,7 @@ namespace CultistLike
                     if (tokenViz != null)
                     {
                         label.text = tokenViz?.token?.label;
-                        text.text = actLogic.TokenDesription();
+                        text.text = actLogic.TokenDescription();
                     }
                     cardBar?.gameObject.SetActive(true);
                     break;
@@ -347,6 +343,7 @@ namespace CultistLike
                         text.text = actLogic.GetText(readyAct);
                         tokenViz.SetResultCount(0);
                     }
+                    collectButton.gameObject.SetActive(false);
                     cardBar?.gameObject.SetActive(true);
                     break;
                 case ActStatus.Running:
@@ -370,8 +367,6 @@ namespace CultistLike
                     text.text = actLogic.endText;
                     cardBar?.gameObject.SetActive(false);
                     Check();
-                    break;
-                default:
                     break;
             }
         }
@@ -415,13 +410,15 @@ namespace CultistLike
 
         public ActWindowSave Save()
         {
-            var save = new ActWindowSave();
-            save.open = open;
-            save.actStatus = actStatus;
-            save.readyAct = readyAct;
-            save.position = transform.position;
+            var save = new ActWindowSave
+            {
+                open = open,
+                actStatus = actStatus,
+                readyAct = readyAct,
+                position = transform.position,
+                localCards = new List<int>()
+            };
 
-            save.localCards = new List<int>();
             for (int i=0; i<transform.childCount; i++)
             {
                 var cardViz = transform.GetChild(i).gameObject.GetComponent<CardViz>();
@@ -435,7 +432,7 @@ namespace CultistLike
             save.slots = new List<SlotVizSave>();
             foreach (var slotViz in slots)
             {
-                if (slotViz.gameObject.activeSelf == true)
+                if (slotViz.gameObject.activeSelf)
                 {
                     save.slots.Add(slotViz.Save());
                 }
@@ -467,7 +464,7 @@ namespace CultistLike
                 slots[i].Load(save.slots[i]);
             }
 
-            if (save.open == true)
+            if (save.open)
             {
                 BringUp();
             }
@@ -519,7 +516,7 @@ namespace CultistLike
                 {
                     foreach (var slotViz in slots)
                     {
-                        if (slotViz != null && slotViz.gameObject.activeSelf == true && slotViz.AcceptsCard(cardViz) == true)
+                        if (slotViz != null && slotViz.gameObject.activeSelf && slotViz.AcceptsCard(cardViz))
                         {
                             if (onlyEmpty == false || slotViz.slottedCard == null)
                             {
@@ -581,7 +578,7 @@ namespace CultistLike
 
         private void Update()
         {
-            if (pendingUpdate == true)
+            if (pendingUpdate)
             {
                 UpdateSlots();
                 Check();

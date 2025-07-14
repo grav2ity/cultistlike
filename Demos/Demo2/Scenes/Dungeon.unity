@@ -920,7 +920,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectedColor: {r: 0.18658273, g: 0.66666657, b: 0.26858345, a: 1}
-  defualtColor: {r: 0.78431374, g: 0.7176471, b: 0.70980394, a: 1}
+  defaultColor: {r: 0.78431374, g: 0.7176471, b: 0.70980394, a: 1}
   selectedButton: {fileID: 1652598850}
 --- !u!114 &320775242
 MonoBehaviour:
@@ -3209,7 +3209,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectedColor: {r: 0.18658273, g: 0.66666657, b: 0.26858345, a: 1}
-  defualtColor: {r: 0.78431374, g: 0.7176471, b: 0.70980394, a: 1}
+  defaultColor: {r: 0.78431374, g: 0.7176471, b: 0.70980394, a: 1}
   selectedButton: {fileID: 1561756284}
 --- !u!1 &1161560765
 GameObject:
@@ -3263,6 +3263,7 @@ MonoBehaviour:
   matches: []
   memoryFragment: {fileID: 0}
   free: 0
+  pause: 0
 --- !u!1001 &1174428571
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3890,7 +3891,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectedColor: {r: 0.18658273, g: 0.66666657, b: 0.26858345, a: 1}
-  defualtColor: {r: 0.78431374, g: 0.7176471, b: 0.70980394, a: 1}
+  defaultColor: {r: 0.78431374, g: 0.7176471, b: 0.70980394, a: 1}
   selectedButton: {fileID: 0}
 --- !u!114 &1386287637
 MonoBehaviour:
@@ -4245,6 +4246,7 @@ MonoBehaviour:
   matches: []
   memoryFragment: {fileID: 0}
   free: 0
+  pause: 0
 --- !u!1 &1561756283
 GameObject:
   m_ObjectHideFlags: 0

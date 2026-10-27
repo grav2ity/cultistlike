@@ -71,6 +71,8 @@ namespace CultistLike
         [SerializeField, HideInInspector] private ActWindow _openWindow;
         [SerializeField, HideInInspector] private float elapsedTime;
 
+        [SerializeField] private float lastTimeScale;
+
         public List<CardViz> cards => root.cards;
         public List<TokenViz> tokens => _tokens;
         public List<ActWindow> windows => _windows;
@@ -291,6 +293,19 @@ namespace CultistLike
         {
             allTime = time;
             maxTime = 0f;
+        }
+
+        public void Pause()
+        {
+            if (timeScale == 0f)
+            {
+                SetTimeScale(lastTimeScale);
+            }
+            else
+            {
+                lastTimeScale = timeScale;
+                SetTimeScale(0f);
+            }
         }
 
         public void Save()

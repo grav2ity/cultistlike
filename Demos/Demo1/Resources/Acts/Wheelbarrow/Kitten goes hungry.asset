@@ -24,6 +24,7 @@ MonoBehaviour:
   - op: 0
     fragment: {fileID: 11400000, guid: 16302b07e8cbf224c86e9105ea4a5b54, type: 2}
     level: 1
+    refLoc: 0
     reference: {fileID: 0}
   cardModifiers:
   - op: 10
@@ -34,8 +35,7 @@ MonoBehaviour:
   tableModifiers: []
   pathModifiers: []
   deckModifiers: []
-  furthermore:
-  - {fileID: 0}
+  furthermore: []
   ignoreGlobalSlots: 0
   slots: []
   randomAlt: 0
@@ -45,4 +45,6 @@ MonoBehaviour:
   spawnedActs: []
   onSpawn: {fileID: 0}
   text: Kitten toils on empty stomach.
+  textRules: []
   endText: 
+  endTextRules: []

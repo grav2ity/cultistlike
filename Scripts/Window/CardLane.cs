@@ -127,6 +127,7 @@ namespace CultistLike
 
             for (int i = newCards.Count - 1; i >= 0; i--)
             {
+                newCards[i].CastShadow(true);
                 GameManager.Instance.CardInPlay(newCards[i]);
             }
         }

@@ -19,7 +19,7 @@ MonoBehaviour:
   tests:
   - cardTest: 0
     canFail: 0
-    loc1: 32
+    loc1: 0
     fragment1: {fileID: 11400000, guid: 219db864b5c9cf84a9e11127db781ccb, type: 2}
     op: 0
     constant: 1
@@ -32,14 +32,17 @@ MonoBehaviour:
   - op: 0
     fragment: {fileID: 11400000, guid: 219db864b5c9cf84a9e11127db781ccb, type: 2}
     level: -1
+    refLoc: 0
     reference: {fileID: 0}
   - op: 0
     fragment: {fileID: 11400000, guid: 81fd3c01bb1bc104aa7ee20bf354b578, type: 2}
     level: 1
+    refLoc: 0
     reference: {fileID: 0}
   - op: 0
     fragment: {fileID: 11400000, guid: f5f0fa7b9f3f88e4eaf16fca23caa0e8, type: 2}
     level: 1
+    refLoc: 0
     reference: {fileID: 0}
   cardModifiers: []
   tableModifiers:
@@ -57,4 +60,6 @@ MonoBehaviour:
   spawnedActs: []
   onSpawn: {fileID: 0}
   text: Might be a pleasant evening after all.
+  textRules: []
   endText: Just a dream. Move on.
+  endTextRules: []

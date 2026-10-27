@@ -11,6 +11,13 @@ namespace CultistLike
     {
         public FragTree fragTree;
 
+        public Action OnActRun;
+        public Action OnActEnd;
+        public Action OnAltAct;
+        public Action<List<ActText>> OnNewText;
+        public Action<List<ActText>> OnTextChange;
+        public Action OnFinished;
+
         [SerializeField, HideInInspector] private Act _activeAct;
         [SerializeField, HideInInspector] private Act _altAct;
 
@@ -26,10 +33,8 @@ namespace CultistLike
         [SerializeField, HideInInspector] private bool doCallback;
         [SerializeField, HideInInspector] private Rule forceRule;
 
-        //TODO is separate endText even necessary
-        [SerializeField, HideInInspector] private string _endText;
-        [SerializeField, HideInInspector] private string _runText;
-        [SerializeField, HideInInspector] private string _label;
+        [SerializeField, HideInInspector] private ActText lastText;
+        [SerializeField, HideInInspector] private List<ActText> textHistory;
 
         [SerializeField, HideInInspector] private Act branchOutAct;
         [SerializeField, HideInInspector] private List<Act> callStack;
@@ -43,10 +48,6 @@ namespace CultistLike
         public FragTree slotsFragTree => actWindow.slotsFragTree;
 
         public TokenViz tokenViz => actWindow.tokenViz;
-
-        public string endText => _endText;
-        public string runText => _runText;
-        public string label => _label;
 
 
 
@@ -80,7 +81,7 @@ namespace CultistLike
             {
                 if (tokenViz?.token?.slot != null)
                 {
-                    slotsToOpen.Add(tokenViz?.token?.slot);
+                    slotsToOpen.Add(tokenViz.token.slot);
                 }
 
                 foreach (var cardViz in fragTree.cards)
@@ -136,10 +137,9 @@ namespace CultistLike
                 forceRule = null;
             }
 
-            actWindow.ParentSlotCardsToWindow();
-            //need this for correct slots
-            actWindow.ApplyStatus(ActStatus.Running);
-            actWindow.UpdateSlots();
+            NextText(GetText(activeAct), activeAct.label);
+
+            OnActRun?.Invoke();
 
             PopulateActList(act.altActs, altActs, act.randomAlt);
             // foreach (var altAct in extraAltActs)
@@ -158,7 +158,6 @@ namespace CultistLike
             {
                 tokenViz.timer.StartTimer(act.time, OnTimeUp);
                 tokenViz.ShowTimer();
-                actWindow.ApplyStatus(ActStatus.Running);
             }
             else
             {
@@ -180,9 +179,9 @@ namespace CultistLike
             // extraAltActs.Clear();
             // extraNextActs.Clear();
 
-            _endText = "";
-            _runText = "";
-            _label = "";
+            lastText = new();
+
+            textHistory.Clear();
 
             fragTree.Clear();
         }
@@ -242,8 +241,9 @@ namespace CultistLike
                 activeAct = altAct;
             }
 
-            //need this to get cards from run slots
-            actWindow.ParentSlotCardsToWindow();
+            //correct place??
+            OnActEnd?.Invoke();
+
 
             foreach (var frag in activeAct.fragments)
             {
@@ -263,13 +263,8 @@ namespace CultistLike
                 GameManager.Instance.SpawnAct(spawnedAct, fragTree, tokenViz);
             }
 
-            // actWindow.ParentSlotCardsToWindow();
 
-            var et = GetEndText(activeAct);
-            if (et != "")
-            {
-                _endText = et;
-            }
+            NextText(GetEndText(activeAct), lastText.label);
 
             if (forceAct != null)
             {
@@ -321,15 +316,9 @@ namespace CultistLike
             }
             else
             {
-                SetupFinalResults();
+                //TODO this cuts short DOTween animations
+                OnFinished?.Invoke();
             }
-        }
-
-        private void SetupFinalResults()
-        {
-            //TODO this cuts short DOTween animations
-            actWindow.SetupResultCards(fragTree.directCards);
-            actWindow.ApplyStatus(ActStatus.Finished);
         }
 
         public void ForceAct(Act act)
@@ -359,9 +348,33 @@ namespace CultistLike
         public Act AttemptInitialActs() => AttemptActs(GameManager.Instance.initialActs, true);
         public Act AttemptAltActs()
         {
-            altAct = AttemptActs(altActs);
-            UpdateText();
-            return altAct;
+            var newAct = AttemptActs(altActs);
+            if (altAct != null)
+            {
+                if (newAct == null)
+                {
+                    altAct = null;
+                    SwitchFromAlt();
+                    OnAltAct?.Invoke();
+
+                }
+                if (newAct != altAct)
+                {
+                    altAct = newAct;
+                    SwitchToAlt();
+                    OnAltAct?.Invoke();
+                }
+            }
+            else
+            {
+                if (newAct != null)
+                {
+                    altAct = newAct;
+                    SwitchToAlt();
+                    OnAltAct?.Invoke();
+                }
+            }
+            return null;
         }
 
         private Act AttemptNextActs() => AttemptActs(nextActs);
@@ -464,19 +477,57 @@ namespace CultistLike
             }
         }
 
-        private void UpdateText()
+        private void SwitchToAlt()
         {
-            string newRunText = altAct ? GetText(altAct) : GetText(activeAct);
-            string newLabel = altAct ? altAct.label : activeAct.label;
-            if (newRunText != "")
+            if (altAct != null)
             {
-                _runText = newRunText;
-            }
-            if (newLabel != "")
-            {
-                _label = newLabel;
+                //altAct always changes displayed text even if strings are empty
+                textHistory[textHistory.Count -1].text = GetText(altAct);
+                textHistory[textHistory.Count -1].label = altAct.label;
+                OnTextChange?.Invoke(textHistory);
             }
         }
+
+        private void SwitchFromAlt()
+        {
+            textHistory[textHistory.Count -1].text = lastText.text;
+            textHistory[textHistory.Count -1].label = lastText.label;
+            OnTextChange?.Invoke(textHistory);
+        }
+
+        private void NextText(string text, string label)
+        {
+            //TODO new label and no new text bahaviour?
+            if (text != "")
+            {
+                lastText.text = text;
+
+                var nt = new ActText();
+                nt.text = text;
+                nt.label = label != "" ? label : lastText.label;
+                lastText.label = nt.label;
+                textHistory.Add(nt);
+
+                OnNewText?.Invoke(textHistory);
+                OnTextChange?.Invoke(textHistory);
+            }
+        }
+
+        public ActText TextHistory(int i)
+        {
+            if (i < textHistory.Count)
+            {
+                return textHistory[i];
+
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+
+        public int TextHistoryCount => textHistory.Count;
 
         public string InterpolateString(string s) => fragTree.InterpolateString(s);
 
@@ -513,9 +564,8 @@ namespace CultistLike
                 branchOutAct = branchOutAct,
                 callStack = callStack,
                 altAct = altAct,
-                endText = _endText,
-                runText = _runText,
-                label = _label
+                lastText = lastText,
+                textHistory = textHistory
             };
 
             return save;
@@ -535,9 +585,10 @@ namespace CultistLike
                 PopulateActList(activeAct.altActs, altActs, activeAct.randomAlt);
             }
 
-            _endText = save.endText;
-            _runText = save.runText;
-            _label = save.label;
+            lastText = save.lastText;
+            textHistory = save.textHistory;
+
+            OnTextChange?.Invoke(textHistory);
         }
 
         private void Awake()
@@ -546,6 +597,14 @@ namespace CultistLike
             fragTree = GetComponent<FragTree>();
             fragTree.onCreateCard = x => x.ParentTo(actWindow.transform, true);
         }
+    }
+
+    [Serializable]
+    public class ActText
+    {
+        public string label;
+        public string text;
+
     }
 
     [Serializable]
@@ -560,9 +619,8 @@ namespace CultistLike
         //???
         public Act altAct;
 
-        public string endText;
-        public string runText;
-        public string label;
+        public ActText lastText;
+        public List<ActText> textHistory;
     }
 
 }

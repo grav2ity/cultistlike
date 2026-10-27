@@ -7,7 +7,6 @@ using UnityEngine.EventSystems;
 using TMPro;
 
 
-
 namespace CultistLike
 {
     public class SlotViz : MonoBehaviour, IDropHandler, ICardDock, IPointerClickHandler
@@ -66,15 +65,7 @@ namespace CultistLike
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            List<CardViz> cardsToH = new List<CardViz>();
-            foreach (var cardViz in GameManager.Instance.table.GetCards())
-            {
-                if (AcceptsCard(cardViz))
-                {
-                    cardsToH.Add(cardViz);
-                }
-            }
-            GameManager.Instance.table.HighlightCards(cardsToH);
+            GameManager.Instance.table.HighlightCards(new List<CardViz>(MatchingCards()));
 
             UIManager.Instance?.cardInfo?.Load(this);
         }
@@ -118,7 +109,7 @@ namespace CultistLike
 
         public void SlotCardPhysical(CardViz cardViz)
         {
-            if (cardViz != null && open)
+            if (cardViz != null && slottedCard == cardViz && open)
             {
                 cardViz.transform.SetParent(transform);
                 cardViz.transform.localPosition = Vector3.zero;
@@ -188,7 +179,6 @@ namespace CultistLike
                     actWindow.FirstSlotEmpty();
                 }
 
-
                 return sc;
             }
             else
@@ -252,6 +242,17 @@ namespace CultistLike
             else
             {
                 return slot.AcceptsCard(cardViz);
+            }
+        }
+
+        public IEnumerable<CardViz> MatchingCards()
+        {
+            foreach (var cardViz in GameManager.Instance.table.GetCards())
+            {
+                if (AcceptsCard(cardViz))
+                {
+                    yield return cardViz;
+                }
             }
         }
 

@@ -1,19 +1,16 @@
 ﻿using UnityEngine;
-using UnityEngine.EventSystems;
 
 using TMPro;
 
 
 namespace CultistLike
 {
-    //TODO collider on card stack is not being disabled
-    public class CardStack : MonoBehaviour, IBeginDragHandler, IDragHandler
+    public class CardStack : MonoBehaviour
     {
-        [HideInInspector] public bool stackDrag;
+        [SerializeField] public GameObject stackCounterGO;
 
         [Header("Layout")]
         [SerializeField] private TextMeshPro text;
-        [SerializeField] private GameObject stackCounterGO;
 
         [SerializeField, HideInInspector] private int count;
 
@@ -23,17 +20,6 @@ namespace CultistLike
 
         public int Count => count;
 
-
-        public void OnBeginDrag(PointerEventData eventData)
-        {
-            stackDrag = true;
-            eventData.pointerDrag = parent.gameObject;
-            parent.OnBeginDrag(eventData);
-            stackDrag = false;
-        }
-
-        //need this
-        public void OnDrag(PointerEventData eventData) {}
 
         public bool Push(CardViz cardViz)
         {
@@ -92,6 +78,7 @@ namespace CultistLike
         {
             this.count = count;
             text.text = count.ToString();
+            stackCounterGO.GetComponent<SphereCollider>().enabled = count > 1;
             stackCounterGO.SetActive(count > 1);
         }
 

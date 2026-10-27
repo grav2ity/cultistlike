@@ -124,37 +124,6 @@ namespace CultistLike
             }
         }
 
-        public int Count(Fragment frag, int level)
-        {
-            if (frag != null)
-            {
-                if (frag == GameManager.Instance.thisAspect)
-                {
-                    return level * scope.Count(thisAspect);
-                }
-                else if (frag == GameManager.Instance.thisCard)
-                {
-                    return level * scope.Count(thisCard.card);
-                }
-                else if (frag == GameManager.Instance.matchedCards)
-                {
-                    return level * matches.Count;
-                }
-                else if (frag == GameManager.Instance.memoryFragment)
-                {
-                    return level * scope.Count(scope.memoryFragment);
-                }
-                else
-                {
-                    return level * scope.Count(frag);
-                }
-            }
-            else
-            {
-                return level;
-            }
-        }
-
         public Fragment ResolveFragment(Fragment frag)
         {
             if (frag != null)

@@ -47,8 +47,10 @@ namespace CultistLike
         {
             if (interactive && eventData.button == PointerEventData.InputButton.Left)
             {
+                bool stackDrag = eventData.pointerPressRaycast.gameObject == cardStack.stackCounterGO;
+
                 //if not dragging whole stack yield one card
-                if (cardStack.stackDrag == false && cardStack.Count > 1)
+                if (stackDrag == false && cardStack.Count > 1)
                 {
                     var cardViz = cardStack.Pop();
                     if (cardViz != null)
@@ -134,40 +136,7 @@ namespace CultistLike
 
             if (eventData.clickCount == 2)
             {
-                var slot = GetComponentInParent<SlotViz>();
-                if (slot != null && slot.cardLock == false)
-                {
-                    slot.UnslotCard();
-                    GameManager.Instance.table.ReturnToTable(this);
-                }
-                else
-                {
-                    //TODO does not exactly work with stacks where cards might have different fragments
-                    SlotViz readySlot = null;
-                    if (GameManager.Instance.openWindow != null)
-                    {
-                        readySlot = GameManager.Instance.openWindow.AcceptsCard(this, true);
-                    }
-                    if (readySlot == null)
-                    {
-                        foreach(var tokenViz in GameManager.Instance.tokens)
-                        {
-                            readySlot = tokenViz.actWindow.AcceptsCard(this, true);
-                            if (readySlot != null)
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    if (readySlot != null)
-                    {
-                        var cardVizY = Yield();
-
-                        cardVizY.transform.parent?.
-                            GetComponentInNearestParent<ICardDock>(true)?.OnCardUndock(cardVizY.gameObject);
-                        readySlot.Grab(cardVizY, true);
-                    }
-                }
+                DoubleClick();
             }
         }
 
@@ -200,6 +169,41 @@ namespace CultistLike
         }
 
         public virtual void OnCardUndock(GameObject go) {}
+
+        public void DoubleClick()
+        {
+            var slot = GetComponentInParent<SlotViz>();
+            if (slot != null && slot.cardLock == false)
+            {
+                slot.UnslotCard();
+                GameManager.Instance.table.ReturnToTable(this);
+            }
+            else
+            {
+                //TODO does not exactly work with stacks where cards might have different fragments
+                SlotViz readySlot = null;
+                if (GameManager.Instance.openWindow != null)
+                {
+                    readySlot = GameManager.Instance.openWindow.AcceptsCard(this, true);
+                }
+                if (readySlot == null)
+                {
+                    foreach(var tokenViz in GameManager.Instance.tokens)
+                    {
+                        readySlot = tokenViz.actWindow.AcceptsCard(this, true);
+                        if (readySlot != null)
+                        {
+                            break;
+                        }
+                    }
+                }
+                if (readySlot != null)
+                {
+                    var cardVizY = Yield();
+                    readySlot.Grab(cardVizY, true);
+                }
+            }
+        }
 
         public void Decay(Card card, float time)
         {

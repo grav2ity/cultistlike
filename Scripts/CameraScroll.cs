@@ -27,9 +27,11 @@ namespace CultistLike
                 {
                     transform.Translate(new Vector3(-h, -v, 0));
                 }
-
-                float z = zoomSpeed * Input.GetAxis("Mouse ScrollWheel");
-                transform.Translate(new Vector3(0, 0, z));
+                if (Input.GetKey(KeyCode.LeftControl) == false)
+                {
+                    float z = zoomSpeed * Input.GetAxis("Mouse ScrollWheel");
+                    transform.Translate(new Vector3(0, 0, z));
+                }
             }
             else
             {

@@ -24,6 +24,8 @@ namespace CultistLike
         [SerializeField] private Timer _timer;
         [SerializeField] private Button okButton;
         [SerializeField] private Button collectButton;
+        [SerializeField] private Button hForwardButton;
+        [SerializeField] private Button hBackwardButton;
 
         [Header("Slots")]
         [SerializeField] private List<SlotViz> idleSlots;
@@ -32,6 +34,8 @@ namespace CultistLike
         [SerializeField, HideInInspector] private bool _open;
         [SerializeField, HideInInspector] private ActStatus actStatus;
         [SerializeField, HideInInspector] private Act readyAct;
+
+        [SerializeField, HideInInspector] private int textIndex;
 
         private ActLogic actLogic;
 
@@ -260,7 +264,6 @@ namespace CultistLike
                     break;
                 case ActStatus.Running:
                     actLogic.AttemptAltActs();
-                    ApplyStatus(ActStatus.Running);
                     break;
                 case ActStatus.Finished:
                     var count = resultLane.Count;
@@ -334,6 +337,9 @@ namespace CultistLike
                         text.text = actLogic.TokenDescription();
                     }
                     cardBar?.gameObject.SetActive(true);
+                    textIndex = 0;
+                    hForwardButton.interactable = false;
+                    hBackwardButton.interactable = false;
                     break;
                 case ActStatus.Ready:
                     if (readyAct != null)
@@ -353,8 +359,6 @@ namespace CultistLike
                     okButton.interactable = false;
                     collectButton.gameObject.SetActive(false);
                     tokenViz.SetResultCount(0);
-                    label.text = actLogic.label;
-                    text.text = actLogic.runText;
                     cardBar?.gameObject.SetActive(true);
                     break;
                 case ActStatus.Finished:
@@ -363,8 +367,6 @@ namespace CultistLike
                     resultLane.gameObject.SetActive(true);
                     collectButton.interactable = true;
                     collectButton.gameObject.SetActive(true);
-                    label.text = actLogic.label;
-                    text.text = actLogic.endText;
                     cardBar?.gameObject.SetActive(false);
                     Check();
                     break;
@@ -408,6 +410,80 @@ namespace CultistLike
             actLogic.fragTree.Remove(frag);
         }
 
+        public void FastForward()
+        {
+            switch(actStatus)
+            {
+                case ActStatus.Idle:
+                    if (open == true)
+                    {
+                        Close();
+                    }
+                    else
+                    {
+                        BringUp();
+                    }
+                    break;
+
+                case ActStatus.Ready:
+                    GoForIt();
+                    break;
+
+                case ActStatus.Running:
+                    tokenViz.timer.TimeUp();
+                    break;
+
+                case ActStatus.Finished:
+                    if (open == false)
+                    {
+                        Show();
+                        CollectAll();
+                        Close();
+                    }
+                    else
+                    {
+                        CollectAll();
+                    }
+                    break;
+            }
+        }
+
+        public void HistoryForward()
+        {
+            if (textIndex < actLogic.TextHistoryCount - 1)
+            {
+                textIndex += 1;
+                UpdateText();
+                UpdateHistoryButtons();
+            }
+        }
+
+        public void HistoryBackward()
+        {
+            if (textIndex > 0)
+            {
+                textIndex -= 1;
+                UpdateText();
+                UpdateHistoryButtons();
+            }
+        }
+
+        private void UpdateText()
+        {
+            if (textIndex < actLogic.TextHistoryCount)
+            {
+                text.text = actLogic.TextHistory(textIndex).text;
+                label.text= actLogic.TextHistory(textIndex).label;
+            }
+
+        }
+
+        private void UpdateHistoryButtons()
+        {
+            hForwardButton.interactable = textIndex < actLogic.TextHistoryCount -1;
+            hBackwardButton.interactable = textIndex > 0;
+        }
+
         public ActWindowSave Save()
         {
             var save = new ActWindowSave
@@ -416,7 +492,8 @@ namespace CultistLike
                 actStatus = actStatus,
                 readyAct = readyAct,
                 position = transform.position,
-                localCards = new List<int>()
+                localCards = new List<int>(),
+                textIndex = textIndex
             };
 
             for (int i=0; i<transform.childCount; i++)
@@ -447,6 +524,8 @@ namespace CultistLike
             actStatus = save.actStatus;
             readyAct = save.readyAct;
             open = save.open;
+            textIndex = save.textIndex;
+
             LoadToken(tokenViz);
 
             foreach (var cardID in save.localCards)
@@ -532,6 +611,31 @@ namespace CultistLike
             }
         }
 
+        private void OnActRun()
+        {
+            ParentSlotCardsToWindow();
+            //need this for correct slots
+            ApplyStatus(ActStatus.Running);
+            UpdateSlots();
+
+        }
+
+        private void OnActEnd()
+        {
+            //need this to get cards from run slots
+            ParentSlotCardsToWindow();
+
+        }
+
+        private void OnAltAct() {}
+
+        private void OnFinished()
+        {
+            SetupResultCards(actLogic.fragTree.directCards);
+            ApplyStatus(ActStatus.Finished);
+
+        }
+
         private void Awake()
         {
             actLogic = GetComponent<ActLogic>();
@@ -541,6 +645,28 @@ namespace CultistLike
             {
                 pendingUpdate = true;
             };
+
+            actLogic.OnActRun += OnActRun;
+            actLogic.OnActEnd += OnActEnd;
+            actLogic.OnAltAct += OnAltAct;
+            actLogic.OnFinished += OnFinished;
+
+            actLogic.OnNewText += history =>
+            {
+                if (textIndex == history.Count - 2)
+                {
+                    textIndex += 1;
+                    UpdateHistoryButtons();
+                }
+            };
+            actLogic.OnTextChange += history =>
+            {
+                if (textIndex == history.Count - 1)
+                {
+                    UpdateText();
+                }
+            };
+
         }
 
         private void Start()
@@ -548,8 +674,13 @@ namespace CultistLike
             GetComponent<Drag>().draggingPlane = GameManager.Instance.windowPlane;
 
             timer.gameObject.SetActive(false);
+            text.text = "";
+            label.text = "";
             okButton.interactable = false;
             collectButton.interactable = false;
+
+            UpdateText();
+            UpdateHistoryButtons();
 
             if (open == false)
             {
@@ -598,6 +729,7 @@ namespace CultistLike
         public CardLaneSave cardLane;
         public List<SlotVizSave> slots;
         public Vector3 position;
+        public int textIndex;
     }
 
     public enum ActStatus

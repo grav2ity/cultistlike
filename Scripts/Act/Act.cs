@@ -67,7 +67,7 @@ namespace CultistLike
         [TextArea(3, 10)] public string endText;
         public List<Rule> endTextRules;
 
-        public bool Attempt(Context context, bool force = false) => Rule.Evaluate(context, tests, and, or, force);
+        public bool Attempt(Context context, bool force = false) => Rule.Evaluate(context, tests, and, or, false, force);
 
         public void ApplyModifiers(Context context) => Rule.Execute(context, actModifiers,
                                                                     cardModifiers, tableModifiers,

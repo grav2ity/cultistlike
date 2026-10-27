@@ -51,11 +51,7 @@ namespace CultistLike
             Parent(draggingPlane.transform);
             dragOriginDock?.OnCardUndock(gameObject);
 
-            //TODO this affects all children
-            foreach(var collider in gameObject.GetComponentsInChildren<Collider>())
-            {
-                collider.enabled = false;
-            }
+            EnableColliders(false);
 
             if (RectTransformUtility.ScreenPointToWorldPointInRectangle(draggingPlane,
                     eventData.position,
@@ -100,12 +96,16 @@ namespace CultistLike
         {
             isDragging = false;
 
-            //TODO this affects all children
+            EnableColliders(true);
+        }
+
+        //TODO this affects all children
+        public virtual void EnableColliders(bool p)
+        {
             foreach(var collider in gameObject.GetComponentsInChildren<Collider>())
             {
-                collider.enabled = true;
+                collider.enabled = p;
             }
-
         }
 
         public virtual void Parent(Transform newParent)

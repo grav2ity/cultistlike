@@ -35,4 +35,6 @@ MonoBehaviour:
   spawnedActs: []
   onSpawn: {fileID: 0}
   text: You got some new stuff
-  endText: 
+  textRules: []
+  endText: You got some new stuff
+  endTextRules: []

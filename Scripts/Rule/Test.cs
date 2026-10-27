@@ -168,7 +168,7 @@ namespace CultistLike
             {
                 List<CardViz> cards = context.matches;
 
-                if (fragment == null) //just count cards
+                if (fragment == null || fragment == GameManager.Instance.matchedCards) //just count cards
                 {
                     total = cards.Count;
                 }
@@ -196,10 +196,20 @@ namespace CultistLike
             }
             else
             {
-                var scope = context.ResolveScope(loc);
-
-                if (fragment != null)
+                if (fragment == GameManager.Instance.matchedCards)
                 {
+                    if (loc == ReqLoc.Free)
+                    {
+                        return context.matches.FindAll(x => x.free == true).Count;
+                    }
+                    else
+                    {
+                        return context.matches.Count;
+                    }
+                }
+                else if (fragment != null)
+                {
+                    var scope = context.ResolveScope(loc);
                     total = scope.Count(fragment, loc == ReqLoc.Free);
                 }
                 else

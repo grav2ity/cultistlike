@@ -51,6 +51,12 @@ namespace CultistLike
             HideTimer();
         }
 
+        public void TimeUp()
+        {
+            StopTimer();
+            GetComponent<CardViz>()?.OnDecayComplete(decayTo);
+        }
+
         public void ShowTimer()
         {
             art.color = Color.grey;
@@ -128,8 +134,7 @@ namespace CultistLike
 
                 if (timeLeft <= 0f)
                 {
-                    StopTimer();
-                    GetComponent<CardViz>()?.OnDecayComplete(decayTo);
+                    TimeUp();
                 }
             }
         }

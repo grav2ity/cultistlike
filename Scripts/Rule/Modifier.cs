@@ -63,7 +63,18 @@ namespace CultistLike
                 var tar = context.ResolveTarget(target);
                 result.targetCards = context.ResolveTargetCards(tar, context.scope);
                 result.what = context.ResolveTarget(fragment);
-                result.level = context.Count(reference, level);
+
+                //TODO ??
+                //result.level = context.Count(reference, level);
+                var frag = context.ResolveFragment(reference);
+                if (frag != null)
+                {
+                    result.level = level * Test.GetCount(context, ReqLoc.Scope, frag);
+                }
+                else
+                {
+                    result.level = level;
+                }
             }
             return result;
         }

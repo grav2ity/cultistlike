@@ -87,6 +87,17 @@ namespace CultistLike
             }
         }
 
+        public void TimeUp()
+        {
+            if (following == null)
+            {
+                _duration = 0f;
+                elapsedTime = 0f;
+                enabled = false;
+            }
+            timeUpEvent.Invoke();
+        }
+
         private void Awake()
         {
             GetComponentInChildren<Canvas>().worldCamera = Camera.main;
@@ -104,13 +115,7 @@ namespace CultistLike
             if (timeLeft <= 0f)
             {
                 image.fillAmount = 0.9f;
-                if (following == null)
-                {
-                    _duration = 0f;
-                    elapsedTime = 0f;
-                    enabled = false;
-                }
-                timeUpEvent.Invoke();
+                TimeUp();
             }
         }
     }

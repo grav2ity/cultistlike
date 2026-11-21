@@ -6,8 +6,9 @@ using UnityEngine;
 namespace CultistLike
 {
     [CreateAssetMenu(menuName = "Slot")]
-    public class Slot : ScriptableObject
+    public class Slot : ScriptableObject, ISave
     {
+        public uint ID;
         public string label;
         [Space(10)]
         [TextArea(3, 10)] public string description;
@@ -51,6 +52,9 @@ namespace CultistLike
         [Tooltip("Cannot remove Card from the Slot.")]
         public bool cardLock;
         public bool actGrab;
+
+        public uint GetID() => ID;
+        public void SetID(uint id) => ID = id;
 
 
         public bool Opens(ActLogic actLogic)

@@ -7,7 +7,7 @@ namespace CultistLike
 {
     public class CardStack : MonoBehaviour
     {
-        [SerializeField] public GameObject stackCounterGO;
+        public GameObject stackCounterGO;
 
         [Header("Layout")]
         [SerializeField] private TextMeshPro text;

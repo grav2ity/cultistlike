@@ -12,9 +12,9 @@ namespace CultistLike
     {
         [Header("Drag Options")]
         [Tooltip("Object centered on cursor while dragging")]
-        public bool centerOnCursor;
+        [SerializeField] private bool centerOnCursor;
         [Tooltip("Return object to previous location if it was not docked after dropping")]
-        public bool undrag;
+        [SerializeField] private bool undrag;
 
         [HideInInspector] public RectTransform draggingPlane;
 
@@ -120,9 +120,6 @@ namespace CultistLike
                 newParent?.GetComponentInNearestParent<FragTree>()?.OnAddCard(this);
             }
         }
-
-        // public T GetComponentInNearestParent<T>(bool includeInactive = false) where T : class?
-        //     => transform.GetComponentInNearestParent<T>(includeInactive);
 
         public virtual void DOMove(Vector3 target, float speed, Action<Drag> onStart = null, Action<Drag> onComplete = null)
         {

@@ -7,14 +7,18 @@ using UnityEngine;
 namespace CultistLike
 {
     [CreateAssetMenu(menuName = "Act")]
-    public class Act : ScriptableObject
+    public class Act : ScriptableObject, ISave
     {
+        public uint ID;
+
         public string label;
         [Space(10)]
         [Tooltip("Limits execution to this Token. Mandatory for initial and spawned Acts.")]
         public Token token;
         [Tooltip("First in the Act chain. Can be started by player pressing button.")]
         public bool initial;
+        [Tooltip("Can be only run once.")]
+        public bool oneShot;
         [Space(10)]
         public float time;
 
@@ -53,12 +57,16 @@ namespace CultistLike
         [Header("Next Acts")]
         public bool randomNext;
         public List<ActLink> nextActs;
+        public Act defaultNext;
         [Header("Spawned Acts")]
         public List<ActLink> spawnedActs;
 
         [Header("On Spawn")]
         [Tooltip("Rule that will be run on spawning this Act in a new Token.")]
         public Rule onSpawn;
+
+        [Header("Token Effects")]
+        public Fragment art;
 
         [Space(10)]
         [Header("Text")]
@@ -67,12 +75,17 @@ namespace CultistLike
         [TextArea(3, 10)] public string endText;
         public List<Rule> endTextRules;
 
+        public bool Available => oneShot == false || GameManager.Instance.oneShotActs.Contains(this) == false;
+
         public bool Attempt(Context context, bool force = false) => Rule.Evaluate(context, tests, and, or, false, force);
 
         public void ApplyModifiers(Context context) => Rule.Execute(context, actModifiers,
                                                                     cardModifiers, tableModifiers,
                                                                     pathModifiers, deckModifiers,
                                                                     furthermore);
+
+        public uint GetID() => ID;
+        public void SetID(uint id) => ID = id;
     }
 
     [Serializable]

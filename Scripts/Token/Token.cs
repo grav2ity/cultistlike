@@ -6,8 +6,10 @@ using UnityEngine;
 namespace CultistLike
 {
     [CreateAssetMenu(menuName = "Token")]
-    public class Token : ScriptableObject
+    public class Token : ScriptableObject, ISave
     {
+        public uint ID;
+
         [Tooltip("Label to display when no Act is running.")]
         public string label;
         public Sprite art;
@@ -29,5 +31,8 @@ namespace CultistLike
         public bool dissolve;
         [Tooltip("Only one Token of this type can be on the table at any given time.")]
         public bool unique;
+
+        public uint GetID() => ID;
+        public void SetID(uint id) => ID = id;
     }
 }

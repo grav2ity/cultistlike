@@ -10,7 +10,7 @@ namespace CultistLike
     [Serializable]
     public class DeckInst
     {
-        [SerializeField] public Deck deck;
+        public Deck deck;
         [SerializeField] private List<Fragment> fragments;
 
         public DeckInst(Deck deck)
@@ -19,6 +19,12 @@ namespace CultistLike
 
             fragments = new List<Fragment>();
             Reshuffle();
+        }
+
+        public DeckInst(DeckInstSave save)
+        {
+            fragments = new();
+            Load(save);
         }
 
         public Fragment Draw()
@@ -102,6 +108,34 @@ namespace CultistLike
             }
         }
 
+        public DeckInstSave Save()
+        {
+            var save = new DeckInstSave()
+            {
+                deck = deck.SaveID(),
+                fragments = new()
+            };
+
+            foreach (var frag in fragments)
+            {
+                save.fragments.Add(frag.SaveID());
+            }
+
+            return save;
+        }
+
+        public void Load(DeckInstSave save)
+        {
+            deck = save.deck.SavedObject<Deck>();
+
+            fragments.Clear();
+            foreach (var frag in save.fragments)
+            {
+                fragments.Add(frag.SavedObject<Fragment>());
+            }
+
+        }
+
         private void Reshuffle()
         {
             if (deck.shuffle)
@@ -117,5 +151,12 @@ namespace CultistLike
                 fragments = deck.fragments.GetRange(0, deck.fragments.Count);
             }
         }
+    }
+
+    [Serializable]
+    public class DeckInstSave
+    {
+        public uint deck;
+        public List<uint> fragments;
     }
 }

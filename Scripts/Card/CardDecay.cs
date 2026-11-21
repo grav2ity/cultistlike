@@ -14,14 +14,12 @@ namespace CultistLike
         [SerializeField] private SpriteRenderer art;
 
         [SerializeField, HideInInspector] private Card decayTo;
-
-        // [SerializeField, HideInInspector] private bool paused;
         public bool paused;
 
-        [SerializeField, HideInInspector] private float decayTime;
-        [SerializeField, HideInInspector] private float elapsedTime;
+        private float decayTime;
+        private float elapsedTime;
 
-        [SerializeField, HideInInspector] private Color originalColor;
+        private Color originalColor;
 
         private Renderer timerRenderer;
 
@@ -85,7 +83,7 @@ namespace CultistLike
             {
                 duration = decayTime,
                 elapsedTime = elapsedTime,
-                decayTo = decayTo,
+                decayTo = decayTo.SaveID(),
                 paused = paused
             };
             return save;
@@ -95,7 +93,7 @@ namespace CultistLike
         {
             decayTime = save.duration;
             elapsedTime = save.elapsedTime;
-            decayTo = save.decayTo;
+            decayTo = save.decayTo.SavedObject<Card>();
 
             if (decayTime != 0f)
             {
@@ -128,7 +126,7 @@ namespace CultistLike
         {
             if (paused == false)
             {
-                elapsedTime += Time.deltaTime * GameManager.Instance.timeScale;
+                elapsedTime += GameManager.Instance.DeltaTime;
 
                 UpdateDisplay(timeLeft);
 
@@ -145,7 +143,7 @@ namespace CultistLike
     {
         public float duration;
         public float elapsedTime;
-        public Card decayTo;
+        public uint decayTo;
         public bool paused;
     }
 }

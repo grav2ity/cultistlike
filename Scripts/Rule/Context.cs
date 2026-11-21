@@ -27,7 +27,17 @@ namespace CultistLike
         private readonly List<CardViz> toDestroy = new List<CardViz>();
 
 
-        public Context(Context context, bool keepMatches = false) : this(context.actLogic, keepMatches) {}
+        public Viz Viz => actLogic ? actLogic.tokenViz : (thisCard ? thisCard : null);
+
+        //previous version failed for Contexts without actLogic (created from CardViz)
+        public Context(Context context, bool keepMatches = false)
+        {
+            actLogic = context.actLogic;
+            scope = context.scope;
+            thisAspect = context.thisAspect;
+            thisCard = context.thisCard;
+            matches = keepMatches ? scope.matches : scope.cards.GetRange(0, scope.cards.Count);
+        }
 
         public Context(FragTree fragments, bool keepMatches = false)
         {
@@ -136,6 +146,10 @@ namespace CultistLike
                 {
                     return thisCard.card;
                 }
+                else if (frag == GameManager.Instance.thisMatch)
+                {
+                    return matches != null && matches.Count > 0 ? matches[0].card : null;
+                }
                 else if (frag == GameManager.Instance.memoryFragment)
                 {
                     return scope.memoryFragment;
@@ -162,6 +176,10 @@ namespace CultistLike
                 else if (frag == GameManager.Instance.thisCard)
                 {
                     return new Target(thisCard);
+                }
+                else if (frag == GameManager.Instance.thisMatch)
+                {
+                    return matches != null && matches.Count > 0 ? new Target(matches[0].card) : null;
                 }
                 else if (frag == GameManager.Instance.matchedCards)
                 {

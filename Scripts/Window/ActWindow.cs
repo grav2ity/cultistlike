@@ -31,11 +31,11 @@ namespace CultistLike
         [SerializeField] private List<SlotViz> idleSlots;
         [SerializeField] private List<SlotViz> runSlots;
 
-        [SerializeField, HideInInspector] private bool _open;
-        [SerializeField, HideInInspector] private ActStatus actStatus;
-        [SerializeField, HideInInspector] private Act readyAct;
+        private bool _open;
+        private ActStatus actStatus;
+        private Act readyAct;
 
-        [SerializeField, HideInInspector] private int textIndex;
+        private int textIndex;
 
         private ActLogic actLogic;
 
@@ -291,6 +291,7 @@ namespace CultistLike
             foreach (var cardViz in resultLane.cards)
             {
                 cardViz.ShowFace();
+                cardViz.transform.localRotation = Quaternion.identity;
                 if (GameManager.Instance.table.LastLocation(cardViz))
                 {
                     GameManager.Instance.table.ReturnToTable(cardViz);
@@ -410,6 +411,11 @@ namespace CultistLike
             actLogic.fragTree.Remove(frag);
         }
 
+        public void ForceAct(Act act)
+        {
+            actLogic.ForceAct(act);
+        }
+
         public void FastForward()
         {
             switch(actStatus)
@@ -490,7 +496,7 @@ namespace CultistLike
             {
                 open = open,
                 actStatus = actStatus,
-                readyAct = readyAct,
+                readyAct = readyAct != null ? readyAct.SaveID() : 0,
                 position = transform.position,
                 localCards = new List<int>(),
                 textIndex = textIndex
@@ -522,7 +528,7 @@ namespace CultistLike
         {
             transform.position = save.position;
             actStatus = save.actStatus;
-            readyAct = save.readyAct;
+            readyAct = save.readyAct.SavedObject<Act>();
             open = save.open;
             textIndex = save.textIndex;
 
@@ -570,6 +576,7 @@ namespace CultistLike
         private void StatusIdle()
         {
             actLogic.Reset();
+            tokenViz.SetArt();
             ApplyStatus(ActStatus.Idle);
             UpdateSlots();
         }
@@ -617,14 +624,12 @@ namespace CultistLike
             //need this for correct slots
             ApplyStatus(ActStatus.Running);
             UpdateSlots();
-
         }
 
         private void OnActEnd()
         {
             //need this to get cards from run slots
             ParentSlotCardsToWindow();
-
         }
 
         private void OnAltAct() {}
@@ -633,40 +638,61 @@ namespace CultistLike
         {
             SetupResultCards(actLogic.fragTree.directCards);
             ApplyStatus(ActStatus.Finished);
+        }
 
+        private void OnFragChange()
+        {
+            pendingUpdate = true;
+        }
+
+        private void OnNewText(List<ActText> history)
+        {
+            if (textIndex == history.Count - 2)
+            {
+                textIndex += 1;
+                UpdateHistoryButtons();
+            }
+        }
+
+        private void OnTextChange(List<ActText> history)
+        {
+            if (textIndex == history.Count - 1)
+            {
+                UpdateText();
+            }
         }
 
         private void Awake()
         {
             actLogic = GetComponent<ActLogic>();
+        }
 
-            var fragTree = GetComponent<FragTree>();
-            fragTree.ChangeEvent += () =>
-            {
-                pendingUpdate = true;
-            };
-
+        public void OnEnable()
+        {
             actLogic.OnActRun += OnActRun;
             actLogic.OnActEnd += OnActEnd;
             actLogic.OnAltAct += OnAltAct;
             actLogic.OnFinished += OnFinished;
 
-            actLogic.OnNewText += history =>
-            {
-                if (textIndex == history.Count - 2)
-                {
-                    textIndex += 1;
-                    UpdateHistoryButtons();
-                }
-            };
-            actLogic.OnTextChange += history =>
-            {
-                if (textIndex == history.Count - 1)
-                {
-                    UpdateText();
-                }
-            };
+            var fragTree = GetComponent<FragTree>();
+            fragTree.ChangeEvent += OnFragChange;
 
+            actLogic.OnNewText += OnNewText;
+            actLogic.OnTextChange += OnTextChange;
+        }
+
+        public void OnDisable()
+        {
+            actLogic.OnActRun -= OnActRun;
+            actLogic.OnActEnd -= OnActEnd;
+            actLogic.OnAltAct -= OnAltAct;
+            actLogic.OnFinished -= OnFinished;
+
+            var fragTree = GetComponent<FragTree>();
+            fragTree.ChangeEvent -= OnFragChange;
+
+            actLogic.OnNewText -= OnNewText;
+            actLogic.OnTextChange -= OnTextChange;
         }
 
         private void Start()
@@ -724,7 +750,7 @@ namespace CultistLike
     {
         public bool open;
         public ActStatus actStatus;
-        public Act readyAct;
+        public uint readyAct;
         public List<int> localCards;
         public CardLaneSave cardLane;
         public List<SlotVizSave> slots;

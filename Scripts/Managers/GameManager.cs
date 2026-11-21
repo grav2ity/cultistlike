@@ -20,7 +20,7 @@ namespace CultistLike
             {
                 if(_instance == null)
                 {
-                    _instance = GameObject.FindObjectOfType<GameManager>();
+                    _instance = FindObjectOfType<GameManager>();
                 }
 
                 return _instance;
@@ -55,6 +55,7 @@ namespace CultistLike
         [Header("Special fragments")]
         public Fragment thisAspect;
         public Fragment thisCard;
+        public Fragment thisMatch;
         public Fragment matchedCards;
         public Fragment memoryFragment;
 
@@ -62,27 +63,38 @@ namespace CultistLike
         public float timeScale;
         public float maxTime;
         public float allTime;
+    #if UNITY_EDITOR
+        [HideInInspector] public int timeSkip;
+    #endif
 
         [HideInInspector] public UnityEvent<CardViz> onCardInPlay;
 
         [SerializeField, HideInInspector] private List<TokenViz> _tokens;
         [SerializeField, HideInInspector] private List<ActWindow> _windows;
 
-        [SerializeField, HideInInspector] private ActWindow _openWindow;
-        [SerializeField, HideInInspector] private float elapsedTime;
+        [SerializeField, HideInInspector] private List<Act> _oneShotActs;
 
-        [SerializeField] private float lastTimeScale;
+        [SerializeField, HideInInspector] private ActWindow _openWindow;
+
+        private float lastTimeScale;
 
         public List<CardViz> cards => root.cards;
         public List<TokenViz> tokens => _tokens;
         public List<ActWindow> windows => _windows;
+        public List<Act> oneShotActs => _oneShotActs;
 
         public List<Act> initialActs { get; private set; }
 
         public List<Slot> slotSOS { get; private set; }
 
+
         public ActWindow openWindow { get => _openWindow; private set => _openWindow = value; }
-        public float time => elapsedTime;
+
+    #if UNITY_EDITOR
+        public float DeltaTime => Time.deltaTime * timeScale + timeSkip;
+    #else
+        public float DeltaTime => Time.deltaTime * timeScale;
+    #endif
 
         public bool devTimeOn => maxTime > 0 || allTime > 0;
 
@@ -131,8 +143,8 @@ namespace CultistLike
 
         private CardViz CreateCard()
         {
-            var cardViz = UnityEngine.Object.Instantiate(cardPrefab);
-            cardViz.draggingPlane = GameManager.Instance.cardDragPlane;
+            var cardViz = Instantiate(cardPrefab);
+            cardViz.draggingPlane = Instance.cardDragPlane;
             return cardViz;
         }
 
@@ -183,7 +195,7 @@ namespace CultistLike
 
         public TokenViz CreateToken()
         {
-            var tokenViz = UnityEngine.Object.Instantiate(tokenPrefab);
+            var tokenViz = Instantiate(tokenPrefab);
             AddToken(tokenViz);
             return tokenViz;
         }
@@ -216,7 +228,7 @@ namespace CultistLike
 
         public ActWindow CreateWindow()
         {
-            var actWindow = UnityEngine.Object.Instantiate(actWindowPrefab, windowPlane);
+            var actWindow = Instantiate(actWindowPrefab, windowPlane);
             AddWindow(actWindow);
             return actWindow;
         }
@@ -233,7 +245,7 @@ namespace CultistLike
 
         public TokenViz SpawnAct(Act act, FragTree spawner, Viz viz)
         {
-            if (act != null && act.token != null)
+            if (act != null && act.token != null && act.Available == true)
             {
                 var newTokenViz = SpawnToken(act.token, spawner, viz);
                 if (newTokenViz != null)
@@ -253,7 +265,7 @@ namespace CultistLike
                 if (token.unique == false || tokens.Find(x => x.token == token) == null)
                 {
                     var newPosition = viz != null ? viz.transform.position : Vector3.zero;
-                    var newTokenViz = UnityEngine.Object.Instantiate(tokenPrefab, newPosition, Quaternion.identity);
+                    var newTokenViz = Instantiate(tokenPrefab, newPosition, Quaternion.identity);
                     newTokenViz.LoadToken(token);
                     newTokenViz.memoryFragment = spawner?.memoryFragment;
 
@@ -262,11 +274,11 @@ namespace CultistLike
 
                     if (viz != null)
                     {
-                        GameManager.Instance.table.Place(viz, new List<Viz> { newTokenViz });
+                        Instance.table.Place(viz, new List<Viz> { newTokenViz });
                     }
                     else
                     {
-                        GameManager.Instance.table.ReturnToTable(newTokenViz);
+                        Instance.table.ReturnToTable(newTokenViz);
                     }
 
                     root.localScale = new Vector3(0f, 0f, 0f);
@@ -308,7 +320,7 @@ namespace CultistLike
             }
         }
 
-        public void Save()
+        public string Save()
         {
             var save = new GameManagerSave();
             DOTween.CompleteAll(true);
@@ -323,7 +335,7 @@ namespace CultistLike
                 save.tokens.Add(tokenViz.Save());
             }
 
-            save.decks = DeckManager.Instance.deckInsts;
+            save.decks = DeckManager.Instance.Save();
 
             save.table = table.Save();
 
@@ -336,23 +348,29 @@ namespace CultistLike
                 }
             }
 
-            var jsonSave = JsonUtility.ToJson(save);
-            SaveManager.Instance.Save(jsonSave);
+            save.oneShotActs = new();
+            foreach (var act in _oneShotActs)
+            {
+                save.oneShotActs.Add(act.SaveID());
+            }
 
+            var jsonSave = JsonUtility.ToJson(save);
+            return jsonSave;
         }
 
-        public void Load()
+        public void Load(string jsonSave)
         {
-            Reset();
 
-            var jsonSave = SaveManager.Instance.Load();
+            if (jsonSave == "")
+                return;
+
+            Reset();
 
             GameManagerSave save = new GameManagerSave(jsonSave);
 
-
             foreach (var cardSave in save.cards)
             {
-                var cardViz = GameManager.Instance.CreateCard();
+                var cardViz = Instance.CreateCard();
                 SaveManager.Instance.RegisterCard(cardSave.ID, cardViz);
             }
 
@@ -363,7 +381,7 @@ namespace CultistLike
 
             foreach (var tokenSave in save.tokens)
             {
-                var tokenViz = GameManager.Instance.CreateToken();
+                var tokenViz = Instance.CreateToken();
                 tokenViz.Load(tokenSave);
                 tokenViz.Parent(table.transform);
             }
@@ -388,6 +406,12 @@ namespace CultistLike
                     cardViz.ParentTo(heap.transform, true);
                     cardViz.name = cardViz.card.name;
                 }
+            }
+
+            _oneShotActs.Clear();
+            foreach (var act in save.oneShotActs)
+            {
+                _oneShotActs.Add(act.SavedObject<Act>());
             }
 
             //load table last
@@ -477,10 +501,15 @@ namespace CultistLike
         #endif
         }
 
-        private void Update()
+    #if UNITY_EDITOR
+        private void LateUpdate()
         {
-            elapsedTime += Time.deltaTime * timeScale;
+            if (timeSkip > 0)
+                timeSkip--;
+            else if (timeSkip < 0)
+                timeSkip++;
         }
+    #endif
     }
 
     [Serializable]
@@ -488,12 +517,14 @@ namespace CultistLike
     {
         public List<CardVizSave> cards;
         public List<TokenVizSave> tokens;
-        public List<DeckInst> decks;
+        public List<DeckInstSave> decks;
         public string table;
 
         //TODO move out of here?
         public List<int> heapCards;
         public FragTreeSave heap;
+
+        public List<uint> oneShotActs;
 
         public GameManagerSave()
         {

@@ -9,7 +9,7 @@ using TMPro;
 
 namespace CultistLike
 {
-    public class SlotViz : MonoBehaviour, IDropHandler, ICardDock, IPointerClickHandler
+    public class SlotViz : MonoBehaviour, IDropHandler, ICardDock, IPointerClickHandler, ISerializationCallbackReceiver
     {
         public Slot slot;
 
@@ -29,9 +29,9 @@ namespace CultistLike
         [Tooltip("Removing Card will cause all other Slots to close.")]
         public bool firstSlot;
 
+        private ActWindow actWindow;
+        private CardViz _slottedCard;
 
-        [SerializeField, HideInInspector] private ActWindow actWindow;
-        [SerializeField, HideInInspector] private CardViz _slottedCard;
 
         public bool open => gameObject.activeSelf;
         public CardViz slottedCard { get => _slottedCard; private set => _slottedCard = value; }
@@ -107,12 +107,13 @@ namespace CultistLike
             }
         }
 
-        public void SlotCardPhysical(CardViz cardViz)
+        public bool SlotCardPhysical(CardViz cardViz)
         {
             if (cardViz != null && slottedCard == cardViz && open)
             {
                 cardViz.transform.SetParent(transform);
                 cardViz.transform.localPosition = Vector3.zero;
+                cardViz.transform.localRotation = Quaternion.identity;
 
                 if (visualsGO.activeInHierarchy == false)
                 {
@@ -125,7 +126,9 @@ namespace CultistLike
                 }
 
                 cardViz.CastShadow(false);
+                return true;
             }
+            return false;
         }
 
         public void SlotCardLogical(CardViz cardViz)
@@ -162,7 +165,8 @@ namespace CultistLike
             {
                 slottedCard.free = true;
                 slottedCard.interactive = true;
-                slottedCard.Parent(null);
+                //parenting to null here was a bug
+                slottedCard.Parent(slottedCard.draggingPlane);
 
                 slottedCard.CastShadow(true);
 
@@ -305,8 +309,8 @@ namespace CultistLike
 
                 void OnComplete(CardViz x)
                 {
-                    SlotCardPhysical(x);
-                    if (bringUp)
+                    bool slotted = SlotCardPhysical(x);
+                    if (slotted && bringUp)
                     {
                         actWindow.BringUp();
                     }
@@ -336,7 +340,7 @@ namespace CultistLike
         {
             var save = new SlotVizSave
             {
-                slot = slot,
+                slot = slot != null ? slot.SaveID() : 0,
                 cardID = slottedCard != null ? slottedCard.GetInstanceID() : 0
             };
             return save;
@@ -344,7 +348,7 @@ namespace CultistLike
 
         public void Load(SlotVizSave save)
         {
-            LoadSlot(save.slot);
+            LoadSlot(save.slot.SavedObject<Slot>());
 
             var cardViz = SaveManager.Instance.CardFromID(save.cardID);
             if (cardViz != null)
@@ -363,12 +367,25 @@ namespace CultistLike
         {
             actWindow = GetComponentInParent<ActWindow>();
         }
+
+        public virtual void OnBeforeSerialize() {}
+
+        public virtual void OnAfterDeserialize()
+        {
+        //for built-in hot reload
+        #if UNITY_EDITOR
+            if (grab && slottedCard == null)
+            {
+                GameManager.Instance.onCardInPlay.AddListener(GrabAction);
+            }
+        #endif
+        }
     }
 
     [Serializable]
     public class SlotVizSave
     {
-        public Slot slot;
+        public uint slot;
         public int cardID;
     }
 

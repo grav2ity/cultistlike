@@ -14,9 +14,10 @@ namespace CultistLike
         public bool stackMatching;
         public float maxSpacingX;
         public float spacingZ;
+        public float rotationY;
         [HideInInspector] public List<CardViz> cards;
 
-        [SerializeField, HideInInspector] private ActWindow actWindow;
+        private ActWindow actWindow;
 
 
         public int Count
@@ -53,6 +54,7 @@ namespace CultistLike
             {
                 cards.Remove(cardViz);
                 cardViz.ShowFace();
+                cardViz.transform.localRotation = Quaternion.identity;
             }
         }
 
@@ -111,7 +113,7 @@ namespace CultistLike
                 Vector3 o = new Vector3(
                     -0.5f * spacing.x * (cards.Count - 1),
                     0,
-                    -spacingZ * (cards.Count)
+                    -spacingZ * cards.Count
                 );
 
                 foreach (var cardViz in cards)
@@ -121,6 +123,7 @@ namespace CultistLike
                         cardViz.Hide();
                     }
                     cardViz.transform.localPosition = o;
+                    cardViz.transform.Rotate(new Vector3(0f, rotationY, 0f));
                     o += spacing;
                 }
             }
@@ -152,8 +155,6 @@ namespace CultistLike
         {
             var save = new CardLaneSave
             {
-                maxSpacingX = maxSpacingX,
-                spacingZ = spacingZ,
                 cards = new List<int>()
             };
 
@@ -166,9 +167,6 @@ namespace CultistLike
 
         public void Load(CardLaneSave save)
         {
-            maxSpacingX = save.maxSpacingX;
-            spacingZ = save.spacingZ;
-
             var cards = new List<CardViz>();
             foreach (var cardID in save.cards)
             {
@@ -186,8 +184,6 @@ namespace CultistLike
     [Serializable]
     public class CardLaneSave
     {
-        public float maxSpacingX;
-        public float spacingZ;
         public List<int> cards;
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -12,12 +13,11 @@ namespace CultistLike
     /// e.g. <c>Vector2Int</c> for array based table; <c>Vector3</c> for position based table.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class Table<T> : MonoBehaviour, ICardDock, IDropHandler, IPointerDownHandler
+    public abstract class Table<T> : MonoBehaviour, ICardDock, IDropHandler, IPointerDownHandler, ISerializationCallbackReceiver
     {
         public FragTree fragTree;
 
         protected Dictionary<GameObject, T> lastLocations = new Dictionary<GameObject, T>();
-
 
         public abstract Vector3 ToLocalPosition(T t);
         public abstract T FromLocalPosition(Vector3 t);
@@ -213,6 +213,29 @@ namespace CultistLike
             {
                 card?.SetHighlight(false);
             }
+        }
+
+
+        //temp stuff for built-in hot reload
+        private List<GameObject> gos = new();
+        private List<T> locations = new();
+
+        public virtual void OnBeforeSerialize()
+        {
+            gos.Clear();
+            locations.Clear();
+            foreach (var kvp in lastLocations)
+            {
+                gos.Add(kvp.Key);
+                locations.Add(kvp.Value);
+            }
+        }
+
+        public virtual void OnAfterDeserialize()
+        {
+            lastLocations = new();
+            for (int i = 0; i != Math.Min(gos.Count, locations.Count); i++)
+                lastLocations.Add(gos[i], locations[i]);
         }
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 using TMPro;
@@ -6,13 +7,17 @@ using TMPro;
 
 namespace CultistLike
 {
-    public class CardInfo : MonoBehaviour
+    public class CardInfo : MonoBehaviour, IScrollHandler
     {
         [Header("Layout")]
         [SerializeField] private Image art;
         [SerializeField] private TextMeshProUGUI description;
         [SerializeField] private TextMeshProUGUI cardName;
         [SerializeField] private FragmentBar fragmentBar;
+
+        [HideInInspector] public CardViz cardViz;
+
+        [HideInInspector] public Fragment lastChange;
 
 
         public string Description {
@@ -25,11 +30,17 @@ namespace CultistLike
             set => cardName.text = value;
         }
 
+        public void OnChange()
+        {
+            fragmentBar.Load(cardViz.fragTree);
+        }
 
         public void LoadCard(CardViz cardViz)
         {
             if (cardViz != null)
             {
+                this.cardViz = cardViz;
+                this.cardViz.fragTree.ChangeEvent += OnChange;
                 LoadCard(cardViz.card);
 
                 fragmentBar.Load(cardViz.fragTree);
@@ -38,7 +49,7 @@ namespace CultistLike
 
         public void LoadCard(Card card)
         {
-            UIManager.Instance?.aspectInfo?.Unload();
+            UIManager.Instance.aspectInfo?.Unload();
 
             if (card!= null)
             {
@@ -63,7 +74,7 @@ namespace CultistLike
 
         public void Load(SlotViz slotViz)
         {
-            UIManager.Instance?.aspectInfo?.Unload();
+            UIManager.Instance.aspectInfo?.Unload();
 
             if (slotViz != null)
             {
@@ -86,6 +97,9 @@ namespace CultistLike
             art.sprite = null;
             art.color = Color.white;
 
+            if (cardViz != null) cardViz.fragTree.ChangeEvent -= OnChange;
+            cardViz = null;
+
             fragmentBar.Unload();
 
             gameObject.SetActive(false);
@@ -94,6 +108,25 @@ namespace CultistLike
         private void Awake()
         {
             gameObject.SetActive(false);
+        }
+
+        private void OnDisable()
+        {
+            if (cardViz != null) cardViz.fragTree.ChangeEvent -= OnChange;
+        }
+
+        public void OnScroll(PointerEventData eventData)
+        {
+        #if UNITY_EDITOR
+            float scroll = eventData.scrollDelta.y;
+            if (lastChange != null)
+            {
+                if (scroll > 0)
+                    cardViz.fragTree.Add(lastChange);
+                else if (scroll < 0)
+                    cardViz.fragTree.Remove(lastChange);
+            }
+        #endif
         }
     }
 }

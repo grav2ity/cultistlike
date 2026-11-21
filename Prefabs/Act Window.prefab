@@ -427,6 +427,7 @@ MonoBehaviour:
   stackMatching: 1
   maxSpacingX: 0.4
   spacingZ: 0.01
+  rotationY: 3
   cards: []
   actWindow: {fileID: 0}
 --- !u!114 &1479448047524415684
@@ -1463,8 +1464,7 @@ MonoBehaviour:
     label: 
     text: 
   textHistory: []
-  branchOutAct: {fileID: 0}
-  callStack: []
+  branchOutActs: []
 --- !u!114 &8067377276828595321
 MonoBehaviour:
   m_ObjectHideFlags: 0

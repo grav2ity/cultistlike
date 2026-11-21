@@ -6,12 +6,13 @@ using UnityEngine;
 
 namespace CultistLike
 {
-    public class Fragment : ScriptableObject, IFrag
+    public class Fragment : ScriptableObject, IFrag, ISave
     {
+        public uint ID;
         [Multiline] public string label;
         public Sprite art;
         [Tooltip("Solid color used when art is not set.")]
-        public Color color;
+        public Color color = new(1f, 1f, 1f);
         [Tooltip("Do not show inside UI fragment bar.")]
         public bool hidden;
         [TextArea(3, 10)] public string description;
@@ -40,6 +41,9 @@ namespace CultistLike
         public virtual Fragment ToFragment() => this;
         public virtual int Count() => 1;
         public virtual bool Hidden() => hidden;
+
+        public uint GetID() => ID;
+        public void SetID(uint id) => ID = id;
     }
 
     [Serializable]
@@ -89,8 +93,8 @@ namespace CultistLike
             return 0;
         }
 
-        public int AddToList(List<HeldFragment> list) => HeldFragment.AdjustInList(list, fragment, count);
-        public int RemoveFromList(List<HeldFragment> list) => HeldFragment.AdjustInList(list, fragment, -count);
+        public int AddToList(List<HeldFragment> list) => AdjustInList(list, fragment, count);
+        public int RemoveFromList(List<HeldFragment> list) => AdjustInList(list, fragment, -count);
 
         public Fragment ToFragment() => fragment;
         public int Count() => count;

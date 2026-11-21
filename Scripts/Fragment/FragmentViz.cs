@@ -7,19 +7,18 @@ using TMPro;
 
 namespace CultistLike
 {
-    public class FragmentViz : MonoBehaviour, IPointerClickHandler
+    public class FragmentViz : MonoBehaviour, IPointerClickHandler, IScrollHandler
     {
         [Header("Aspect")]
-        public Fragment fragment;
-        [SerializeField, HideInInspector] private CardViz cardViz;
+        [SerializeField] private Fragment fragment;
 
         [Header("Layout")]
-        [SerializeField] public Image art;
+        [SerializeField] private Image art;
         [SerializeField] private TextMeshProUGUI countText;
+        [SerializeField] private float width;
 
-        [SerializeField, HideInInspector] private int _count;
-
-        public float width;
+        private CardViz cardViz;
+        private int _count;
 
 
         public int count
@@ -33,12 +32,39 @@ namespace CultistLike
         {
             if (cardViz == null)
             {
-                UIManager.Instance?.aspectInfo?.LoadAspect(fragment);
+                UIManager.Instance.aspectInfo?.LoadAspect(fragment);
             }
             else
             {
-                UIManager.Instance?.cardInfo?.LoadCard(cardViz);
+                UIManager.Instance.cardInfo?.LoadCard(cardViz);
             }
+        }
+
+        public void OnScroll(PointerEventData eventData)
+        {
+        #if UNITY_EDITOR
+            float scroll = eventData.scrollDelta.y;
+            var cardInfo = GetComponentInParent<CardInfo>();
+            var actWindow = GetComponentInParent<ActWindow>();
+            if (cardInfo != null)
+            {
+                //this needs to be before
+                cardInfo.lastChange = fragment;
+
+                if (scroll > 0)
+                    cardInfo.cardViz.fragTree.Add(fragment);
+                else if (scroll < 0)
+                    cardInfo.cardViz.fragTree.Remove(fragment);
+
+            }
+            else if (actWindow != null)
+            {
+                if (scroll > 0)
+                    actWindow.AddFragment(fragment);
+                else if (scroll < 0)
+                    actWindow.RemoveFragment(fragment);
+            }
+        #endif
         }
 
         public void Load<T>(T t) where T : IFrag

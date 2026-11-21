@@ -179,78 +179,48 @@ namespace CultistLike
 
         public int Adjust(CardViz cardViz, int level)
         {
+            int count = 0;
             if (cardViz != null)
             {
                 if (level > 0)
                 {
-                    int count = 0;
-                    for (int i=0; i<level; i++)
+                    CardViz newCardViz;
+                    while (count++ < level && (newCardViz = cardViz.Duplicate()) != null)
                     {
-                        var newCardViz = cardViz.Duplicate();
-                        if (newCardViz != null)
-                        {
-                            Add(newCardViz);
-                            if (onCreateCard != null)
-                            {
-                                onCreateCard(newCardViz);
-                            }
-                            count++;
-                        }
+                        Add(newCardViz);
+                        onCreateCard?.Invoke(newCardViz);
                     }
-                    OnChange();
-                    return count;
                 }
                 else if (level < 0)
                 {
                     if (Remove(cardViz) != null)
                     {
-                        OnChange();
-                        return -1;
-                    }
-                    else
-                    {
-                        return 0;
+                        count = -1;
                     }
                 }
             }
-            return 0;
+            if (count != 0)
+            {
+                OnChange();
+            }
+            return count;
         }
-
 
         public int Adjust(Card card, int level)
         {
+            int count = 0;
             if (card != null)
             {
                 if (level > 0)
                 {
-                    int count = 0;
-                    for (int i=0; i<level; i++)
-                    {
-                        if (Add(card) != null)
-                        {
-                            count++;
-                        }
-                    }
-                    return count;
+                    while (count++ < level && Add(card) != null);
                 }
                 else if (level < 0)
                 {
-                    int count = 0;
-                    while (level++ < 0)
-                    {
-                        if (Remove(card) != null)
-                        {
-                            count--;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                    return count;
+                    while (count-- > level && Remove(card) != null);
                 }
             }
-            return 0;
+            return count;
         }
 
         public int Adjust(Target target, int level)
@@ -331,17 +301,22 @@ namespace CultistLike
 
         public FragTreeSave Save()
         {
-            var save = new FragTreeSave();
+            var save = new FragTreeSave
+            {
+                matches = new List<int>(),
+                localFragments = new(),
+                memoryFragment = memoryFragment != null ? memoryFragment.SaveID() : 0,
+                free = free
+            };
+            foreach (var hfrag in localFragments)
+            {
+                save.localFragments.Add(new HeldFragmentSave{id = hfrag.fragment.SaveID(), count = hfrag.count});
 
-            save.matches = new List<int>();
+            }
             foreach (var cardViz in matches)
             {
                 save.matches.Add(cardViz.GetInstanceID());
             }
-
-            save.localFragments = localFragments;
-            save.memoryFragment = memoryFragment;
-            save.free = free;
 
             return save;
         }
@@ -355,17 +330,19 @@ namespace CultistLike
                 matches.Add(SaveManager.Instance.CardFromID(cardID));
             }
 
-            localFragments = save.localFragments;
-            memoryFragment = save.memoryFragment;
+            localFragments.Clear();
+            foreach (var hfrag in save.localFragments)
+            {
+                localFragments.Add(new HeldFragment(hfrag.id.SavedObject<Fragment>(), hfrag.count));
+            }
+
+            memoryFragment = save.memoryFragment.SavedObject<Fragment>();
             free = save.free;
         }
 
         public void OnChange()
         {
-            if (ChangeEvent != null)
-            {
-                ChangeEvent();
-            }
+            ChangeEvent?.Invoke();
             if (transform.parent != null)
             {
                 transform.parent.GetComponentInNearestParent<FragTree>()?.OnChange();
@@ -461,9 +438,16 @@ namespace CultistLike
     [Serializable]
     public class FragTreeSave
     {
-        public List<HeldFragment> localFragments;
+        public List<HeldFragmentSave> localFragments;
         public List<int> matches;
-        public Fragment memoryFragment;
+        public uint memoryFragment;
         public bool free;
+    }
+
+    [Serializable]
+    public class HeldFragmentSave
+    {
+        public uint id;
+        public int count;
     }
 }

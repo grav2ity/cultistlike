@@ -6,8 +6,10 @@ using UnityEngine;
 namespace CultistLike
 {
     [CreateAssetMenu(menuName = "Deck")]
-    public class Deck : ScriptableObject
+    public class Deck : ScriptableObject, ISave
     {
+        public uint ID;
+
         public string label;
         [Space(10)]
         [TextArea(3, 10)] public string text;
@@ -23,6 +25,8 @@ namespace CultistLike
         [Tooltip("Fragments added to every Fragment drawn from this Deck.")]
         public List<Fragment> tagOn;
         public Fragment memoryFragment;
+        [Tooltip("Act to branch out into after drawing from this deck.")]
+        public Act onDraw;
 
         [Header("Options")]
         [Tooltip("Randomize Deck order.")]
@@ -39,5 +43,8 @@ namespace CultistLike
 
         public void Add(Fragment frag) => DeckManager.Instance.GetDeckInst(this).Add(frag);
         public void AddFront(Fragment frag) => DeckManager.Instance.GetDeckInst(this).AddFront(frag);
+
+        public uint GetID() => ID;
+        public void SetID(uint id) => ID = id;
     }
 }

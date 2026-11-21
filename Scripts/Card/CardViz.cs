@@ -31,7 +31,7 @@ namespace CultistLike
         [Tooltip("Size on the table for an Array based table; final size is (1,1) + 2*(x,y)")]
         [SerializeField] private Vector2Int CellCount;
 
-        [SerializeField, HideInInspector] private bool _faceDown;
+        private bool _faceDown;
 
 
         public override Vector2Int GetCellSize() => CellCount;
@@ -55,6 +55,7 @@ namespace CultistLike
                     var cardViz = cardStack.Pop();
                     if (cardViz != null)
                     {
+                        cardViz.transform.rotation = Quaternion.identity;
                         eventData.pointerDrag = cardViz.gameObject;
                         cardViz.OnBeginDrag(eventData);
                         return;
@@ -238,8 +239,8 @@ namespace CultistLike
             {
                 interactive = false;
                 transform.DOLocalRotate(transform.localEulerAngles +
-                                        new Vector3(0f, 180f, 0f),
-                                        GameManager.Instance.rotateSpeed);
+                                        new Vector3(0f, -180f, 0f),
+                                        GameManager.Instance.rotateSpeed, RotateMode.FastBeyond360);
                 transform.DOPunchPosition(new Vector3(0f, 0f, -1f),
                                           GameManager.Instance.rotateSpeed, 2, 0f).
                     OnComplete(() => { interactive = true; });
@@ -434,7 +435,7 @@ namespace CultistLike
             var save = new CardVizSave
             {
                 ID = GetInstanceID(),
-                card = card,
+                card = card != null ? card.SaveID() : 0,
                 fragSave = fragTree.Save(),
                 free = free,
                 faceDown = faceDown,
@@ -470,7 +471,7 @@ namespace CultistLike
 
         public void Load(CardVizSave save)
         {
-            LoadCard(save.card, false);
+            LoadCard(save.card.SavedObject<Card>(), false);
             fragTree.Load(save.fragSave);
             free = save.free;
             if (save.faceDown)
@@ -497,7 +498,6 @@ namespace CultistLike
                     cardViz.Hide();
                     cardViz.interactive = false;
                     fragTree.Add(cardViz);
-
                 }
             }
         }
@@ -634,7 +634,7 @@ namespace CultistLike
         {
             if (card == null)
             {
-                Debug.LogError("Please set Card for " + this.name);
+                Debug.LogError("Please set Card for " + name);
             }
 
             DecayDefault();
@@ -647,7 +647,7 @@ namespace CultistLike
     public class CardVizSave
     {
         public int ID;
-        public Card card;
+        public uint card;
         public FragTreeSave fragSave;
         public bool free;
         public bool faceDown;

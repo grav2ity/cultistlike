@@ -27,7 +27,7 @@ namespace CultistLike
                 {
                     transform.Translate(new Vector3(-h, -v, 0));
                 }
-                if (Input.GetKey(KeyCode.LeftControl) == false)
+                if (Input.GetKey(KeyCode.LeftControl) == false && Input.GetKey(KeyCode.LeftShift) == false)
                 {
                     float z = zoomSpeed * Input.GetAxis("Mouse ScrollWheel");
                     transform.Translate(new Vector3(0, 0, z));

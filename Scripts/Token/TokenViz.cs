@@ -30,8 +30,8 @@ namespace CultistLike
         [Tooltip("Size on the table for an Array based table; final size is (1,1) + 2*(x,y)")]
         [SerializeField] private Vector2Int CellCount;
 
-        [SerializeField, HideInInspector] private ActWindow _actWindow;
-        [SerializeField, HideInInspector] private int resultCount;
+        private ActWindow _actWindow;
+        private int resultCount;
 
 
         public ActWindow actWindow { get => _actWindow; private set => _actWindow = value; }
@@ -71,13 +71,42 @@ namespace CultistLike
             {
                 this.token = token;
                 title.text = token.label;
-                if (token.art != null)
-                {
-                    art.sprite = token.art;
-                }
-                artBack.material.SetColor("_Color", token.color);
+                // if (token.art != null)
+                // {
+                //     art.sprite = token.art;
+                // }
+                // artBack.material.SetColor("_Color", token.color);
+                SetArt();
 
                 gameObject.name = "[TOKEN] " + token.name;
+            }
+        }
+
+        public void SetArt(Fragment frag = null)
+        {
+            if (frag != null)
+            {
+                if (frag.art != null)
+                {
+                    art.sprite = frag.art;
+                }
+                else if (art.sprite != null)
+                {
+                    art.color = frag.color;
+                }
+                else
+                {
+                    artBack.material.SetColor("_Color", frag.color);
+                }
+            }
+            else
+            {
+                if (token?.art != null)
+                {
+                    art.sprite = token.art;
+                    art.color = Color.white;
+                }
+                artBack.material.SetColor("_Color", token.color);
             }
         }
 
@@ -118,7 +147,7 @@ namespace CultistLike
         {
             var save = new TokenVizSave
             {
-                token = token,
+                token = token != null ? token.SaveID() : 0,
                 position = transform.position,
                 timerSave = timer.Save(),
                 windowSave = actWindow.Save(),
@@ -130,7 +159,7 @@ namespace CultistLike
 
         public void Load(TokenVizSave save)
         {
-            LoadToken(save.token);
+            LoadToken(save.token.SavedObject<Token>());
 
             transform.position = save.position;
 
@@ -149,6 +178,15 @@ namespace CultistLike
             if (token != null)
             {
                 LoadToken(token);
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (actWindow != null)
+            {
+                var actLogic = actWindow.GetComponent<ActLogic>();
+                timer.timeUpEvent.AddListener(actLogic.OnTimeUp);
             }
         }
 
@@ -179,7 +217,7 @@ namespace CultistLike
     [Serializable]
     public class TokenVizSave
     {
-        public Token token;
+        public uint token;
         public Vector3 position;
 
         public TimerSave timerSave;

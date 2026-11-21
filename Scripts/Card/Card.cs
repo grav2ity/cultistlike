@@ -6,6 +6,9 @@ namespace CultistLike
     [CreateAssetMenu(menuName = "Card")]
     public class Card : Fragment
     {
+        [Tooltip("Act to branch out into when this card is drawn.")]
+        public Act onDraw;
+
         [Header("Decay")]
         [Tooltip("Whenever Card is created it will automatically Decay to / turn into the specified Card.")]
         public Card decayTo;

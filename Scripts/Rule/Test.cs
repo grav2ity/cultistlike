@@ -20,6 +20,7 @@ namespace CultistLike
         RandomClash = 20
     }
 
+    //TODO MAYBE new/old test
     public enum ReqLoc
     {
         Scope          = 0,
@@ -42,14 +43,14 @@ namespace CultistLike
         public ReqOp op;
         [Space(10)]
         [Tooltip("Fragment2 not set - value. Fragment2 set - multiplier. Accepts negative values.")]
-        public int constant;
+        public float constant;
         public ReqLoc loc2;
         public Fragment fragment2;
 
 
         public bool Attempt(Context context)
         {
-            int right;
+            float right;
             Fragment fragment1r = context.ResolveFragment(fragment1);
             Fragment fragment2r = context.ResolveFragment(fragment2);
 
@@ -75,7 +76,7 @@ namespace CultistLike
                     {
                         right = Math.Min(right, context.matches.Count);
                         passed = true;
-                        context.matches = context.matches.GetRange(0, right);
+                        context.matches = context.matches.GetRange(0, Mathf.RoundToInt(right));
                     }
                 }
                 else
@@ -124,7 +125,7 @@ namespace CultistLike
             }
         }
 
-        public static bool Compare(ReqOp op, int constant, int left, int right)
+        public static bool Compare(ReqOp op, float constant, float left, float right)
         {
             switch (op)
             {
@@ -145,7 +146,9 @@ namespace CultistLike
                 case ReqOp.RandomChallenge:
                     return constant * left > Random.Range(0, 100);
                 case ReqOp.RandomClash:
-                    float div = left + right;
+                    // float div = left + right;
+                    //TODO manual
+                    float div = left + (constant != 0 ? constant : 1) * right;
                     if (div > 0f)
                     {
                         float chance = left / div;

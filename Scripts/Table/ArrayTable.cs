@@ -258,7 +258,7 @@ namespace CultistLike
 
         private void Start()
         {
-            gridCorner = 0.5f * (new Vector3(-planeWidth, -planeHeight, 0f));
+            gridCorner = 0.5f * new Vector3(-planeWidth, -planeHeight, 0f);
 
             for(int i=0; i<transform.childCount; i++)
             {
@@ -268,7 +268,6 @@ namespace CultistLike
                 {
                     OnCardDock(child.gameObject);
                 }
-
             }
         }
 
@@ -294,14 +293,16 @@ namespace CultistLike
 
         private Vector3 GridCoordsToLocal(Vector2Int v)
         {
-            return ((new Vector3(v.x * cellSize.x, v.y * cellSize.y, 0f)) +
-                    0.5f * new Vector3(cellSize.x, cellSize.y, 0f)) + gridCorner;
+            return new Vector3(v.x * cellSize.x, v.y * cellSize.y, 0f) +
+                    0.5f * new Vector3(cellSize.x, cellSize.y, 0f) + gridCorner;
         }
 
         [Serializable]
+        //this is serialized for built-in hot reload
+        //it is not saved in save/load as Start should replace all the stuff on the table
         private class SArray<T>
         {
-            [NonSerialized] public T[] array;
+            [SerializeField] public T[] array;
             [SerializeField] private int w, h;
 
 

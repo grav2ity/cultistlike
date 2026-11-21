@@ -461,14 +461,14 @@ namespace CultistLike
                 if (op == DeckOp.Draw)
                 {
                     //TODO
-                    int maxTries = 3;
+                    // int maxTries = 3;
                     Fragment frag;
-                    do
-                    {
-                        frag = deck.Draw();
-                        maxTries--;
-                    }
-                    while (maxTries > 0 && GameManager.Instance.AllowedToCreate((Card)frag) == false);
+                    // do
+                    // {
+                    frag = deck.Draw();
+                    //     maxTries--;
+                    // }
+                    // while (maxTries > 0 && GameManager.Instance.AllowedToCreate((Card)frag) == false);
 
                     CreateCard(context, deck, frag);
                 }
@@ -531,6 +531,11 @@ namespace CultistLike
         {
             if (context != null && drawnFrag is Card card)
             {
+                if (deck.onDraw != null && context.actLogic != null)
+                {
+                    context.actLogic.BranchOut(deck.onDraw);
+                }
+
                 var newCardViz = context.scope.Add(card);
                 newCardViz.ShowBack();
 
@@ -545,6 +550,15 @@ namespace CultistLike
                 {
                     newCardViz.fragTree.memoryFragment = deck.memoryFragment;
                 }
+
+                if (card.onDraw != null && context.actLogic != null)
+                {
+                    context.actLogic.BranchOut(card.onDraw);
+                }
+            }
+            else if (context != null && drawnFrag is Aspect aspect)
+            {
+                context.scope.Adjust(aspect, 1);
             }
         }
 
@@ -577,15 +591,15 @@ namespace CultistLike
 
         public void Execute(Context context)
         {
-            if (context != null && context.actLogic != null)
+            if (context != null)
             {
                 switch (op)
                 {
                     case TableOp.SpawnAct:
-                        GameManager.Instance.SpawnAct(act, context.scope, context.actLogic.tokenViz);
+                        GameManager.Instance.SpawnAct(act, context.scope, context.Viz);
                         break;
                     case TableOp.SpawnToken:
-                        GameManager.Instance.SpawnToken(act.token, context.scope, context.actLogic.tokenViz);
+                        GameManager.Instance.SpawnToken(act.token, context.scope, context.Viz);
                         break;
                 }
             }

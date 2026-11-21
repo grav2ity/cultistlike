@@ -721,6 +721,8 @@ MonoBehaviour:
   description: {fileID: 1076247044}
   cardName: {fileID: 2133746043}
   fragmentBar: {fileID: 79586703}
+  cardViz: {fileID: 0}
+  lastChange: {fileID: 0}
 --- !u!1 &275062833
 GameObject:
   m_ObjectHideFlags: 0
@@ -804,8 +806,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 652287397}
-        m_TargetAssemblyTypeName: CultistLike.GameManager, Assembly-CSharp
+      - m_Target: {fileID: 1191440417}
+        m_TargetAssemblyTypeName: CultistLike.SaveManager, Assembly-CSharp
         m_MethodName: Load
         m_Mode: 1
         m_Arguments:
@@ -1905,18 +1907,20 @@ MonoBehaviour:
   scaleSpeed: 0.5
   thisAspect: {fileID: 11400000, guid: e32b76eebd1bfe04394bd167e13d81f3, type: 2}
   thisCard: {fileID: 11400000, guid: 061650b8809ec324497d66707b41c540, type: 2}
+  thisMatch: {fileID: 0}
   matchedCards: {fileID: 11400000, guid: 359609367f1923146b1068c9f2375786, type: 2}
   memoryFragment: {fileID: 11400000, guid: 7b2646c88635c0c4e8203394fc991144, type: 2}
   timeScale: 0
   maxTime: 0
   allTime: 0
+  timeSkip: 0
   onCardInPlay:
     m_PersistentCalls:
       m_Calls: []
   _tokens: []
   _windows: []
+  _oneShotActs: []
   _openWindow: {fileID: 0}
-  elapsedTime: 0
 --- !u!1 &655447639
 GameObject:
   m_ObjectHideFlags: 0
@@ -3379,7 +3383,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 911806a9abe035f4eab9861a68031ec9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  idBase: {fileID: 11400000, guid: 27286a647a561ba43b015cd552137587, type: 2}
   fileName: cultist_save.txt
+  saveFrequency: 0
+  maxSaves: 0
+  autoSaveIndex: 0
 --- !u!4 &1191440418
 Transform:
   m_ObjectHideFlags: 0
@@ -4106,6 +4114,7 @@ MonoBehaviour:
   cellCount: {x: 38, y: 38}
   growStep: 3
   array:
+    array: []
     w: 0
     h: 0
 --- !u!114 &1547840998
@@ -5921,8 +5930,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 652287397}
-        m_TargetAssemblyTypeName: CultistLike.GameManager, Assembly-CSharp
+      - m_Target: {fileID: 1191440417}
+        m_TargetAssemblyTypeName: CultistLike.SaveManager, Assembly-CSharp
         m_MethodName: Save
         m_Mode: 1
         m_Arguments:

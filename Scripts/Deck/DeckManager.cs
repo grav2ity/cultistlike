@@ -1,14 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using UnityEngine;
 
 
-
 namespace CultistLike
 {
-    public class DeckManager : MonoBehaviour
+    public class DeckManager : MonoBehaviour, ISerializationCallbackReceiver
     {
-        public static DeckManager Instance { get; private set; }
+        private static DeckManager _instance;
+
+        public static DeckManager Instance
+        {
+            get
+            {
+                if(_instance == null)
+                {
+                    _instance = FindObjectOfType<DeckManager>();
+                }
+
+                return _instance;
+            }
+        }
 
         public List<DeckInst> deckInsts;
 
@@ -30,9 +43,24 @@ namespace CultistLike
             }
         }
 
-        public void Load(List<DeckInst> decks)
+        public List<DeckInstSave> Save()
         {
-            deckInsts = decks;
+            var save = new List<DeckInstSave>();
+            foreach (var deckInst in deckInsts)
+            {
+                save.Add(deckInst.Save());
+            }
+            return save;
+        }
+
+        public void Load(List<DeckInstSave> decks)
+        {
+            deckInsts.Clear();
+            foreach (var deckInstSave in decks)
+            {
+                deckInsts.Add(new DeckInst(deckInstSave));
+            }
+
             decDict.Clear();
             foreach (var deckInst in deckInsts)
             {
@@ -48,9 +76,29 @@ namespace CultistLike
 
         private void Awake()
         {
-            Instance = this;
-
             decDict = new Dictionary<Deck, DeckInst>();
+        }
+
+        //temp stuff for built-in hot reload
+        private List<Deck> decks = new();
+        private List<DeckInst> dInstsList = new();
+
+        public virtual void OnBeforeSerialize()
+        {
+            decks.Clear();
+            dInstsList.Clear();
+            foreach (var kvp in decDict)
+            {
+                decks.Add(kvp.Key);
+                dInstsList.Add(kvp.Value);
+            }
+        }
+
+        public virtual void OnAfterDeserialize()
+        {
+            decDict = new();
+            for (int i = 0; i != Math.Min(decks.Count, dInstsList.Count); i++)
+                decDict.Add(decks[i], dInstsList[i]);
         }
     }
 }

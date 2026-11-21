@@ -15,12 +15,12 @@ namespace CultistLike
         [SerializeField] private TextMeshProUGUI text;
         [SerializeField] private Image image;
 
-        [SerializeField, HideInInspector] private float _duration;
-        [SerializeField, HideInInspector] private float elapsedTime;
+        private float _duration;
+        private float elapsedTime;
 
-        [SerializeField, HideInInspector] private UnityEvent timeUpEvent;
+        public UnityEvent timeUpEvent;
 
-        [SerializeField, HideInInspector] private Timer following;
+        private Timer following;
 
 
         public float timeLeft => following != null ? following.timeLeft : _duration - elapsedTime;
@@ -108,7 +108,7 @@ namespace CultistLike
 
         private void Update()
         {
-            elapsedTime += Time.deltaTime * GameManager.Instance.timeScale;
+            elapsedTime += GameManager.Instance.DeltaTime;
 
             UpdateDisplay(timeLeft);
 

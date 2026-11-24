@@ -112,13 +112,14 @@ namespace CultistLike
         {
             var save = new DeckInstSave()
             {
-                deck = deck.SaveID(),
+                deck = deck != null ? deck.SaveID() : 0,
                 fragments = new()
             };
 
             foreach (var frag in fragments)
             {
-                save.fragments.Add(frag.SaveID());
+                if (frag != null)
+                    save.fragments.Add(frag.SaveID());
             }
 
             return save;

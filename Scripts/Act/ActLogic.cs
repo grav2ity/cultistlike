@@ -289,7 +289,7 @@ namespace CultistLike
                 {
                     using (var context = new Context(this))
                     {
-                        if (AttemptAct(act, context))
+                        if (AttemptAct(act, context, false, false))
                         {
                             passed.Add(act);
                         }
@@ -429,7 +429,7 @@ namespace CultistLike
 
         private Act AttemptNextActs() => AttemptActs(nextActs);
 
-        private bool AttemptAct(Act act, Context context, bool force = false)
+        private bool AttemptAct(Act act, Context context, bool force = false, bool saveMatches = true)
         {
             //TODO correct place?
             if (act.Available == false)
@@ -437,10 +437,10 @@ namespace CultistLike
                 return false;
             }
 
-            context.ResetMatches();
             if (act.Attempt(context, force))
             {
-                context.SaveMatches();
+                if (saveMatches == true)
+                    context.SaveMatches();
                 return true;
             }
             else
@@ -465,6 +465,7 @@ namespace CultistLike
                     {
                         return act;
                     }
+                    context.ResetMatches();
                 }
             }
             return null;
@@ -539,6 +540,9 @@ namespace CultistLike
         {
             if (altAct != null)
             {
+                if (textHistory.Count == 0)
+                    textHistory.Add(new ActText());
+
                 //altAct always changes displayed text even if strings are empty
                 textHistory[textHistory.Count -1].text = GetText(altAct);
                 textHistory[textHistory.Count -1].label = altAct.label;
@@ -548,6 +552,11 @@ namespace CultistLike
 
         private void SwitchFromAlt()
         {
+            //TODO rather lame temp solution
+            Context context = new Context(this);
+            //just to save matches
+            AttemptAct(activeAct, context, true);
+
             textHistory[textHistory.Count -1].text = lastText.text;
             textHistory[textHistory.Count -1].label = lastText.label;
             OnTextChange?.Invoke(textHistory);
@@ -617,7 +626,7 @@ namespace CultistLike
             var save = new ActLogicSave
             {
                 fragSave = fragTree.Save(),
-                callTree = callTree.Save(),
+                callTree = callTree,
                 activeAct = activeAct != null ? activeAct.SaveID() : 0,
                 callbackAct = callbackAct != null ? callbackAct.SaveID() : 0,
                 altAct = altAct != null ? altAct.SaveID() : 0,
@@ -631,7 +640,7 @@ namespace CultistLike
         public void Load(ActLogicSave save)
         {
             fragTree.Load(save.fragSave);
-            callTree.Load(save.callTree);
+            callTree = save.callTree;
             activeAct = save.activeAct.SavedObject<Act>();
             callbackAct = save.callbackAct.SavedObject<Act>();
             altAct = save.altAct.SavedObject<Act>();
@@ -671,38 +680,21 @@ namespace CultistLike
     }
 
     [Serializable]
-    public class CallTree
+    public class CallTree : ISerializationCallbackReceiver
     {
-        public Act act;
+        [NonSerialized] public Act act;
+        public uint actID;
         [SerializeReference] public CallTree parent;
         [SerializeReference] public List<CallTree> children = new();
 
-        public CallTreeSave Save()
+        public void OnBeforeSerialize()
         {
-            var save = new CallTreeSave
-            {
-                act = act.SaveID(),
-                children = new()
-            };
-
-            foreach (var child in children)
-            {
-                save.children.Add(child.Save());
-            }
-            return save;
+            actID = act != null ? act.SaveID() : 0;
         }
 
-        public CallTree Load(CallTreeSave save)
+        public void OnAfterDeserialize()
         {
-            act = save.act.SavedObject<Act>();
-
-            foreach (var savedChild in save.children)
-            {
-                var child = Load(savedChild);
-                child.parent = this;
-                children.Add(child);
-            }
-            return this;
+            act = actID.SavedObject<Act>();
         }
     }
 
@@ -714,17 +706,10 @@ namespace CultistLike
     }
 
     [Serializable]
-    public class CallTreeSave
-    {
-        public uint act;
-        public List<CallTreeSave> children = new();
-    }
-
-    [Serializable]
     public class ActLogicSave
     {
         public FragTreeSave fragSave;
-        public CallTreeSave callTree;
+        public CallTree callTree;
         public uint activeAct;
         public uint callbackAct;
 

@@ -83,7 +83,7 @@ namespace CultistLike
             {
                 duration = decayTime,
                 elapsedTime = elapsedTime,
-                decayTo = decayTo.SaveID(),
+                decayTo = decayTo != null ? decayTo.SaveID() : 0,
                 paused = paused
             };
             return save;

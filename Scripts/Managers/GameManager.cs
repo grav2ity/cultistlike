@@ -351,7 +351,8 @@ namespace CultistLike
             save.oneShotActs = new();
             foreach (var act in _oneShotActs)
             {
-                save.oneShotActs.Add(act.SaveID());
+                if (act != null)
+                    save.oneShotActs.Add(act.SaveID());
             }
 
             var jsonSave = JsonUtility.ToJson(save);

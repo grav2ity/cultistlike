@@ -118,12 +118,13 @@ namespace CultistLike
                 {
                     if (rule != null)
                     {
-                        context.ResetMatches();
-                        rule.Run(context);
+                        using (var context2 = new Context(context))
+                        {
+                            rule.Run(context2);
+                        }
                     }
                 }
             }
-            context?.ResetMatches();
         }
 
         public bool Evaluate(Context context) => Evaluate(context, tests, and, or, invert);

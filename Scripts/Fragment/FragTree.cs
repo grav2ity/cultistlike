@@ -213,11 +213,11 @@ namespace CultistLike
             {
                 if (level > 0)
                 {
-                    while (count++ < level && Add(card) != null);
+                    while (count < level && Add(card) != null) count++;
                 }
                 else if (level < 0)
                 {
-                    while (count-- > level && Remove(card) != null);
+                    while (count > level && Remove(card) != null) count--;
                 }
             }
             return count;

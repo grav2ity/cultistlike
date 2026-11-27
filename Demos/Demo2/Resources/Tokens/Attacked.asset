@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b90be55e95f4914094bbfa9c44b694b, type: 3}
   m_Name: Attacked
   m_EditorClassIdentifier: 
-  label: Attack
-  description: 
+  ID: 0
+  label: Attacked
   art: {fileID: 0}
   color: {r: 0.72955966, g: 0.04568027, b: 0.025236256, a: 1}
+  description: 
+  textRules: []
   slot: {fileID: 0}
   dissolve: 1
   unique: 0

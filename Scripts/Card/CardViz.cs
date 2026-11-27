@@ -126,18 +126,17 @@ namespace CultistLike
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (interactive && faceDown)
+            if (eventData.clickCount == 2)
+            {
+                DoubleClick();
+            }
+            else if (interactive && faceDown)
             {
                 Reverse();
             }
             else
             {
                 UIManager.Instance?.cardInfo?.LoadCard(this);
-            }
-
-            if (eventData.clickCount == 2)
-            {
-                DoubleClick();
             }
         }
 
@@ -337,11 +336,16 @@ namespace CultistLike
                     title.text = title.text.Substring(0, index);
                 }
 
-                title.text = title.text + "\n[" + card.label.Substring(2, card.label.Length - 4) + ']';
+                if (card.label.Length > 4)
+                {
+                    title.text = title.text + "\n[" + card.label.Substring(2, card.label.Length - 4) + ']';
+                }
 
-                cardDecay.StopTimer();
-
-                Decay(this.card, card.lifetime);
+                if (card.lifetime > 0f)
+                {
+                    cardDecay.StopTimer();
+                    Decay(this.card, card.lifetime);
+                }
             }
             else
             {
@@ -534,6 +538,8 @@ namespace CultistLike
                 transform.DOScale(targetScale, GameManager.Instance.scaleSpeed).
                     OnComplete(() =>
                     {
+                        //TODO run all this stuff outside of the OnComplete?
+
                         if (card.onDecayComplete != null)
                         {
                             using (var context = new Context(this))
@@ -634,7 +640,7 @@ namespace CultistLike
         {
             if (card == null)
             {
-                Debug.LogError("Please set Card for " + name);
+                Debug.LogError($"Please set Card for: {name}", this);
             }
 
             DecayDefault();

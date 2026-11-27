@@ -146,7 +146,8 @@ namespace CultistLike
                             }
                             else
                             {
-                                targetCard.Decay(targetCard.card.decayTo, targetCard.card.lifetime);
+                                //TODO update manual
+                                targetCard.Decay(targetCard.card.decayTo, level != 0 ? level : targetCard.card.lifetime);
                             }
                         }
                         break;

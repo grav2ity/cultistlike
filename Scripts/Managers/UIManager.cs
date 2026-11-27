@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEditor;
 using UnityEngine;
 
 
@@ -26,6 +27,14 @@ namespace CultistLike
 
         private int autoSave;
 
+        public static void InspectorSelect(ScriptableObject so)
+        {
+        #if UNITY_EDITOR
+                Selection.activeObject = so;
+                EditorGUIUtility.PingObject(so);
+        #endif
+        }
+
         private void Update()
         {
             if (Input.GetKeyDown("space"))
@@ -35,7 +44,9 @@ namespace CultistLike
 
         #if UNITY_EDITOR
             float axis = Input.GetAxis("Mouse ScrollWheel");
-            if (axis != 0f && Input.GetKey(KeyCode.LeftControl) == true)
+            bool lmButton = Input.GetMouseButtonUp(0);
+
+            if ((axis != 0f || lmButton == true) && Input.GetKey(KeyCode.LeftControl) == true)
             {
                 RaycastHit hit;
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -46,50 +57,60 @@ namespace CultistLike
                     GameManager.Instance.normalSpeed = GameManager.Instance.fastSpeed;
 
                     Transform objectHit = hit.transform;
-                    if (objectHit.gameObject.GetComponentInParent<CardViz>() != null)
-                    {
-                        // Selection.activeGameObject = hit.collider.gameObject;
-                        if (axis < 0f) return;
+                    CardViz cardViz;
+                    SlotViz slotViz;
+                    TokenViz tokenViz;
+                    ActWindow actWindow;
 
-                        var cardViz = objectHit.gameObject.GetComponentInParent<CardViz>();
-                        if (cardViz.interactive == true)
+                    if ((cardViz = objectHit.gameObject.GetComponentInParent<CardViz>()) != null)
+                    {
+                        if (lmButton)
+                            InspectorSelect(cardViz.card);
+                        else if (axis > 0f)
                         {
-                            if (cardViz.decay.enabled == true)
+                            if (cardViz.interactive == true)
                             {
-                                cardViz.decay.TimeUp();
-                            }
-                            else
-                            {
-                                cardViz.DoubleClick();
+                                if (cardViz.decay.enabled == true)
+                                {
+                                    cardViz.decay.TimeUp();
+                                }
+                                else
+                                {
+                                    cardViz.DoubleClick();
+                                }
                             }
                         }
                     }
-                    else if (objectHit.gameObject.GetComponentInParent<SlotViz>() != null)
+                    else if ((slotViz = objectHit.gameObject.GetComponentInParent<SlotViz>()) != null)
                     {
-                        if (axis < 0f) return;
-
-                        var slotViz = objectHit.gameObject.GetComponentInParent<SlotViz>();
-                        foreach (var cardViz in slotViz.MatchingCards())
+                        if (lmButton)
+                            InspectorSelect(slotViz.slot);
+                        else if (axis > 0f)
                         {
-                            if (slotViz.slottedCard == null)
+                            foreach (var cV in slotViz.MatchingCards())
                             {
-                                var cardVizY = cardViz.Yield();
-                                slotViz.Grab(cardVizY, true);
-                                break;
+                                if (slotViz.slottedCard == null)
+                                {
+                                    var cardVizY = cV.Yield();
+                                    slotViz.Grab(cardVizY, true);
+                                    break;
+                                }
                             }
                         }
                     }
-                    else if (objectHit.gameObject.GetComponentInParent<TokenViz>() != null)
+                    else if ((tokenViz = objectHit.gameObject.GetComponentInParent<TokenViz>()) != null)
                     {
-                        if (axis < 0f) return;
-
-                        objectHit.gameObject.GetComponentInParent<TokenViz>().actWindow.FastForward();
+                        if (lmButton)
+                            InspectorSelect(tokenViz.token);
+                        else if (axis > 0f)
+                            tokenViz.actWindow.FastForward();
                     }
-                    else if (objectHit.gameObject.GetComponentInParent<ActWindow>() != null)
+                    else if ((actWindow = objectHit.gameObject.GetComponentInParent<ActWindow>()) != null)
                     {
-                        if (axis < 0f) return;
-
-                        objectHit.gameObject.GetComponentInParent<ActWindow>().FastForward();
+                        if (lmButton)
+                            InspectorSelect(actWindow.act);
+                        else if (axis > 0f)
+                            actWindow.FastForward();
                     }
                     else if (objectHit.gameObject.GetComponentInParent<ArrayTable>() != null)
                     {
@@ -97,15 +118,12 @@ namespace CultistLike
                             GameManager.Instance.timeSkip++;
                         else if (axis < 0f)
                             GameManager.Instance.timeSkip--;
-
-
-
                     }
 
                     GameManager.Instance.normalSpeed = normalSpeed;
                 }
             }
-            else if (axis != 0f && Input.GetKey(KeyCode.LeftShift) == true)
+            else if (axis != 0f && Input.GetKey(KeyCode.LeftAlt) == true)
             {
                 if (axis > 0f)
                     autoSave++;

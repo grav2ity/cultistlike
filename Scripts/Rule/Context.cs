@@ -62,6 +62,7 @@ namespace CultistLike
             if (cardViz != null)
             {
                 thisCard = cardViz;
+                thisAspect = cardViz.card;
             }
         }
 

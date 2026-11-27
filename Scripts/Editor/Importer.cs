@@ -15,6 +15,17 @@ namespace CultistLike
         public Dictionary<string, Slot> slots = new();
         public Dictionary<string, Token> tokens = new();
 
+        static Dictionary<char, List<string>> typeToProps = new Dictionary<char, List<string>>
+        {
+            { 'A', new List<string>{"label", "text", "endText"} },
+            { 'C', new List<string>{"label", "description"} },
+            { 'F', new List<string>{"label", "description"} },
+            { 'R', new List<string>{"text"} },
+            { 'S', new List<string>{"label", "description"} },
+            { 'T', new List<string>{"label", "description"} }
+        };
+
+
         public void OnEntity(char entityType, string fileName, List<string> unnamedProperties,
                         Dictionary<char, string> namedProperties)
         {
@@ -23,80 +34,63 @@ namespace CultistLike
                 return;
             }
 
+            SerializedObject sobj = null;
             switch (entityType)
             {
                 case 'A':
                     if (acts.ContainsKey(fileName))
                     {
-                        if (unnamedProperties.Count > 0)
-                        {
-                            acts[fileName].label = unnamedProperties[0];
-                        }
-                        if (unnamedProperties.Count > 1)
-                        {
-                            acts[fileName].text = unnamedProperties[1];
-                        }
-                        if (unnamedProperties.Count > 2)
-                        {
-                            acts[fileName].endText = unnamedProperties[2];
-                        }
+                        sobj = new SerializedObject(acts[fileName]);
                     }
                     break;
                 case 'C':
                     if (cards.ContainsKey(fileName))
                     {
-                        if (unnamedProperties.Count > 0)
-                        {
-                            cards[fileName].label = unnamedProperties[0];
-                        }
-                        if (unnamedProperties.Count > 1)
-                        {
-                            cards[fileName].description = unnamedProperties[1];
-                        }
+                        sobj = new SerializedObject(cards[fileName]);
                     }
                     break;
                 case 'F':
                     if (aspects.ContainsKey(fileName))
                     {
-                        if (unnamedProperties.Count > 0)
-                        {
-                            aspects[fileName].label = unnamedProperties[0];
-                        }
-                        if (unnamedProperties.Count > 1)
-                        {
-                            aspects[fileName].description = unnamedProperties[1];
-                        }
+                        sobj = new SerializedObject(aspects[fileName]);
                     }
                     break;
                  case 'R':
                     if (rules.ContainsKey(fileName))
                     {
-                        if (unnamedProperties.Count > 0)
-                        {
-                            rules[fileName].text = unnamedProperties[0];
-                        }
+                        sobj = new SerializedObject(rules[fileName]);
                     }
                     break;
                  case 'S':
                     if (slots.ContainsKey(fileName))
                     {
-                        if (unnamedProperties.Count > 0)
-                        {
-                            slots[fileName].description = unnamedProperties[0];
-                        }
+                        sobj = new SerializedObject(slots[fileName]);
                     }
                     break;
                  case 'T':
                     if (tokens.ContainsKey(fileName))
                     {
-                        if (unnamedProperties.Count > 0)
-                        {
-                            tokens[fileName].description = unnamedProperties[0];
-                        }
+                        sobj = new SerializedObject(tokens[fileName]);
                     }
                     break;
             }
 
+            if (sobj != null)
+            {
+                sobj.Update();
+
+                var propNames = typeToProps[entityType];
+                if (propNames != null)
+                {
+                    for (int i=0; i < unnamedProperties.Count && i < propNames.Count; i++)
+                    {
+                        var prop = sobj.FindProperty(propNames[i]);
+                        prop.stringValue = unnamedProperties[i];
+                    }
+                }
+
+                sobj.ApplyModifiedProperties();
+            }
         }
     }
 
@@ -118,17 +112,17 @@ namespace CultistLike
             }
         }
 
-        [MenuItem("Cultistlike/Import Text")]
-        static void ImportText()
+        // [MenuItem("Cultistlike/Import Text")]
+        static public void ImportText(string file)
         {
             CultistAssets assets = new();
 
-            FindAssets<Act>("Act", assets.acts);
-            FindAssets<Aspect>("Aspect", assets.aspects);
-            FindAssets<Card>("Card", assets.cards);
-            FindAssets<Rule>("Rule", assets.rules);
-            FindAssets<Slot>("Slot", assets.slots);
-            FindAssets<Token>("Token", assets.tokens);
+            FindAssets("Act", assets.acts);
+            FindAssets("Aspect", assets.aspects);
+            FindAssets("Card", assets.cards);
+            FindAssets("Rule", assets.rules);
+            FindAssets("Slot", assets.slots);
+            FindAssets("Token", assets.tokens);
 
             var parser = new EntityParser(
                 (char entityType,
@@ -148,7 +142,7 @@ namespace CultistLike
                     assets.OnEntity(entityType, label, unnamedProperties, namedProperties);
             });
 
-            parser.ParseFile("data.txt");
+            parser.ParseFile(file);
         }
     }
 }

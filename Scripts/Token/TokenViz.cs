@@ -71,6 +71,11 @@ namespace CultistLike
             {
                 this.token = token;
                 title.text = token.label;
+                if (token.art != null)
+                {
+                    title.gameObject.SetActive(false);
+                }
+
                 // if (token.art != null)
                 // {
                 //     art.sprite = token.art;
@@ -196,7 +201,7 @@ namespace CultistLike
 
             if (token == null)
             {
-                Debug.LogError("Please set Token for " + this.name);
+                Debug.LogError($"Please set Token for: {name}", this);
             }
 
             //actWindow will be null if object was not loaded

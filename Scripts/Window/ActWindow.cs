@@ -49,6 +49,7 @@ namespace CultistLike
         public Timer timer => _timer;
 
         public FragTree slotsFragTree => slotsFrag;
+        public Act act => actStatus == ActStatus.Running ? actLogic.activeAct : readyAct;
 
         public List<CardViz> cards => actLogic.fragTree.cards;
 
@@ -414,6 +415,11 @@ namespace CultistLike
         public void ForceAct(Act act)
         {
             actLogic.ForceAct(act);
+        }
+
+        public void ForceRule(Rule rule)
+        {
+            actLogic.ForceRule(rule);
         }
 
         public void FastForward()

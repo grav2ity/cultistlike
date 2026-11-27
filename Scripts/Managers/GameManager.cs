@@ -243,9 +243,9 @@ namespace CultistLike
             }
         }
 
-        public TokenViz SpawnAct(Act act, FragTree spawner, Viz viz)
+        public TokenViz SpawnAct(Act act, FragTree spawner, Viz viz, bool force=false)
         {
-            if (act != null && act.token != null && act.Available == true)
+            if (act != null && act.token != null && (force == true || act.Available == true))
             {
                 var newTokenViz = SpawnToken(act.token, spawner, viz);
                 if (newTokenViz != null)

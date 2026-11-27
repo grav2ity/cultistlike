@@ -30,6 +30,12 @@ namespace CultistLike
 
         public void OnPointerClick(PointerEventData eventData)
         {
+        #if UNITY_EDITOR
+            if (Input.GetKey(KeyCode.LeftControl) == true)
+            {
+                UIManager.InspectorSelect(fragment);
+            }
+        #endif
             if (cardViz == null)
             {
                 UIManager.Instance.aspectInfo?.LoadAspect(fragment);
@@ -43,26 +49,29 @@ namespace CultistLike
         public void OnScroll(PointerEventData eventData)
         {
         #if UNITY_EDITOR
-            float scroll = eventData.scrollDelta.y;
-            var cardInfo = GetComponentInParent<CardInfo>();
-            var actWindow = GetComponentInParent<ActWindow>();
-            if (cardInfo != null)
+            if (Input.GetKey(KeyCode.LeftShift) == true)
             {
-                //this needs to be before
-                cardInfo.lastChange = fragment;
+                float scroll = eventData.scrollDelta.y;
+                var cardInfo = GetComponentInParent<CardInfo>();
+                var actWindow = GetComponentInParent<ActWindow>();
+                if (cardInfo != null)
+                {
+                    //this needs to be before
+                    cardInfo.lastChange = fragment;
 
-                if (scroll > 0)
-                    cardInfo.cardViz.fragTree.Add(fragment);
-                else if (scroll < 0)
-                    cardInfo.cardViz.fragTree.Remove(fragment);
+                    if (scroll > 0)
+                        cardInfo.cardViz.fragTree.Add(fragment);
+                    else if (scroll < 0)
+                        cardInfo.cardViz.fragTree.Remove(fragment);
 
-            }
-            else if (actWindow != null)
-            {
-                if (scroll > 0)
-                    actWindow.AddFragment(fragment);
-                else if (scroll < 0)
-                    actWindow.RemoveFragment(fragment);
+                }
+                else if (actWindow != null)
+                {
+                    if (scroll > 0)
+                        actWindow.AddFragment(fragment);
+                    else if (scroll < 0)
+                        actWindow.RemoveFragment(fragment);
+                }
             }
         #endif
         }

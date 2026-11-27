@@ -36,6 +36,7 @@ namespace CultistLike
         [SerializeField, HideInInspector] private List<Act> branchOutActs;
         [SerializeField, HideInInspector] private CallTree callTree;
 
+
         private ActWindow actWindow;
 
 
@@ -119,8 +120,7 @@ namespace CultistLike
 
         public void RunAct(Act act)
         {
-            Debug.Log("Running act: " + act.name);
-            // Debug.Log(tokenViz.name + ": running act: " + act.name);
+            Debug.Log($"Running act: {act.name}", act);
             activeAct = act;
             forceAct = null;
             branchOutActs.Clear();
@@ -243,7 +243,7 @@ namespace CultistLike
         {
             if (altAct != null)
             {
-                Debug.Log("Switched to: " + altAct.name);
+                Debug.Log("Switched to: {altAct.name}", altAct);
                 activeAct = altAct;
             }
 
@@ -261,8 +261,13 @@ namespace CultistLike
                 fragTree.Add(frag);
             }
 
-            ApplyTriggers();
+            //moved Context creation here for better clarity
+            using (var context = new Context(this))
+            {
+                ApplyTriggers(context);
+            }
 
+            //each using scope batches modifier execution
             using (var context = new Context(this, true))
             {
                 activeAct.ApplyModifiers(context);
@@ -271,7 +276,14 @@ namespace CultistLike
             PopulateActList(activeAct?.spawnedActs, spawnedActs);
             foreach (var spawnedAct in spawnedActs)
             {
-                GameManager.Instance.SpawnAct(spawnedAct, fragTree, tokenViz);
+                    //TODO update manual
+                    using (var context = new Context(this))
+                    {
+                        if (AttemptAct(spawnedAct, context, false, false))
+                        {
+                            GameManager.Instance.SpawnAct(spawnedAct, fragTree, tokenViz);
+                        }
+                    }
             }
 
 
@@ -284,21 +296,25 @@ namespace CultistLike
             }
             else if (branchOutActs.Count > 0)
             {
-                List<Act> passed = new();
-                foreach (var act in branchOutActs)
+                List<Act> waiting = new();
+                int i=0;
+                for (; i < branchOutActs.Count; i++)
                 {
                     using (var context = new Context(this))
                     {
-                        if (AttemptAct(act, context, false, false))
-                        {
-                            passed.Add(act);
-                        }
+                        if (AttemptAct(branchOutActs[i], context))
+                            break;
                     }
                 }
 
-                if (passed.Count > 0)
+                if (i < branchOutActs.Count)
                 {
-                    foreach (var act in passed)
+                    waiting =  branchOutActs.GetRange(i, branchOutActs.Count);
+                }
+
+                if (waiting.Count > 0)
+                {
+                    foreach (var act in waiting)
                     {
                         CallTree newCallTree = new()
                         {
@@ -308,11 +324,9 @@ namespace CultistLike
                         callTree.children.Add(newCallTree);
                     }
 
-                    var callTreeN = callTree.children[0];
-                    callTree.children.RemoveAt(0);
-                    callTree = callTreeN;
+                    callTree = callTree.children[0];
 
-                    Debug.Log("Branching out to act: " + callTree.act.name);
+                    Debug.Log($"Branching out to act: {callTree.act.name}", callTree.act);
                     RunAct(callTree.act);
                     return;
                 }
@@ -330,22 +344,24 @@ namespace CultistLike
                 }
             }
 
-            PopulateActList(activeAct?.nextActs, nextActs, activeAct.randomNext);
+            PopulateActList(activeAct.nextActs, nextActs, activeAct.randomNext);
             Act nextAct = AttemptNextActs();
 
             while (nextAct == null && callTree.parent != null)
             {
+                callTree.parent.children.RemoveAt(0);
                 if (callTree.parent.children.Count > 0)
                 {
-                    var callTreeN = callTree.parent.children[0];
-                    callTree.parent.children.RemoveAt(0);
-                    callTree = callTreeN;
-                    nextAct = callTree.act;
+                    callTree = callTree.parent.children[0];
 
-                    Debug.Log("Branching out to act: " + nextAct.name);
-                    Context context = new Context(this);
-                    //just to save matches
-                    AttemptAct(nextAct, context, true);
+                    using (var context = new Context(this))
+                    {
+                        if (AttemptAct(callTree.act, context))
+                        {
+                            nextAct = callTree.act;
+                            Debug.Log($"Branching out to act: {callTree.act.name}", callTree.act);
+                        }
+                    }
                 }
                 else
                 {
@@ -369,9 +385,7 @@ namespace CultistLike
 
         public void ForceAct(Act act)
         {
-            Context context = new Context(this);
-            //just to save matches
-            AttemptAct(act, context, true);
+            MakeMatches(act);
 
             callTree = new();
             branchOutActs.Clear();
@@ -431,7 +445,7 @@ namespace CultistLike
 
         private bool AttemptAct(Act act, Context context, bool force = false, bool saveMatches = true)
         {
-            //TODO correct place?
+            //TODO correct place and what about force
             if (act.Available == false)
             {
                 return false;
@@ -471,6 +485,14 @@ namespace CultistLike
             return null;
         }
 
+        //make matchCards list for acts that were not attempted or need update
+        private void MakeMatches(Act act)
+        {
+            Context context = new Context(this);
+            //just to save matches
+            AttemptAct(act, context, true);
+        }
+
         public void InjectTriggers(Target target)
         {
             if (target != null)
@@ -500,7 +522,11 @@ namespace CultistLike
                 context.thisAspect = cardViz.card;
                 foreach (var rule in cardViz.card.rules)
                 {
-                    if (rule) rule.Run(context);
+                    if (rule)
+                    {
+                        rule.Run(context);
+                        context.ResetMatches();
+                    }
                 }
             }
         }
@@ -512,27 +538,28 @@ namespace CultistLike
                 context.thisAspect = fragment;
                 foreach (var rule in fragment.rules)
                 {
-                    if (rule) rule.Run(context);
+                    if (rule)
+                    {
+                        rule.Run(context);
+                        context.ResetMatches();
+                    }
                 }
             }
         }
 
-        private void ApplyTriggers()
+        private void ApplyTriggers(Context context)
         {
-            using (var context = new Context(this))
+            foreach (var cardViz in context.scope.cards)
             {
-                foreach (var cardViz in context.scope.cards)
-                {
-                    ApplyCardTriggers(context, cardViz);
+                ApplyCardTriggers(context, cardViz);
 
-                }
-                context.thisCard = null;
-                //TODO each fragment type gets only one trigger
-                //which is or isn't a desired behaviour?
-                foreach (var frag in context.scope.fragments)
-                {
-                    ApplyAspectTriggers(context, frag.fragment);
-                }
+            }
+            context.thisCard = null;
+            //TODO each fragment type gets only one trigger
+            //which is or isn't a desired behaviour?
+            foreach (var frag in context.scope.fragments)
+            {
+                ApplyAspectTriggers(context, frag.fragment);
             }
         }
 
@@ -553,9 +580,7 @@ namespace CultistLike
         private void SwitchFromAlt()
         {
             //TODO rather lame temp solution
-            Context context = new Context(this);
-            //just to save matches
-            AttemptAct(activeAct, context, true);
+            MakeMatches(activeAct);
 
             textHistory[textHistory.Count -1].text = lastText.text;
             textHistory[textHistory.Count -1].label = lastText.label;
@@ -623,6 +648,7 @@ namespace CultistLike
 
         public ActLogicSave Save()
         {
+            callTree.Root().Traverse(ct => ct.actID = ct.act != null ? ct.act.SaveID() : 0);
             var save = new ActLogicSave
             {
                 fragSave = fragTree.Save(),
@@ -633,7 +659,6 @@ namespace CultistLike
                 lastText = lastText,
                 textHistory = textHistory
             };
-
             return save;
         }
 
@@ -641,6 +666,7 @@ namespace CultistLike
         {
             fragTree.Load(save.fragSave);
             callTree = save.callTree;
+            callTree.Root().Traverse(ct => ct.act = ct.actID.SavedObject<Act>());
             activeAct = save.activeAct.SavedObject<Act>();
             callbackAct = save.callbackAct.SavedObject<Act>();
             altAct = save.altAct.SavedObject<Act>();
@@ -680,21 +706,27 @@ namespace CultistLike
     }
 
     [Serializable]
-    public class CallTree : ISerializationCallbackReceiver
+    public class CallTree
     {
-        [NonSerialized] public Act act;
+        public Act act;
         public uint actID;
         [SerializeReference] public CallTree parent;
         [SerializeReference] public List<CallTree> children = new();
 
-        public void OnBeforeSerialize()
+        public void Traverse(Action<CallTree> a)
         {
-            actID = act != null ? act.SaveID() : 0;
+            a(this);
+            foreach (var child in children)
+            {
+                child.Traverse(a);
+            }
         }
 
-        public void OnAfterDeserialize()
+        public CallTree Root()
         {
-            act = actID.SavedObject<Act>();
+            var root = this;
+            while (root.parent != null) root = root.parent;
+            return root;
         }
     }
 
